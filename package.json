@@ -1,0 +1,24 @@
+{
+  "name": "node-flydrive",
+  "version": "0.1.0",
+  "description": "Flexible and Fluent way to manage ACL in Node.js.",
+  "keywords": [
+    "filesystem",
+    "file",
+    "aws",
+    "s3"
+  ],
+  "author": "Romain Lanz <romain.lanz@slynova.ch>",
+  "license": "MIT",
+  "main": "src/StorageManager.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Slynova-Org/node-flydrive"
+  },
+  "bugs": {
+    "url": "https://github.com/Slynova-Org/node-flydrive/issues"
+  },
+  "dependencies": {
+    "node-exceptions": "^1.0.3"
+  }
+}
