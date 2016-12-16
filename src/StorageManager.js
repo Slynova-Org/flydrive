@@ -37,7 +37,13 @@ class StorageManager {
     this.disks = []
     this.customDrivers = []
 
-    this.__call()
+    publicApi.forEach(method => {
+      this[method] = function () {
+        const args = arguments
+        const driver = this.disk()
+        return driver[method].apply(driver, args)
+      }
+    })
   }
 
   /**
@@ -63,18 +69,6 @@ class StorageManager {
     name = name || this._getDefaultDriver()
 
     return this.disks[name] = this._get(name)
-  }
-
-  /**
-   * Proxy all storage method to the default driver.
-   */
-  __call () {
-    publicApi.forEach(method => {
-      this[method] = () => {
-        const driver = this.disk()
-        return driver[method].apply(driver, arguments)
-      }
-    })
   }
 
   /**

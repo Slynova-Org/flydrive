@@ -28,6 +28,16 @@ class Storage {
     return yield this.driver.exists(path)
   }
 
+  /**
+   * Get the content of a file.
+   *
+   * @param  {string}  path
+   * @return {Buffer}
+   */
+  * get (path) {
+    return yield this.driver.get(path)
+  }
+
 }
 
 module.exports = Storage

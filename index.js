@@ -7,5 +7,6 @@ const StorageManager = require('./src/StorageManager')
 const storage = new StorageManager(config)
 
 co(function* () {
-  console.log(yield storage.disk('local').exists('index.js'))
+  const file = yield storage.get('index.js')
+  console.log(file.toString())
 })

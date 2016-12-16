@@ -9,6 +9,7 @@
 
 const fs = require('mz/fs')
 const path = require('path')
+const FileNotFound = require('../Exceptions/FileNotFound')
 
 class LocalFileSystem {
 
@@ -31,6 +32,21 @@ class LocalFileSystem {
       return true
     } catch (e) {
       if ('ENOENT' === e.code) return false
+      throw e
+    }
+  }
+
+  /**
+   * Get the content of a file.
+   *
+   * @param  {string}  path
+   * @return {Buffer}
+   */
+  * get (path) {
+    try {
+      return yield fs.readFile(this._fullPath(path))
+    } catch (e) {
+      if ('ENOENT' === e.code) throw FileNotFound.file(path)
       throw e
     }
   }
