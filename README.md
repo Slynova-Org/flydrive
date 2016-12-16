@@ -60,6 +60,7 @@ co(function* () {
 
 Any pull requests or discussions are welcome.<br>
 Note that every pull request providing new feature or correcting a bug should be created with appropriate unit tests.
+
 <br>
 ## Change Logs
 
