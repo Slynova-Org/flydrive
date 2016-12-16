@@ -106,7 +106,27 @@ class LocalFileSystem {
       yield fs.unlink(this._fullPath(path))
       return true
     } catch (e) {
-      console.log(e)
+      throw e
+    }
+  }
+
+  /**
+   * Move a file to a new location.
+   *
+   * @param  {string}  path
+   * @param  {string}  target
+   * @return {boolean}
+   */
+  * move (oldPath, target) {
+    try {
+      yield fs.rename(this._fullPath(oldPath), this._fullPath(target))
+      return true
+    } catch (e) {
+      if ('ENOENT' === e.code) {
+        yield fs.mkdir(path.dirname(this._fullPath(target)))
+        yield this.move(oldPath, target)
+      }
+      throw e
     }
   }
 

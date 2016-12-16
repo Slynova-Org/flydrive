@@ -82,6 +82,17 @@ class Storage {
     return yield this.driver.delete(path)
   }
 
+  /**
+   * Move a file to a new location.
+   *
+   * @param  {string}  path
+   * @param  {string}  target
+   * @return {boolean}
+   */
+  * move (path, target) {
+    return yield this.driver.move(path, target)
+  }
+
 }
 
 module.exports = Storage
