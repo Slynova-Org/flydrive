@@ -64,6 +64,38 @@ class LocalFileSystem {
   }
 
   /**
+   * Prepend the content into a file.
+   *
+   * @param  {string}  path
+   * @param  {string}  content
+   * @return {boolean}
+   */
+  * prepend (path, content) {
+    if (yield this.exists(path)) {
+      const actualContent = (yield this.get(path)).toString()
+      return yield this.put(path, `${content}${actualContent}`)
+    }
+
+    return yield this.put(path, content)
+  }
+
+  /**
+   * Append the content into a file.
+   *
+   * @param  {string}  path
+   * @param  {string}  content
+   * @return {boolean}
+   */
+  * append (path, content) {
+    if (yield this.exists(path)) {
+      const actualContent = (yield this.get(path)).toString()
+      return yield this.put(path, `${actualContent}${content}`)
+    }
+
+    return yield this.put(path, content)
+  }
+
+  /**
    * Compute a path to a fully qualified path.
    *
    * @param  {string}  relativePath

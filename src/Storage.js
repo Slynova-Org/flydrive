@@ -50,6 +50,28 @@ class Storage {
     return yield this.driver.put(path, content)
   }
 
+  /**
+   * Prepend the content into a file.
+   *
+   * @param  {string}  path
+   * @param  {string}  content
+   * @return {boolean}
+   */
+  * prepend (path, content) {
+    return yield this.driver.prepend(path, content)
+  }
+
+  /**
+   * Append the content into a file.
+   *
+   * @param  {string}  path
+   * @param  {string}  content
+   * @return {boolean}
+   */
+  * append (path, content) {
+    return yield this.driver.append(path, content)
+  }
+
 }
 
 module.exports = Storage
