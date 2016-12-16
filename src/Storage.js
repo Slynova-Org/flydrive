@@ -38,6 +38,18 @@ class Storage {
     return yield this.driver.get(path)
   }
 
+
+  /**
+   * Write the content into a file.
+   *
+   * @param  {string}  path
+   * @param  {string}  content
+   * @return {boolean}
+   */
+  * put (path, content) {
+    return yield this.driver.put(path, content)
+  }
+
 }
 
 module.exports = Storage

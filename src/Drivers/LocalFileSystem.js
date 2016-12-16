@@ -52,6 +52,18 @@ class LocalFileSystem {
   }
 
   /**
+   * Write the content into a file.
+   *
+   * @param  {string}  path
+   * @param  {string}  content
+   * @return {boolean}
+   */
+  * put (path, content) {
+    yield fs.writeFile(this._fullPath(path), content)
+    return true
+  }
+
+  /**
    * Compute a path to a fully qualified path.
    *
    * @param  {string}  relativePath

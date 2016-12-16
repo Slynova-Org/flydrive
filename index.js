@@ -7,6 +7,6 @@ const StorageManager = require('./src/StorageManager')
 const storage = new StorageManager(config)
 
 co(function* () {
-  const file = yield storage.get('index.js')
-  console.log(file.toString())
+  const file = yield storage.put('test.js', 'Hello World')
+  console.log(file)
 })
