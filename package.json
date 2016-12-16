@@ -1,8 +1,9 @@
 {
   "name": "node-flydrive",
-  "version": "0.1.0",
-  "description": "Flexible and Fluent way to manage ACL in Node.js.",
+  "version": "0.0.0-alpha",
+  "description": "Flexible and Fluent way to manage storage in Node.js.",
   "keywords": [
+    "storage",
     "filesystem",
     "file",
     "aws",
