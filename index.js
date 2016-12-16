@@ -1,13 +1,11 @@
 'use strict'
 
+const co = require('co')
 const config = require('./tests/stubs/config')
 const StorageManager = require('./src/StorageManager')
 
 const storage = new StorageManager(config)
 
-storage.extend('myDriver', function (config) {
-  console.log(config)
-  console.log('custom')
+co(function* () {
+  yield storage.exists('index.js')
 })
-
-storage.disk('local')

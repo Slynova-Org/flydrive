@@ -19,6 +19,7 @@
     "url": "https://github.com/Slynova-Org/node-flydrive/issues"
   },
   "dependencies": {
+    "co": "^4.6.0",
     "node-exceptions": "^1.0.3"
   }
 }

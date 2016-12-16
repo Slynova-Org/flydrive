@@ -2,6 +2,10 @@
 # yarn lockfile v1
 
 
+co@^4.6.0:
+  version "4.6.0"
+  resolved "https://registry.yarnpkg.com/co/-/co-4.6.0.tgz#6ea6bdf3d853ae54ccb8e47bfa0bf3f9031fb184"
+
 node-exceptions@^1.0.3:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/node-exceptions/-/node-exceptions-1.0.3.tgz#625a797b92cbe8dd5bd0ae54e93571b7ded90b15"
