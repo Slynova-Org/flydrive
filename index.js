@@ -7,6 +7,6 @@ const StorageManager = require('./src/StorageManager')
 const storage = new StorageManager(config)
 
 co(function* () {
-  const file = yield storage.append('test.js', 'pr00t')
+  const file = yield storage.delete('test.js')
   console.log(file)
 })

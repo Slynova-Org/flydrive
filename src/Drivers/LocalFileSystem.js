@@ -87,12 +87,27 @@ class LocalFileSystem {
    * @return {boolean}
    */
   * append (path, content) {
-    if (yield this.exists(path)) {
-      const actualContent = (yield this.get(path)).toString()
-      return yield this.put(path, `${actualContent}${content}`)
+    try {
+      yield fs.appendFile(this._fullPath(path), content)
+      return true
+    } catch (e) {
+      throw e
     }
+  }
 
-    return yield this.put(path, content)
+  /**
+   * Delete the file.
+   *
+   * @param  {string}  path
+   * @return {boolean}
+   */
+  * delete (path) {
+    try {
+      yield fs.unlink(this._fullPath(path))
+      return true
+    } catch (e) {
+      console.log(e)
+    }
   }
 
   /**

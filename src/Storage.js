@@ -72,6 +72,16 @@ class Storage {
     return yield this.driver.append(path, content)
   }
 
+  /**
+   * Delete the file.
+   *
+   * @param  {string}  path
+   * @return {boolean}
+   */
+  * delete (path) {
+    return yield this.driver.delete(path)
+  }
+
 }
 
 module.exports = Storage
