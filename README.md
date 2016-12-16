@@ -28,10 +28,12 @@
 ## Getting Started
 
 This package is available in the Node Package Repository.<br>
-It can easily be installed with `npm`.
+It can easily be installed with `npm` or `yarn`.
 
 ```bash
 $ npm i --save node-flydrive
+# or
+$ yarn add node-flydrive
 ```
 
 When you require the package in your file, it will give you access to the `StorageManager` class.<br>
@@ -41,18 +43,6 @@ This class is a facade for the package and should be instantiated with a [config
 ```javascript
 const StorageManager = require('node-flydrive')
 const storage = new StorageManager(config)
-
-// Note that we are using co to run this code.
-// @see https://github.com/tj/co
-co(function* () {
-  // Use the default disk.
-  const file = yield storage.get('storage/logs.txt')
-  console.log(file.toString())
-
-  // Specify wich disk you want to use.
-  const file = yield storage.disk('local').get('storage/logs.txt')
-  console.log(file.toString())
-})
 ```
 
 <br>
