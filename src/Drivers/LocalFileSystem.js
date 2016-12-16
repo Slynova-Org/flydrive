@@ -7,7 +7,8 @@
  * @copyright Slynova - Romain Lanz <romain.lanz@slynova.ch>
  */
 
-const fs = require('fs')
+const fs = require('mz/fs')
+const path = require('path')
 
 class LocalFileSystem {
 
@@ -26,22 +27,22 @@ class LocalFileSystem {
    */
   * exists (path) {
     try {
-      yield fs.access(path, fs.constants.R_OK)
-      console.log('exists')
+      yield fs.access(this._fullPath(path))
       return true
     } catch (e) {
-      console.log('dont exists')
+      if ('ENOENT' === e.code) return false
+      throw e
     }
   }
 
   /**
    * Compute a path to a fully qualified path.
    *
-   * @param  {string}  path
+   * @param  {string}  relativePath
    * @return {string}
    */
-  _fullPath (path) {
-
+  _fullPath (relativePath) {
+    return path.join(this.root, relativePath)
   }
 
 }

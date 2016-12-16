@@ -20,6 +20,7 @@
   },
   "dependencies": {
     "co": "^4.6.0",
+    "mz": "^2.6.0",
     "node-exceptions": "^1.0.3"
   }
 }

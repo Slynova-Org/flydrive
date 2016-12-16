@@ -2,7 +2,7 @@
 
 /**
  * node-flydrive
- * 
+ *
  * @license MIT
  * @copyright Slynova - Romain Lanz <romain.lanz@slynova.ch>
  */
@@ -14,7 +14,7 @@ module.exports = {
    | Default Filesystem Disk
    |--------------------------------------------------------------------------
    |
-   | 
+   |
    |
    |
    */
@@ -25,7 +25,7 @@ module.exports = {
    | Filesystem Disks
    |--------------------------------------------------------------------------
    |
-   |  
+   |
    |
    | Supported: "local", "s3"
    |
@@ -34,7 +34,7 @@ module.exports = {
 
     'local': {
       'driver': 'local',
-      'root': ''
+      'root': process.cwd()
     },
 
     's3': {
