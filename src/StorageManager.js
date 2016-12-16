@@ -20,9 +20,6 @@ const publicApi = [
   'delete',
   'move',
   'copy',
-  'url',
-  'size',
-  'lastModified',
 ]
 
 class StorageManager {
