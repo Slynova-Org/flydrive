@@ -54,13 +54,21 @@ class LocalFileSystem {
   /**
    * Write the content into a file.
    *
-   * @param  {string}  path
+   * @param  {string}  target
    * @param  {string}  content
    * @return {boolean}
    */
-  * put (path, content) {
-    yield fs.writeFile(this._fullPath(path), content)
-    return true
+  * put (target, content) {
+    try {
+      yield fs.writeFile(this._fullPath(target), content)
+      return true
+    } catch (e) {
+      if ('ENOENT' === e.code) {
+        yield fs.mkdir(path.dirname(this._fullPath(target)))
+        yield this.put(target, content)
+      }
+      throw e
+    }
   }
 
   /**
@@ -113,7 +121,7 @@ class LocalFileSystem {
   /**
    * Move a file to a new location.
    *
-   * @param  {string}  path
+   * @param  {string}  oldPath
    * @param  {string}  target
    * @return {boolean}
    */
@@ -126,6 +134,23 @@ class LocalFileSystem {
         yield fs.mkdir(path.dirname(this._fullPath(target)))
         yield this.move(oldPath, target)
       }
+      throw e
+    }
+  }
+
+  /**
+   * Copy a file to a location.
+   *
+   * @param  {string}  path
+   * @param  {string}  target
+   * @return {boolean}
+   */
+  * copy (path, target) {
+    try {
+      fs.createReadStream(this._fullPath(path))
+        .pipe(fs.createWriteStream(this._fullPath(target)))
+      return true
+    } catch (e) {
       throw e
     }
   }

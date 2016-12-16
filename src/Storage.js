@@ -85,12 +85,23 @@ class Storage {
   /**
    * Move a file to a new location.
    *
+   * @param  {string}  oldPath
+   * @param  {string}  target
+   * @return {boolean}
+   */
+  * move (oldPath, target) {
+    return yield this.driver.move(oldPath, target)
+  }
+
+  /**
+   * Copy a file to a location.
+   *
    * @param  {string}  path
    * @param  {string}  target
    * @return {boolean}
    */
-  * move (path, target) {
-    return yield this.driver.move(path, target)
+  * copy (path, target) {
+    return yield this.driver.copy(path, target)
   }
 
 }
