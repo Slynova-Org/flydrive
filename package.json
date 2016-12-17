@@ -24,6 +24,7 @@
     "node-exceptions": "^1.0.3"
   },
   "devDependencies": {
+    "aws-sdk": "^2.7.15",
     "co": "^4.6.0"
   }
 }

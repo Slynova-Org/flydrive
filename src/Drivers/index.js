@@ -2,6 +2,7 @@
 
 module.exports = {
 
-  local: require('./LocalFileSystem')
+  local: require('./LocalFileSystem'),
+  s3: require('./AwsS3')
 
 }
