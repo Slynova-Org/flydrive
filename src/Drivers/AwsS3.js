@@ -40,6 +40,21 @@ class AwsS3 {
     })
   }
 
+  /**
+   * Get the content of a file.
+   *
+   * @param  {string}  path
+   * @return {Buffer}
+   */
+  * get (path) {
+    return new Promise((resolve, reject) => {
+      this.s3.getObject({ Bucket: this.bucket, Key: path }, (err, data) => {
+        if (err) return reject(err)
+        return resolve(data.Body)
+      })
+    })
+  }
+
 }
 
 module.exports = AwsS3
