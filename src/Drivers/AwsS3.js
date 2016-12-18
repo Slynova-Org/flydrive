@@ -55,6 +55,22 @@ class AwsS3 {
     })
   }
 
+  /**
+   * Write the content into a file.
+   *
+   * @param  {string}  path
+   * @param  {string}  content
+   * @return {string}
+   */
+  * put (path, content) {
+    return new Promise((resolve, reject) => {
+      this.s3.upload({ Bucket: this.bucket, Key: path, Body: content }, (err, data) => {
+        if (err) return reject(err)
+        return resolve(data.Location)
+      })
+    })
+  }
+
 }
 
 module.exports = AwsS3
