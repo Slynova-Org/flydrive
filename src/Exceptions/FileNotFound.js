@@ -12,3 +12,5 @@ class FileNotFound extends NE.RuntimeException {
   }
 
 }
+
+module.exports = FileNotFound

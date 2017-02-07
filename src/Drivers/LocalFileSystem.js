@@ -31,7 +31,7 @@ class LocalFileSystem {
       yield fs.access(this._fullPath(path))
       return true
     } catch (e) {
-      if ('ENOENT' === e.code) return false
+      if (e.code === 'ENOENT') return false
       throw e
     }
   }
@@ -46,7 +46,7 @@ class LocalFileSystem {
     try {
       return yield fs.readFile(this._fullPath(path))
     } catch (e) {
-      if ('ENOENT' === e.code) throw FileNotFound.file(path)
+      if (e.code === 'ENOENT') throw FileNotFound.file(path)
       throw e
     }
   }
@@ -63,7 +63,7 @@ class LocalFileSystem {
       yield fs.writeFile(this._fullPath(target), content)
       return true
     } catch (e) {
-      if ('ENOENT' === e.code) {
+      if (e.code === 'ENOENT') {
         yield fs.mkdir(path.dirname(this._fullPath(target)))
         yield this.put(target, content)
       }
@@ -130,7 +130,7 @@ class LocalFileSystem {
       yield fs.rename(this._fullPath(oldPath), this._fullPath(target))
       return true
     } catch (e) {
-      if ('ENOENT' === e.code) {
+      if (e.code === 'ENOENT') {
         yield fs.mkdir(path.dirname(this._fullPath(target)))
         yield this.move(oldPath, target)
       }

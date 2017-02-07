@@ -35,9 +35,12 @@ class Storage {
    * @return {Buffer}
    */
   * get (path) {
-    return yield this.driver.get(path)
+    try {
+      return yield this.driver.get(path)
+    } catch (e) {
+      console.log(e)
+    }
   }
-
 
   /**
    * Write the content into a file.

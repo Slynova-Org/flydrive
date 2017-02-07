@@ -44,6 +44,12 @@ This class is a facade for the package and should be instantiated with a [config
 const StorageManager = require('node-flydrive')
 const storage = new StorageManager(config)
 ```
+<br>
+
+There's currently 2 available drivers:
+
+* Local
+* Amazon S3
 
 <br>
 ## Contribution Guidelines

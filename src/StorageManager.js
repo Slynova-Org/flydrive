@@ -14,12 +14,13 @@ const DriverNotSupported = require('./Exceptions/DriverNotSupported')
 const publicApi = [
   'exists',
   'get',
+  'getStream',
   'put',
   'prepend',
   'append',
   'delete',
   'move',
-  'copy',
+  'copy'
 ]
 
 class StorageManager {
@@ -64,8 +65,9 @@ class StorageManager {
    */
   disk (name) {
     name = name || this._getDefaultDriver()
+    this.disks[name] = this._get(name)
 
-    return this.disks[name] = this._get(name)
+    return this.disks[name]
   }
 
   /**
