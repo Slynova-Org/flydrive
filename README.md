@@ -20,6 +20,8 @@
 
 ## Table of Contents
 
+[![Greenkeeper badge](https://badges.greenkeeper.io/Slynova-Org/node-flydrive.svg)](https://greenkeeper.io/)
+
  * [Getting Started](#getting-started)
  * [Contribution Guidelines](#contribution-guidelines)
  * [Change Logs](#change-logs)
