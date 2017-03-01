@@ -22,6 +22,6 @@
   "dependencies": {
     "mz": "^2.6.0",
     "node-exceptions": "^1.0.3",
-    "aws-sdk": "^2.20.0"
+    "aws-sdk": "^2.22.0"
   }
 }
