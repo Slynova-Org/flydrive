@@ -39,10 +39,10 @@ module.exports = {
 
     's3': {
       'driver': 's3',
-      'key': 'YOUR_KEY',
-      'secret': 'YOUR_SECRET',
-      'region': 'YOUR_REGION',
-      'bucket': 'YOUR_BUCKET'
+      'key': 'AWS_S3_KEY',
+      'secret': 'AWS_S3_SECRET',
+      'region': 'AWS_S3_REGION',
+      'bucket': 'AWS_S3_BUCKET'
     }
 
   }
