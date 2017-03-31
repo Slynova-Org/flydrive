@@ -18,13 +18,6 @@
 <hr>
 <br>
 
-## Table of Contents
-
- * [Getting Started](#getting-started)
- * [Contribution Guidelines](#contribution-guidelines)
- * [Change Logs](#change-logs)
-
-<br>
 ## Getting Started
 
 This package is available in the Node Package Repository.<br>
@@ -44,6 +37,7 @@ This class is a facade for the package and should be instantiated with a [config
 const StorageManager = require('node-flydrive')
 const storage = new StorageManager(config)
 ```
+
 <br>
 
 There's currently 2 available drivers:
@@ -52,12 +46,8 @@ There's currently 2 available drivers:
 * Amazon S3 (You need to install `aws-sdk` package to be able to use this driver)
 
 <br>
+
 ## Contribution Guidelines
 
 Any pull requests or discussions are welcome.<br>
 Note that every pull request providing new feature or correcting a bug should be created with appropriate unit tests.
-
-<br>
-## Change Logs
-
-Nothing will be wrote here before the release of the first version.
