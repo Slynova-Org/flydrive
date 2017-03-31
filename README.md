@@ -49,7 +49,7 @@ const storage = new StorageManager(config)
 There's currently 2 available drivers:
 
 * Local
-* Amazon S3
+* Amazon S3 (You need to install `aws-sdk` package to be able to use this driver)
 
 <br>
 ## Contribution Guidelines

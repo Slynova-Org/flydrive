@@ -21,7 +21,10 @@
   },
   "dependencies": {
     "mz": "^2.6.0",
-    "node-exceptions": "^2.0.0",
-    "aws-sdk": "^2.28.0"
+    "node-exceptions": "^2.0.0"
+  },
+  "devDependencies": {
+    "japa": "^1.0.1",
+    "require-all": "^2.2.0"
   }
 }
