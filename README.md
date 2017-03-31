@@ -31,19 +31,18 @@ $ yarn add node-flydrive
 
 When you require the package in your file, it will give you access to the `StorageManager` class.<br>
 This class is a facade for the package and should be instantiated with a [configuration object](https://github.com/Slynova-Org/node-flydrive/blob/master/tests/stubs/config.js).
-<br>
 
 ```javascript
 const StorageManager = require('node-flydrive')
 const storage = new StorageManager(config)
 ```
 
-<br>
-
 There's currently 2 available drivers:
 
 * Local
 * Amazon S3 (You need to install `aws-sdk` package to be able to use this driver)
+
+:point_right: [Read the Official Documentation](https://github.com/Slynova-Org/node-flydrive/wiki)
 
 <br>
 
