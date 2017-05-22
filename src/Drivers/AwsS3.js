@@ -1,5 +1,3 @@
-'use strict'
-
 /**
  * node-flydrive
  *
@@ -31,7 +29,7 @@ class AwsS3 {
    * @param  {string}  path
    * @return {boolean}
    */
-  * exists (path) {
+  async exists (path) {
     return new Promise((resolve, reject) => {
       this.s3.headObject({ Bucket: this.bucket, Key: path }, (err, data) => {
         if (err.code === 'NotFound') resolve(false)
@@ -47,7 +45,7 @@ class AwsS3 {
    * @param  {string}  path
    * @return {Buffer}
    */
-  * get (path) {
+  async get (path) {
     return new Promise((resolve, reject) => {
       this.s3.getObject({ Bucket: this.bucket, Key: path }, (err, data) => {
         if (err) {
@@ -66,7 +64,7 @@ class AwsS3 {
    * @param  {string}  content
    * @return {string}
    */
-  * put (path, content) {
+  async put (path, content) {
     return new Promise((resolve, reject) => {
       this.s3.upload({ Bucket: this.bucket, Key: path, Body: content }, (err, data) => {
         if (err) return reject(err)
@@ -82,7 +80,7 @@ class AwsS3 {
    * @param  {string}  content
    * @return {boolean}
    */
-  * prepend (path, content) {
+  async prepend (path, content) {
     throw MethodNotSupported.method('prepend', 's3')
   }
 
@@ -93,8 +91,8 @@ class AwsS3 {
    * @param  {string}  content
    * @return {boolean}
    */
-  * append (path, content) {
-    throw MethodNotSupported.method('prepend', 's3')
+  async append (path, content) {
+    throw MethodNotSupported.method('append', 's3')
   }
 
   /**
@@ -103,7 +101,7 @@ class AwsS3 {
    * @param  {string}  path
    * @return {boolean}
    */
-  * delete (path) {
+  async delete (path) {
     return new Promise((resolve, reject) => {
       this.s3.deleteObject({ Bucket: this.bucket, Key: path }, (err, data) => {
         if (err) return reject(err)
@@ -119,11 +117,11 @@ class AwsS3 {
    * @param  {string}  target
    * @return {boolean}
    */
-  * move (oldPath, target) {
+  async move (oldPath, target) {
     try {
-      yield this.copy(oldPath, target)
-      yield this.delete(oldPath)
-      
+      await this.copy(oldPath, target)
+      await this.delete(oldPath)
+
       return true
     } catch (e) {
       console.log(e)
@@ -137,7 +135,7 @@ class AwsS3 {
    * @param  {string}  target
    * @return {boolean}
    */
-  * copy (path, target) {
+  async copy (path, target) {
     return new Promise((resolve, reject) => {
       this.s3.copyObject({ Bucket: this.bucket, CopySource: `${this.bucket}/${path}`, Key: target }, (err, data) => {
         if (err) return reject(err)

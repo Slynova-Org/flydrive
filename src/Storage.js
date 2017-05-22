@@ -1,5 +1,3 @@
-'use strict'
-
 /**
  * node-flydrive
  *
@@ -24,8 +22,8 @@ class Storage {
    * @param  {string}  path
    * @return {boolean}
    */
-  * exists (path) {
-    return yield this.driver.exists(path)
+  async exists (path) {
+    return await this.driver.exists(path)
   }
 
   /**
@@ -34,9 +32,9 @@ class Storage {
    * @param  {string}  path
    * @return {Buffer}
    */
-  * get (path) {
+  async get (path) {
     try {
-      return yield this.driver.get(path)
+      return await this.driver.get(path)
     } catch (e) {
       console.log(e)
     }
@@ -49,8 +47,8 @@ class Storage {
    * @param  {string}  content
    * @return {boolean}
    */
-  * put (path, content) {
-    return yield this.driver.put(path, content)
+  async put (path, content) {
+    return await this.driver.put(path, content)
   }
 
   /**
@@ -60,8 +58,8 @@ class Storage {
    * @param  {string}  content
    * @return {boolean}
    */
-  * prepend (path, content) {
-    return yield this.driver.prepend(path, content)
+  async prepend (path, content) {
+    return await this.driver.prepend(path, content)
   }
 
   /**
@@ -71,8 +69,8 @@ class Storage {
    * @param  {string}  content
    * @return {boolean}
    */
-  * append (path, content) {
-    return yield this.driver.append(path, content)
+  async append (path, content) {
+    return await this.driver.append(path, content)
   }
 
   /**
@@ -81,8 +79,8 @@ class Storage {
    * @param  {string}  path
    * @return {boolean}
    */
-  * delete (path) {
-    return yield this.driver.delete(path)
+  async delete (path) {
+    return await this.driver.delete(path)
   }
 
   /**
@@ -92,8 +90,8 @@ class Storage {
    * @param  {string}  target
    * @return {boolean}
    */
-  * move (oldPath, target) {
-    return yield this.driver.move(oldPath, target)
+  async move (oldPath, target) {
+    return await this.driver.move(oldPath, target)
   }
 
   /**
@@ -103,8 +101,8 @@ class Storage {
    * @param  {string}  target
    * @return {boolean}
    */
-  * copy (path, target) {
-    return yield this.driver.copy(path, target)
+  async copy (path, target) {
+    return await this.driver.copy(path, target)
   }
 
 }

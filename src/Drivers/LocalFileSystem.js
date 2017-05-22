@@ -1,5 +1,3 @@
-'use strict'
-
 /**
  * node-flydrive
  *
@@ -26,9 +24,9 @@ class LocalFileSystem {
    * @param  {string}  path
    * @return {boolean}
    */
-  * exists (path) {
+  async exists (path) {
     try {
-      yield fs.access(this._fullPath(path))
+      await fs.access(this._fullPath(path))
       return true
     } catch (e) {
       if (e.code === 'ENOENT') return false
@@ -42,9 +40,9 @@ class LocalFileSystem {
    * @param  {string}  path
    * @return {Buffer}
    */
-  * get (path) {
+  async get (path) {
     try {
-      return yield fs.readFile(this._fullPath(path))
+      return await fs.readFile(this._fullPath(path))
     } catch (e) {
       if (e.code === 'ENOENT') throw FileNotFound.file(path)
       throw e
@@ -58,14 +56,14 @@ class LocalFileSystem {
    * @param  {string}  content
    * @return {boolean}
    */
-  * put (target, content) {
+  async put (target, content) {
     try {
-      yield fs.writeFile(this._fullPath(target), content)
+      await fs.writeFile(this._fullPath(target), content)
       return true
     } catch (e) {
       if (e.code === 'ENOENT') {
-        yield fs.mkdir(path.dirname(this._fullPath(target)))
-        yield this.put(target, content)
+        await fs.mkdir(path.dirname(this._fullPath(target)))
+        await this.put(target, content)
       }
       throw e
     }
@@ -78,13 +76,13 @@ class LocalFileSystem {
    * @param  {string}  content
    * @return {boolean}
    */
-  * prepend (path, content) {
-    if (yield this.exists(path)) {
-      const actualContent = (yield this.get(path)).toString()
-      return yield this.put(path, `${content}${actualContent}`)
+  async prepend (path, content) {
+    if (await this.exists(path)) {
+      const actualContent = (await this.get(path)).toString()
+      return await this.put(path, `${content}${actualContent}`)
     }
 
-    return yield this.put(path, content)
+    return await this.put(path, content)
   }
 
   /**
@@ -94,9 +92,9 @@ class LocalFileSystem {
    * @param  {string}  content
    * @return {boolean}
    */
-  * append (path, content) {
+  async append (path, content) {
     try {
-      yield fs.appendFile(this._fullPath(path), content)
+      await fs.appendFile(this._fullPath(path), content)
       return true
     } catch (e) {
       throw e
@@ -109,9 +107,9 @@ class LocalFileSystem {
    * @param  {string}  path
    * @return {boolean}
    */
-  * delete (path) {
+  async delete (path) {
     try {
-      yield fs.unlink(this._fullPath(path))
+      await fs.unlink(this._fullPath(path))
       return true
     } catch (e) {
       throw e
@@ -125,14 +123,14 @@ class LocalFileSystem {
    * @param  {string}  target
    * @return {boolean}
    */
-  * move (oldPath, target) {
+  async move (oldPath, target) {
     try {
-      yield fs.rename(this._fullPath(oldPath), this._fullPath(target))
+      await fs.rename(this._fullPath(oldPath), this._fullPath(target))
       return true
     } catch (e) {
       if (e.code === 'ENOENT') {
-        yield fs.mkdir(path.dirname(this._fullPath(target)))
-        yield this.move(oldPath, target)
+        await fs.mkdir(path.dirname(this._fullPath(target)))
+        await this.move(oldPath, target)
       }
       throw e
     }
@@ -145,7 +143,7 @@ class LocalFileSystem {
    * @param  {string}  target
    * @return {boolean}
    */
-  * copy (path, target) {
+  async copy (path, target) {
     try {
       fs.createReadStream(this._fullPath(path))
         .pipe(fs.createWriteStream(this._fullPath(target)))
