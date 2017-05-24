@@ -25,6 +25,7 @@
   },
   "devDependencies": {
     "japa": "^1.0.3",
-    "japa-cli": "^1.0.1"
+    "japa-cli": "^1.0.1",
+    "rimraf": "^2.6.1"
   }
 }
