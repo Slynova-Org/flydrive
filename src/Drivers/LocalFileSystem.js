@@ -10,7 +10,6 @@ const path = require('path')
 const FileNotFound = require('../Exceptions/FileNotFound')
 
 class LocalFileSystem {
-
   /**
    * Constructor.
    */
@@ -79,10 +78,10 @@ class LocalFileSystem {
   async prepend (path, content) {
     if (await this.exists(path)) {
       const actualContent = (await this.get(path)).toString()
-      return await this.put(path, `${content}${actualContent}`)
+      return this.put(path, `${content}${actualContent}`)
     }
 
-    return await this.put(path, content)
+    return this.put(path, content)
   }
 
   /**
@@ -162,7 +161,6 @@ class LocalFileSystem {
   _fullPath (relativePath) {
     return path.join(this.root, relativePath)
   }
-
 }
 
 module.exports = LocalFileSystem

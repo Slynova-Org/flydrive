@@ -8,7 +8,6 @@
 const NE = require('node-exceptions')
 
 class MethodNotSupported extends NE.RuntimeException {
-
   static method (name, driver) {
     const exception = new this(`Method ${name} is not supported for the driver ${driver}`, 400)
     exception.method = name
@@ -16,7 +15,6 @@ class MethodNotSupported extends NE.RuntimeException {
 
     return exception
   }
-
 }
 
 module.exports = MethodNotSupported

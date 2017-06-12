@@ -8,14 +8,12 @@ const config = require('../stubs/config')
 const Storage = require('../../src/StorageManager')
 
 let storage = null
-const storagePath = './tests/unit/storage/'
 
 function fullPath (relativePath) {
   return path.join(process.cwd(), `./tests/unit/storage/${relativePath}`)
 }
 
 test.group('Local Driver', group => {
-
   group.before(() => {
     storage = new Storage(config)
   })
@@ -28,7 +26,7 @@ test.group('Local Driver', group => {
 
     // Populating storage folder
     filesToCreate.forEach(
-      async file => await fs.writeFile(fullPath(file), file)
+      async file => fs.writeFile(fullPath(file), file)
     )
   })
 
@@ -74,5 +72,4 @@ test.group('Local Driver', group => {
       await storage.disk('local').exists('./tests/unit/storage/i_will_be_renamed')
     )
   })
-
 })

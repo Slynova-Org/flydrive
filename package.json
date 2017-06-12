@@ -12,6 +12,15 @@
   "author": "Romain Lanz <romain.lanz@slynova.ch>",
   "license": "MIT",
   "main": "src/StorageManager.js",
+  "scripts": {
+    "lint": "standard",
+    "pretest": "npm run lint",
+    "posttest": "npm run coverage",
+    "test:local": "FORCE_COLOR=true node bin/index.js --local",
+    "test": "./node_modules/.bin/nyc npm run test:local",
+    "test:win": "set FORCE_COLOR=true && node bin/index.js --win",
+    "coverage": "nyc report --reporter=text-lcov | coveralls"
+  },
   "repository": {
     "type": "git",
     "url": "https://github.com/Slynova-Org/node-flydrive"
@@ -24,8 +33,16 @@
     "node-exceptions": "^2.0.1"
   },
   "devDependencies": {
+    "coveralls": "^2.13.1",
     "japa": "^1.0.3",
     "japa-cli": "^1.0.1",
-    "rimraf": "^2.6.1"
+    "nyc": "^11.0.2",
+    "rimraf": "^2.6.1",
+    "standard": "^10.0.2"
+  },
+  "nyc": {
+    "include": [
+      "src"
+    ]
   }
 }
