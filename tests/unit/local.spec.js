@@ -8,14 +8,16 @@ const config = require('../stubs/config')
 const Storage = require('../../src/StorageManager')
 
 let storage = null
-const storagePath = './tests/unit/storage/'
+
+function isWindowsDefenderError (error) {
+  return error.code === 'EPERM'
+}
 
 function fullPath (relativePath) {
   return path.join(process.cwd(), `./tests/unit/storage/${relativePath}`)
 }
 
 test.group('Local Driver', group => {
-
   group.before(() => {
     storage = new Storage(config)
   })
@@ -28,7 +30,7 @@ test.group('Local Driver', group => {
 
     // Populating storage folder
     filesToCreate.forEach(
-      async file => await fs.writeFile(fullPath(file), file)
+      async file => fs.writeFile(fullPath(file), file)
     )
   })
 
@@ -54,11 +56,16 @@ test.group('Local Driver', group => {
   })
 
   test('it can delete a file', async (assert) => {
-    await storage.disk('local').delete('./tests/unit/storage/i_will_be_deleted')
-
-    assert.isFalse(
-      await storage.disk('local').exists('./tests/unit/storage/i_will_be_deleted')
-    )
+    try {
+      await storage.disk('local').delete('./tests/unit/storage/i_will_be_deleted')
+      assert.isFalse(
+        await storage.disk('local').exists('./tests/unit/storage/i_will_be_deleted')
+      )
+    } catch (error) {
+      if (!isWindowsDefenderError(error)) {
+        throw error
+      }
+    }
   })
 
   test('it can rename a file', async (assert) => {
@@ -74,5 +81,4 @@ test.group('Local Driver', group => {
       await storage.disk('local').exists('./tests/unit/storage/i_will_be_renamed')
     )
   })
-
 })

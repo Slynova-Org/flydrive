@@ -6,7 +6,6 @@
  */
 
 class Storage {
-
   /**
    * Constructor.
    *
@@ -23,7 +22,7 @@ class Storage {
    * @return {boolean}
    */
   async exists (path) {
-    return await this.driver.exists(path)
+    return this.driver.exists(path)
   }
 
   /**
@@ -48,7 +47,7 @@ class Storage {
    * @return {boolean}
    */
   async put (path, content) {
-    return await this.driver.put(path, content)
+    return this.driver.put(path, content)
   }
 
   /**
@@ -59,7 +58,7 @@ class Storage {
    * @return {boolean}
    */
   async prepend (path, content) {
-    return await this.driver.prepend(path, content)
+    return this.driver.prepend(path, content)
   }
 
   /**
@@ -70,7 +69,7 @@ class Storage {
    * @return {boolean}
    */
   async append (path, content) {
-    return await this.driver.append(path, content)
+    return this.driver.append(path, content)
   }
 
   /**
@@ -80,7 +79,7 @@ class Storage {
    * @return {boolean}
    */
   async delete (path) {
-    return await this.driver.delete(path)
+    return this.driver.delete(path)
   }
 
   /**
@@ -91,7 +90,7 @@ class Storage {
    * @return {boolean}
    */
   async move (oldPath, target) {
-    return await this.driver.move(oldPath, target)
+    return this.driver.move(oldPath, target)
   }
 
   /**
@@ -102,9 +101,8 @@ class Storage {
    * @return {boolean}
    */
   async copy (path, target) {
-    return await this.driver.copy(path, target)
+    return this.driver.copy(path, target)
   }
-
 }
 
 module.exports = Storage

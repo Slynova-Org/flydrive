@@ -22,7 +22,6 @@ const publicApi = [
 ]
 
 class StorageManager {
-
   /**
    * Constructor.
    *
@@ -130,7 +129,6 @@ class StorageManager {
   _getDefaultDriver () {
     return this.config.default
   }
-
 }
 
 module.exports = StorageManager

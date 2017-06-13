@@ -10,7 +10,6 @@ const FileNotFound = require('../Exceptions/FileNotFound')
 const MethodNotSupported = require('../Exceptions/MethodNotSupported')
 
 class AwsS3 {
-
   /**
    * Constructor.
    */
@@ -143,7 +142,6 @@ class AwsS3 {
       })
     })
   }
-
 }
 
 module.exports = AwsS3
