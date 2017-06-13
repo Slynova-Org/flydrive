@@ -1,12 +1,10 @@
 'use strict'
 
 /*
- * adonis-framework
+ * node-flydrive
  *
- * (c) Harminder Virk <virk@adonisjs.com>
- *
- * For the full copyright and license information, please view the LICENSE
- * file that was distributed with this source code.
+ * @license MIT
+ * @copyright Slynova - Romain Lanz <romain.lanz@slynova.ch>
 */
 
 const semver = require('semver')
