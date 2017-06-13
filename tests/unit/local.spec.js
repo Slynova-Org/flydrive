@@ -9,6 +9,10 @@ const Storage = require('../../src/StorageManager')
 
 let storage = null
 
+function isWindowsDefenderError (error) {
+  return error.code === 'EPERM'
+}
+
 function fullPath (relativePath) {
   return path.join(process.cwd(), `./tests/unit/storage/${relativePath}`)
 }
@@ -52,11 +56,16 @@ test.group('Local Driver', group => {
   })
 
   test('it can delete a file', async (assert) => {
-    await storage.disk('local').delete('./tests/unit/storage/i_will_be_deleted')
-
-    assert.isFalse(
-      await storage.disk('local').exists('./tests/unit/storage/i_will_be_deleted')
-    )
+    try {
+      await storage.disk('local').delete('./tests/unit/storage/i_will_be_deleted')
+      assert.isFalse(
+        await storage.disk('local').exists('./tests/unit/storage/i_will_be_deleted')
+      )
+    } catch (error) {
+      if (!isWindowsDefenderError(error)) {
+        throw error
+      }
+    }
   })
 
   test('it can rename a file', async (assert) => {
