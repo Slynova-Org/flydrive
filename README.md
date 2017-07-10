@@ -1,8 +1,10 @@
 <p align="center">
-  <h1>node-flydrive</h1>
+  <img src="https://user-images.githubusercontent.com/2793951/28023500-5cb4b28c-658e-11e7-8c56-8ec4e94be74b.png" alt="node-flydrive">
 </p>
 
 <p align="center">
+  <a href="https://travis-ci.org/Slynova-Org/node-flydrive"><img src="https://img.shields.io/travis/Slynova-Org/node-flydrive/master.svg?style=flat-square" alt="Build Status"></a>
+  <a href="https://coveralls.io/github/Slynova-Org/node-flydrive?branch=master"><img src="https://img.shields.io/coveralls/Slynova-Org/node-flydrive/master.svg?style=flat-square" alt="Coverage Status"></a>
   <a href="https://www.npmjs.com/package/node-flydrive"><img src="https://img.shields.io/npm/v/node-flydrive.svg?style=flat-square" alt="Version"></a>
   <a href="https://www.npmjs.com/package/node-flydrive"><img src="https://img.shields.io/npm/dt/node-flydrive.svg?style=flat-square" alt="Downloads"></a>
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/npm/l/node-flydrive.svg?style=flat-square" alt="License"></a>
