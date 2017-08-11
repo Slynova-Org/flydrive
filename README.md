@@ -35,7 +35,7 @@ When you require the package in your file, it will give you access to the `Stora
 This class is a facade for the package and should be instantiated with a [configuration object](https://github.com/Slynova-Org/node-flydrive/blob/master/tests/stubs/config.js).
 
 ```javascript
-const StorageManager = require('node-flydrive')
+const StorageManager = require('@slynova/flydrive')
 const storage = new StorageManager(config)
 ```
 
