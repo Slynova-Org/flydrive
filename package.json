@@ -1,5 +1,5 @@
 {
-  "name": "node-flydrive",
+  "name": "@slynova/flydrive",
   "version": "0.0.0-alpha",
   "description": "Flexible and Fluent way to manage storage in Node.js.",
   "keywords": [
@@ -33,15 +33,15 @@
   },
   "dependencies": {
     "mz": "^2.6.0",
-    "node-exceptions": "^2.0.1"
+    "node-exceptions": "^2.0.2"
   },
   "devDependencies": {
     "coveralls": "^2.13.1",
     "japa": "^1.0.3",
     "japa-cli": "^1.0.1",
-    "nyc": "^11.0.2",
+    "nyc": "^11.1.0",
     "rimraf": "^2.6.1",
-    "standard": "^10.0.2"
+    "standard": "^10.0.3"
   },
   "nyc": {
     "include": [
