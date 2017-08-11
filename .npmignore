@@ -1,5 +1,4 @@
 tests
 .editorconfig
 .travis.yml
-.nyc_output
-coverage
+japaFile.js
