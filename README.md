@@ -5,9 +5,9 @@
 <p align="center">
   <a href="https://travis-ci.org/Slynova-Org/node-flydrive"><img src="https://img.shields.io/travis/Slynova-Org/node-flydrive/master.svg?style=flat-square" alt="Build Status"></a>
   <a href="https://coveralls.io/github/Slynova-Org/node-flydrive?branch=master"><img src="https://img.shields.io/coveralls/Slynova-Org/node-flydrive/master.svg?style=flat-square" alt="Coverage Status"></a>
-  <a href="https://www.npmjs.com/package/node-flydrive"><img src="https://img.shields.io/npm/v/node-flydrive.svg?style=flat-square" alt="Version"></a>
-  <a href="https://www.npmjs.com/package/node-flydrive"><img src="https://img.shields.io/npm/dt/node-flydrive.svg?style=flat-square" alt="Downloads"></a>
-  <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/npm/l/node-flydrive.svg?style=flat-square" alt="License"></a>
+  <a href="https://www.npmjs.com/package/@slynova/flydrive"><img src="https://img.shields.io/npm/v/@slynova/flydrive.svg?style=flat-square" alt="Version"></a>
+  <a href="https://www.npmjs.com/package/@slynova/flydrive"><img src="https://img.shields.io/npm/dt/@slynova/flydrive.svg?style=flat-square" alt="Downloads"></a>
+  <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/npm/l/@slynova/flydrive.svg?style=flat-square" alt="License"></a>
 </p>
 
 <br>
@@ -26,9 +26,9 @@ This package is available in the Node Package Repository.<br>
 It can easily be installed with `npm` or `yarn`.
 
 ```bash
-$ npm i --save node-flydrive
+$ npm i --save @slynova/flydrive
 # or
-$ yarn add node-flydrive
+$ yarn add @slynova/flydrive
 ```
 
 When you require the package in your file, it will give you access to the `StorageManager` class.<br>
