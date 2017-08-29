@@ -31,8 +31,10 @@ class AwsS3 {
   async exists (path) {
     return new Promise((resolve, reject) => {
       this.s3.headObject({ Bucket: this.bucket, Key: path }, (err, data) => {
-        if (err.code === 'NotFound') resolve(false)
-        if (err) return reject(err)
+        if (err) {
+          if (err.code === 'NotFound') resolve(false)
+          return reject(err)
+        }
         return resolve(true)
       })
     })
