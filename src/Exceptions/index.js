@@ -7,6 +7,20 @@
 
 const NE = require('node-exceptions')
 
+class InvalidConfig extends NE.RuntimeException {
+  static missingDiskName () {
+    return new this('Make sure to define a default disk name inside config file', 500, 'E_INVALID_CONFIG')
+  }
+
+  static missingDiskConfig (name) {
+    return new this(`Make sure to define config for ${name} disk`, 500, 'E_INVALID_CONFIG')
+  }
+
+  static missingDiskDriver (name) {
+    return new this(`Make sure to define driver for ${name} disk`, 500, 'E_INVALID_CONFIG')
+  }
+}
+
 class MethodNotSupported extends NE.RuntimeException {
   static method (name, driver) {
     const exception = new this(`Method ${name} is not supported for the driver ${driver}`, 400)
@@ -32,4 +46,4 @@ class FileNotFound extends NE.RuntimeException {
   }
 }
 
-module.exports = { MethodNotSupported, DriverNotSupported, FileNotFound }
+module.exports = { MethodNotSupported, DriverNotSupported, FileNotFound, InvalidConfig }

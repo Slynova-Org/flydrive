@@ -5,7 +5,6 @@
  * @copyright Slynova - Romain Lanz <romain.lanz@slynova.ch>
  */
 
-const S3 = require('aws-sdk/clients/s3')
 const CE = require('../Exceptions')
 
 class AwsS3 {
@@ -13,6 +12,8 @@ class AwsS3 {
    * Constructor.
    */
   constructor (config) {
+    const S3 = require('aws-sdk/clients/s3')
+
     this.bucket = config.bucket
     this.s3 = new S3({
       accessKeyId: config.key,
