@@ -3,6 +3,8 @@
 const fs = require('fs-extra')
 const path = require('path')
 const test = require('japa')
+
+const CE = require('../../src/Exceptions')
 const LocalFileSystem = require('../../src/Drivers/LocalFileSystem')
 
 function isWindowsDefenderError (error) {
@@ -79,5 +81,30 @@ test.group('Local Driver', group => {
     await this.storage.append('./tests/unit/storage/i_have_content', ' universe')
     const content = await this.storage.get('./tests/unit/storage/i_have_content')
     assert.equal(content, 'hello universe')
+  })
+
+  test('prepend to new file', async (assert) => {
+    await this.storage.prepend('./tests/unit/storage/i_have_content', 'hello')
+    const content = await this.storage.get('./tests/unit/storage/i_have_content', 'utf-8')
+    assert.equal(content, 'hello')
+  })
+
+  test('throw file not found exception when unable to find file', async (assert) => {
+    assert.plan(1)
+    try {
+      await this.storage.get('./tests/unit/storage/non_existing', 'utf-8')
+    } catch (error) {
+      assert.instanceOf(error, CE.FileNotFound)
+    }
+  })
+
+  test('do not prepend root path when path itself is absolute', async (assert) => {
+    const dummyFile = path.join(__dirname, './dummy_file')
+
+    await this.storage.put(dummyFile, 'dummy content')
+    const content = await this.storage.get(dummyFile, 'utf-8')
+
+    assert.equal(content, 'dummy content')
+    await this.storage.delete(dummyFile)
   })
 })

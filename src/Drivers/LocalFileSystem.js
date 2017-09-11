@@ -57,7 +57,7 @@ class LocalFileSystem {
    */
   async get (location, encoding) {
     try {
-      return fs.readFile(this._fullPath(location), encoding)
+      return await fs.readFile(this._fullPath(location), encoding)
     } catch (e) {
       if (e.code === 'ENOENT') {
         throw CE.FileNotFound.file(location)
