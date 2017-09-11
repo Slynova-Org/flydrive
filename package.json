@@ -1,6 +1,6 @@
 {
   "name": "@slynova/flydrive",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Flexible and Fluent way to manage storage in Node.js.",
   "keywords": [
     "storage",
