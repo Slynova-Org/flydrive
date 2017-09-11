@@ -20,7 +20,7 @@
     "pretest": "npm run lint",
     "posttest": "npm run coverage",
     "test:local": "FORCE_COLOR=true node bin/index.js --local",
-    "test": "./node_modules/.bin/nyc npm run test:local",
+    "test": "npx nyc npm run test:local",
     "test:win": "set FORCE_COLOR=true && node bin/index.js --win",
     "coverage": "nyc report --reporter=text-lcov | coveralls"
   },
