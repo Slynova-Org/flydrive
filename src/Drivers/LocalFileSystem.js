@@ -7,7 +7,7 @@
 
 const fs = require('fs-extra')
 const path = require('path')
-const FileNotFound = require('../Exceptions/FileNotFound')
+const CE = require('../Exceptions')
 
 class LocalFileSystem {
   /**
@@ -60,7 +60,7 @@ class LocalFileSystem {
       return fs.readFile(this._fullPath(location), encoding)
     } catch (e) {
       if (e.code === 'ENOENT') {
-        throw FileNotFound.file(location)
+        throw CE.FileNotFound.file(location)
       }
       throw e
     }
