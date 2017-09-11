@@ -14,8 +14,6 @@
 
 `node-flydrive` is a framework-agnostic package which provides a powerful wrapper to manage Storage in [Node.js](https://nodejs.org).<br>
 
-> :pray: This package is under active development, some breaking changes may occur before the first release.
-
 <br>
 <hr>
 <br>
