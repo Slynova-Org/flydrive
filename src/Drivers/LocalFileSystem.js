@@ -5,9 +5,9 @@
  * @copyright Slynova - Romain Lanz <romain.lanz@slynova.ch>
  */
 
-const fs = require('mz/fs')
+const fs = require('fs-extra')
 const path = require('path')
-const FileNotFound = require('../Exceptions/FileNotFound')
+const CE = require('../Exceptions')
 
 class LocalFileSystem {
   /**
@@ -18,148 +18,153 @@ class LocalFileSystem {
   }
 
   /**
-   * Determine if a file or directory exists.
+   * Returns full path to the storage root directory
    *
-   * @param  {string}  path
-   * @return {boolean}
+   * @method _fullPath
+   *
+   * @param  {String}  relativePath
+   *
+   * @return {String}
+   *
+   * @private
    */
-  async exists (path) {
-    try {
-      await fs.access(this._fullPath(path))
-      return true
-    } catch (e) {
-      if (e.code === 'ENOENT') return false
-      throw e
-    }
+  _fullPath (relativePath) {
+    return path.isAbsolute(relativePath) ? relativePath : path.join(this.root, relativePath)
   }
 
   /**
-   * Get the content of a file.
+   * Determine if a file or folder already exists
    *
-   * @param  {string}  path
-   * @return {Buffer}
+   * @method exists
+   * @async
+   *
+   * @param {String} location
    */
-  async get (path) {
-    try {
-      return await fs.readFile(this._fullPath(path))
-    } catch (e) {
-      if (e.code === 'ENOENT') throw FileNotFound.file(path)
-      throw e
-    }
+  async exists (location) {
+    return fs.pathExists(this._fullPath(location))
   }
 
   /**
-   * Write the content into a file.
+   * Returns file contents
    *
-   * @param  {string}  target
-   * @param  {string}  content
-   * @return {boolean}
+   * @method get
+   * @async
+   *
+   * @param  {String} location
+   * @param  {String} [encoding]
+   *
+   * @return {String}
    */
-  async put (target, content) {
+  async get (location, encoding) {
     try {
-      await fs.writeFile(this._fullPath(target), content)
-      return true
+      return await fs.readFile(this._fullPath(location), encoding)
     } catch (e) {
       if (e.code === 'ENOENT') {
-        await fs.mkdir(path.dirname(this._fullPath(target)))
-        await this.put(target, content)
+        throw CE.FileNotFound.file(location)
       }
       throw e
     }
   }
 
   /**
-   * Prepend the content into a file.
+   * Create a new file. This method will create
+   * missing directories on the fly.
    *
-   * @param  {string}  path
-   * @param  {string}  content
-   * @return {boolean}
+   * @method put
+   *
+   * @param  {String} location
+   * @param  {Mixed}  content
+   * @param  {Object} [options = {}]
+   *
+   * @return {Boolean}
    */
-  async prepend (path, content) {
-    if (await this.exists(path)) {
-      const actualContent = (await this.get(path)).toString()
-      return this.put(path, `${content}${actualContent}`)
-    }
-
-    return this.put(path, content)
+  async put (location, content, options = {}) {
+    await fs.outputFile(this._fullPath(location), content, options)
+    return true
   }
 
   /**
-   * Append the content into a file.
+   * Prepends content to the file
    *
-   * @param  {string}  path
-   * @param  {string}  content
-   * @return {boolean}
+   * @method prepend
+   *
+   * @param  {String} location
+   * @param  {Mixed}  content
+   * @param  {Object} [options = {}]
+   *
+   * @return {Boolean}
    */
-  async append (path, content) {
-    try {
-      await fs.appendFile(this._fullPath(path), content)
-      return true
-    } catch (e) {
-      throw e
+  async prepend (location, content, options) {
+    if (await this.exists(location)) {
+      const actualContent = await this.get(location, 'utf-8')
+      return this.put(location, `${content}${actualContent}`, options)
     }
+
+    return this.put(location, content, options)
   }
 
   /**
-   * Delete the file.
+   * Appends content to the file
    *
-   * @param  {string}  path
-   * @return {boolean}
+   * @method append
+   *
+   * @param  {String} location
+   * @param  {Mixed}  content
+   * @param  {Object} [options = {}]
+   *
+   * @return {Boolean}
    */
-  async delete (path) {
-    try {
-      await fs.unlink(this._fullPath(path))
-      return true
-    } catch (e) {
-      throw e
-    }
+  async append (location, content, options) {
+    await fs.appendFile(this._fullPath(location), content, options)
+    return true
   }
 
   /**
-   * Move a file to a new location.
+   * Delete existing file. This method will not
+   * throw any exception if file doesn't exists
    *
-   * @param  {string}  oldPath
-   * @param  {string}  target
-   * @return {boolean}
+   * @method delete
+   *
+   * @param  {String} location
+   *
+   * @return {Boolean}
    */
-  async move (oldPath, target) {
-    try {
-      await fs.rename(this._fullPath(oldPath), this._fullPath(target))
-      return true
-    } catch (e) {
-      if (e.code === 'ENOENT') {
-        await fs.mkdir(path.dirname(this._fullPath(target)))
-        await this.move(oldPath, target)
-      }
-      throw e
-    }
+  async delete (location) {
+    await fs.remove(this._fullPath(location))
+  }
+
+  /**
+   * Move file to a new location
+   *
+   * @method move
+   * @async
+   *
+   * @param  {String} src
+   * @param  {String} dest
+   * @param  {Object} options
+   *
+   * @return {Boolean}
+   */
+  async move (src, dest, options = {}) {
+    await fs.move(this._fullPath(src), this._fullPath(dest), options)
+    return true
   }
 
   /**
    * Copy a file to a location.
    *
-   * @param  {string}  path
-   * @param  {string}  target
-   * @return {boolean}
-   */
-  async copy (path, target) {
-    try {
-      fs.createReadStream(this._fullPath(path))
-        .pipe(fs.createWriteStream(this._fullPath(target)))
-      return true
-    } catch (e) {
-      throw e
-    }
-  }
-
-  /**
-   * Compute a path to a fully qualified path.
+   * @method copy
+   * @async
    *
-   * @param  {string}  relativePath
-   * @return {string}
+   * @param  {String} src
+   * @param  {String} dest
+   * @param  {Object} options
+   *
+   * @return {Boolean}
    */
-  _fullPath (relativePath) {
-    return path.join(this.root, relativePath)
+  async copy (src, dest, options) {
+    await fs.copy(this._fullPath(src), this._fullPath(dest), options)
+    return true
   }
 }
 

@@ -8,7 +8,6 @@
  */
 
 module.exports = {
-
   /*
    |--------------------------------------------------------------------------
    | Default Filesystem Disk
@@ -24,14 +23,10 @@ module.exports = {
    |--------------------------------------------------------------------------
    | Filesystem Disks
    |--------------------------------------------------------------------------
-   |
-   |
-   |
    | Supported: "local", "s3"
    |
    */
   'disks': {
-
     'local': {
       'driver': 'local',
       'root': process.cwd()
@@ -44,7 +39,5 @@ module.exports = {
       'region': 'AWS_S3_REGION',
       'bucket': 'AWS_S3_BUCKET'
     }
-
   }
-
 }

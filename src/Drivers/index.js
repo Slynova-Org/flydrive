@@ -1,8 +1,11 @@
-module.exports = {}
+/**
+ * node-flydrive
+ *
+ * @license MIT
+ * @copyright Slynova - Romain Lanz <romain.lanz@slynova.ch>
+ */
 
-module.exports.local = require('./LocalFileSystem')
-
-try {
-  require.resolve('aws-sdk')
-  module.exports.s3 = require('./AwsS3')
-} catch (e) {}
+module.exports = {
+  local: require('./LocalFileSystem'),
+  s3: require('./AwsS3')
+}

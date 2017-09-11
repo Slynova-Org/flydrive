@@ -7,19 +7,35 @@
 
 const Storage = require('./Storage')
 const Drivers = require('./Drivers')
-const DriverNotSupported = require('./Exceptions/DriverNotSupported')
+const CE = require('./Exceptions')
 
-const publicApi = [
-  'exists',
-  'get',
-  'getStream',
-  'put',
-  'prepend',
-  'append',
-  'delete',
-  'move',
-  'copy'
-]
+const proxyHandler = {
+  get (target, name) {
+    /**
+     * if node is inspecting then stick to target properties
+     */
+    if (typeof (name) === 'symbol' || name === 'inspect') {
+      return target[name]
+    }
+
+    /**
+     * if value exists on target, return that
+     */
+    if (typeof (target[name]) !== 'undefined') {
+      return target[name]
+    }
+
+    /**
+     * Fallback to driver instance
+     */
+    const disk = target.disk()
+    if (typeof (disk[name]) === 'function') {
+      return disk[name].bind(disk)
+    }
+
+    return disk[name]
+  }
+}
 
 class StorageManager {
   /**
@@ -28,17 +44,22 @@ class StorageManager {
    * @param  {object} config
    */
   constructor (config) {
-    this.config = config
-    this.disks = []
-    this.customDrivers = []
+    this._config = config
 
-    publicApi.forEach(method => {
-      this[method] = function () {
-        const args = arguments
-        const driver = this.disk()
-        return driver[method].apply(driver, args)
-      }
-    })
+    /**
+     * Adding empty disk property to make future checks
+     * simpler
+     */
+    this._config.disks = this._config.disks || {}
+
+    /**
+     * List of drivers extended
+     *
+     * @type {Object}
+     */
+    this._drivers = {}
+
+    return new Proxy(this, proxyHandler)
   }
 
   /**
@@ -49,8 +70,7 @@ class StorageManager {
    * @return {this}
    */
   extend (name, handler) {
-    this.customDrivers[name] = handler
-
+    this._drivers[name] = handler
     return this
   }
 
@@ -61,73 +81,42 @@ class StorageManager {
    * @return {object}
    */
   disk (name) {
-    name = name || this._getDefaultDriver()
-    this.disks[name] = this._get(name)
+    name = name || this._config.default
 
-    return this.disks[name]
-  }
-
-  /**
-   * Attempt to get the disk from the local cache.
-   *
-   * @param  {string} name
-   * @return {object}
-   */
-  _get (name) {
-    return (this.disks[name] !== undefined) ? this.disks[name] : this._resolve(name)
-  }
-
-  /**
-   * Resolve the given disk.
-   *
-   * @param  {string} name
-   * @return {[type]}
-   */
-  _resolve (name) {
-    const config = this._getConfig(name)
-
-    if (this.customDrivers[config.driver]) {
-      return this._callCustomCreator(config)
+    /**
+     * No name is defined and neither there
+     * are any defaults.
+     */
+    if (!name) {
+      throw CE.InvalidConfig.missingDiskName()
     }
 
-    if (Drivers[config.driver]) {
-      return new Storage(
-        new Drivers[config.driver](config)
-      )
+    const diskConfig = this._config.disks[name]
+
+    /**
+     * Configuration for the defined disk is missing
+     */
+    if (!diskConfig) {
+      throw CE.InvalidConfig.missingDiskConfig(name)
     }
 
-    throw DriverNotSupported.driver(name)
-  }
+    /**
+     * There is no driver defined on disk configuration
+     */
+    if (!diskConfig.driver) {
+      throw CE.InvalidConfig.missingDiskDriver(name)
+    }
 
-  /**
-   * Call a custom driver creator.
-   *
-   * @param  {object} config
-   * @return {object}
-   */
-  _callCustomCreator (config) {
-    const driver = this.customDrivers[config.driver](config)
+    const Driver = Drivers[diskConfig.driver] || this._drivers[diskConfig.driver]
 
-    return driver
-  }
+    /**
+     * Unable to pull driver from the drivers list
+     */
+    if (!Driver) {
+      throw CE.DriverNotSupported.driver(diskConfig.driver)
+    }
 
-  /**
-   * Get the configuration of a disk.
-   *
-   * @param  {string} name
-   * @return {object}
-   */
-  _getConfig (name) {
-    return this.config.disks[name]
-  }
-
-  /**
-   * Get the default driver name.
-   *
-   * @return {string}
-   */
-  _getDefaultDriver () {
-    return this.config.default
+    return new Storage(new Driver(diskConfig))
   }
 }
 
