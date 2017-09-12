@@ -29,7 +29,6 @@ const config = {
   bucket: process.env.SES_BUCKET,
   region: process.env.SES_REGION
 }
-console.log(config)
 
 test.group('S3 Driver', () => {
   test('return false when file doesn\'t exists', async (assert) => {
