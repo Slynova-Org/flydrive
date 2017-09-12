@@ -50,3 +50,5 @@ There's currently 2 drivers available:
 
 Any pull requests or discussions are welcome.<br>
 Note that every pull request providing new feature or correcting a bug should be created with appropriate unit tests.
+
+<a target='_blank' rel='nofollow' href='https://app.codesponsor.io/link/CEKaT5pQWy9iaHvVKQCpHJpd/Slynova-Org/node-flydrive'>  <img alt='Sponsor' width='888' height='68' src='https://app.codesponsor.io/embed/CEKaT5pQWy9iaHvVKQCpHJpd/Slynova-Org/node-flydrive.svg' /></a>
