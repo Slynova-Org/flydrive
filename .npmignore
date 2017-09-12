@@ -2,3 +2,4 @@ tests
 .editorconfig
 .travis.yml
 japaFile.js
+.env
