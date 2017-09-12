@@ -34,10 +34,12 @@
   "dependencies": {
     "fs-extra": "^4.0.1",
     "node-exceptions": "^2.0.2",
-    "pify": "^3.0.0"
+    "resetable": "^1.0.2"
   },
   "devDependencies": {
+    "aws-sdk": "^2.112.0",
     "coveralls": "^2.13.1",
+    "dotenv": "^4.0.0",
     "japa": "^1.0.4",
     "japa-cli": "^1.0.1",
     "nyc": "^11.2.1",

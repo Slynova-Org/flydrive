@@ -5,144 +5,291 @@
  * @copyright Slynova - Romain Lanz <romain.lanz@slynova.ch>
  */
 
-const CE = require('../Exceptions')
+const Resetable = require('resetable')
 
+/**
+ * Aws driver for using s3 with flydriver
+ *
+ * @constructor
+ * @class AwsS3
+ */
 class AwsS3 {
-  /**
-   * Constructor.
-   */
   constructor (config) {
-    const S3 = require('aws-sdk/clients/s3')
-
-    this.bucket = config.bucket
-    this.s3 = new S3({
+    this.s3 = new (require('aws-sdk/clients/s3'))({
       accessKeyId: config.key,
       secretAccessKey: config.secret,
       region: config.region
     })
+
+    this._bucket = new Resetable(config.bucket)
   }
 
   /**
-   * Determine if a file or directory exists.
+   * Use a different bucket at runtime
    *
-   * @param  {string}  path
-   * @return {boolean}
+   * @method bucket
+   *
+   * @param  {String} bucket
+   *
+   * @chainable
    */
-  async exists (path) {
+  bucket (bucket) {
+    this._bucket.set(bucket)
+    return this
+  }
+
+  /**
+   * Finds if a file exists or not
+   *
+   * @method exists
+   * @async
+   *
+   * @param  {String} location
+   * @param  {Object} [params]
+   *
+   * @return {Promise<Boolean>}
+   */
+  exists (location, params) {
     return new Promise((resolve, reject) => {
-      this.s3.headObject({ Bucket: this.bucket, Key: path }, (err, data) => {
-        if (err) {
-          if (err.code === 'NotFound') resolve(false)
-          return reject(err)
+      const clonedParams = Object.assign({}, params, {
+        Bucket: this._bucket.pull(),
+        Key: location
+      })
+
+      this.s3.headObject(clonedParams, (error) => {
+        if (error && error.statusCode === 404) {
+          resolve(false)
+          return
         }
-        return resolve(true)
-      })
-    })
-  }
 
-  /**
-   * Get the content of a file.
-   *
-   * @param  {string}  path
-   * @return {Buffer}
-   */
-  async get (path) {
-    return new Promise((resolve, reject) => {
-      this.s3.getObject({ Bucket: this.bucket, Key: path }, (err, data) => {
-        if (err) {
-          if (err.code === 'NoSuchKey') reject(CE.FileNotFound.file(path))
-          return reject(err)
+        if (error) {
+          reject(error)
+          return
         }
-        return resolve(data.Body)
+
+        resolve(true)
       })
     })
   }
 
   /**
-   * Write the content into a file.
+   * Create a new file from string or buffer
    *
-   * @param  {string}  path
-   * @param  {string}  content
-   * @return {string}
+   * @method put
+   * @async
+   *
+   * @param  {String} location
+   * @param  {String} content
+   * @param  {Object} [params]
+   *
+   * @return {Promise<String>}
    */
-  async put (path, content) {
+  put (location, content, params) {
     return new Promise((resolve, reject) => {
-      this.s3.upload({ Bucket: this.bucket, Key: path, Body: content }, (err, data) => {
-        if (err) return reject(err)
-        return resolve(data.Location)
+      const clonedParams = Object.assign({}, params, {
+        Key: location,
+        Body: content,
+        Bucket: this._bucket.pull()
+      })
+
+      this.s3.upload(clonedParams, (error, response) => {
+        if (error) {
+          return reject(error)
+        }
+        resolve(response.Location)
       })
     })
   }
 
   /**
-   * Prepend the content into a file.
+   * Remove a file
    *
-   * @param  {string}  path
-   * @param  {string}  content
-   * @return {boolean}
-   */
-  async prepend (path, content) {
-    throw CE.MethodNotSupported.method('prepend', 's3')
-  }
-
-  /**
-   * Append the content into a file.
+   * @method delete
+   * @async
    *
-   * @param  {string}  path
-   * @param  {string}  content
-   * @return {boolean}
-   */
-  async append (path, content) {
-    throw CE.MethodNotSupported.method('append', 's3')
-  }
-
-  /**
-   * Delete the file.
+   * @param  {String} location
+   * @param  {Object} [params = {}]
    *
-   * @param  {string}  path
-   * @return {boolean}
+   * @return {Promise<Boolean>}
    */
-  async delete (path) {
+  async delete (location, params = {}) {
     return new Promise((resolve, reject) => {
-      this.s3.deleteObject({ Bucket: this.bucket, Key: path }, (err, data) => {
-        if (err) return reject(err)
-        return resolve(true)
+      const clonedParams = Object.assign({}, params, {
+        Bucket: this._bucket.pull(),
+        Key: location
+      })
+
+      this.s3.deleteObject(clonedParams, (error, response) => {
+        if (error) {
+          return reject(error)
+        }
+        resolve(true)
       })
     })
   }
 
   /**
-   * Move a file to a new location.
+   * Returns s3 object for a given file
    *
-   * @param  {string}  oldPath
-   * @param  {string}  target
-   * @return {boolean}
+   * @method getObject
+   * @async
+   *
+   * @param  {String}  location
+   * @param  {Object}  params
+   *
+   * @return {Promise<Object>}
    */
-  async move (oldPath, target) {
-    try {
-      await this.copy(oldPath, target)
-      await this.delete(oldPath)
+  async getObject (location, params) {
+    return new Promise((resolve, reject) => {
+      const clonedParams = Object.assign({}, params, {
+        Bucket: this._bucket.pull(),
+        Key: location
+      })
 
-      return true
-    } catch (e) {
-      console.log(e)
+      this.s3.getObject(clonedParams, (error, response) => {
+        if (error) {
+          return reject(error)
+        }
+        resolve(response)
+      })
+    })
+  }
+
+  /**
+   * Returns contents for a give file
+   *
+   * @method get
+   * @async
+   *
+   * @param  {String} location
+   * @param  {String} [encoding = 'utf-8']
+   * @param  {Object} [params = {}]
+   *
+   * @return {Promise<String>}
+   */
+  async get (location, encoding = 'utf-8', params = {}) {
+    const { Body } = await this.getObject(location, params)
+    return Buffer.isBuffer(Body) ? Body.toString(encoding) : Body
+  }
+
+  /**
+   * Returns the stream for the given file
+   *
+   * @method getStream
+   *
+   * @param  {String}  location
+   * @param  {Object}  [params = {}]
+   *
+   * @return {Stream}
+   */
+  getStream (location, params = {}) {
+    const clonedParams = Object.assign({}, params, {
+      Bucket: this._bucket.pull(),
+      Key: location
+    })
+    return this.s3.getObject(clonedParams).createReadStream()
+  }
+
+  /**
+   * Returns url for a given key. Note this method doesn't
+   * validates the existence of file or it's visibility
+   * status.
+   *
+   * @method getUrl
+   *
+   * @param  {String} location
+   * @param  {String} bucket
+   *
+   * @return {String}
+   */
+  getUrl (location, bucket) {
+    bucket = bucket || this._bucket.pull()
+    const { href } = this.s3.endpoint
+    if (href.startsWith('https://s3.amazonaws')) {
+      return `https://${bucket}.s3.amazonaws.com/${location}`
     }
+    return `${href}${bucket}/${location}`
   }
 
   /**
-   * Copy a file to a location.
+   * Returns signed url for an existing file
    *
-   * @param  {string}  path
-   * @param  {string}  target
-   * @return {boolean}
+   * @method getSignedUrl
+   * @async
+   *
+   * @param  {String}     location
+   * @param  {Number}     [expiry = 900]
+   * @param  {Object}     [params = {}]
+   *
+   * @return {Promise<String>}
    */
-  async copy (path, target) {
+  getSignedUrl (location, expiry, params) {
     return new Promise((resolve, reject) => {
-      this.s3.copyObject({ Bucket: this.bucket, CopySource: `${this.bucket}/${path}`, Key: target }, (err, data) => {
-        if (err) return reject(err)
-        return resolve(true)
+      const clonedParams = Object.assign({}, params, {
+        Key: location,
+        Bucket: this._bucket.pull(),
+        Expires: expiry || 900
+      })
+
+      this.s3.getSignedUrl('getObject', clonedParams, (error, url) => {
+        if (error) {
+          return reject(error)
+        }
+        resolve(url)
       })
     })
+  }
+
+  /**
+   * Copy file from one location to another within
+   * or accross s3 buckets.
+   *
+   * @method copy
+   *
+   * @param  {String} src
+   * @param  {String} dest
+   * @param  {String} [destBucket = this.bucket]
+   * @param  {Object} [params = {}]
+   *
+   * @return {Promise<String>}
+   */
+  copy (src, dest, destBucket, params = {}) {
+    return new Promise((resolve, reject) => {
+      const bucket = this._bucket.pull()
+
+      const clonedParams = Object.assign({}, params, {
+        Key: dest,
+        CopySource: `/${bucket}/${src}`,
+        Bucket: destBucket || bucket
+      })
+
+      this.s3.copyObject(clonedParams, (error, response) => {
+        if (error) {
+          return reject(error)
+        }
+        resolve(this.getUrl(dest, destBucket))
+      })
+    })
+  }
+
+  /**
+   * Moves file from one location to another. This
+   * method will call `copy` and `delete` under
+   * the hood.
+   *
+   * @method move
+   *
+   * @param  {String} src
+   * @param  {String} dest
+   * @param  {String} [destBucket = this.bucket]
+   * @param  {Object} [params = {}]
+   *
+   * @return {Promise<String>}
+   */
+  async move (src, dest, destBucket, params = {}) {
+    const url = await this.copy(src, dest, destBucket, params)
+    await this.delete(src)
+    return url
   }
 }
 
