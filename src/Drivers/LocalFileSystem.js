@@ -69,9 +69,9 @@ class LocalFileSystem {
    * @async
    *
    * @param  {String} location
-   * @param  {String} [encoding]
+   * @param  {String|Object} [encoding]
    *
-   * @return {String}
+   * @return {String|Buffer}
    */
   async get (location, encoding) {
     try {
@@ -82,6 +82,22 @@ class LocalFileSystem {
       }
       throw e
     }
+  }
+
+  /**
+   * Returns a read stream for a file location. This method
+   * is same as `fs.createReadStream` but added for
+   * convenience.
+   *
+   * @method getStream
+   *
+   * @param {String} location
+   * @param {Object|String} options
+   *
+   * @return {ReadableStream}
+   */
+  getStream (location, options) {
+    return fs.createReadStream(this._fullPath(location), options)
   }
 
   /**
