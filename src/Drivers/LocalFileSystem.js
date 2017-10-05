@@ -7,7 +7,25 @@
 
 const fs = require('fs-extra')
 const path = require('path')
+const createOutputStream = require('create-output-stream')
 const CE = require('../Exceptions')
+
+/**
+ * Returns a boolean indication if stream param
+ * is a readable stream or not.
+ *
+ * @param {*} stream
+ *
+ * @return {Boolean}
+ */
+const isReadableStream = function (stream) {
+  return stream !== null &&
+  typeof (stream) === 'object' &&
+  typeof (stream.pipe) === 'function' &&
+  typeof (stream._read) === 'function' &&
+  typeof (stream._readableState) === 'object' &&
+  stream.readable !== false
+}
 
 class LocalFileSystem {
   /**
@@ -73,12 +91,21 @@ class LocalFileSystem {
    * @method put
    *
    * @param  {String} location
-   * @param  {Mixed}  content
+   * @param  {String|Buffer|Stream}  content
    * @param  {Object} [options = {}]
    *
    * @return {Boolean}
    */
   async put (location, content, options = {}) {
+    if (isReadableStream(content)) {
+      return new Promise((resolve, reject) => {
+        const ws = createOutputStream(this._fullPath(location), options)
+        ws.on('close', () => resolve(true))
+        ws.on('error', reject)
+        content.pipe(ws)
+      })
+    }
+
     await fs.outputFile(this._fullPath(location), content, options)
     return true
   }
@@ -89,7 +116,7 @@ class LocalFileSystem {
    * @method prepend
    *
    * @param  {String} location
-   * @param  {Mixed}  content
+   * @param  {String|Buffer}  content
    * @param  {Object} [options = {}]
    *
    * @return {Boolean}
@@ -109,12 +136,16 @@ class LocalFileSystem {
    * @method append
    *
    * @param  {String} location
-   * @param  {Mixed}  content
+   * @param  {String|Buffer|Stream}  content
    * @param  {Object} [options = {}]
    *
    * @return {Boolean}
    */
   async append (location, content, options) {
+    if (isReadableStream(content)) {
+      return this.put(location, content, Object.assign({ flags: 'a' }, options))
+    }
+
     await fs.appendFile(this._fullPath(location), content, options)
     return true
   }

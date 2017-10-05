@@ -107,4 +107,27 @@ test.group('Local Driver', group => {
     assert.equal(content, 'dummy content')
     await this.storage.delete(dummyFile)
   })
+
+  test('create file from stream', async (assert) => {
+    await this.storage.put('./tests/unit/storage/foo', 'Foo related content')
+    const readStream = fs.createReadStream(path.join(__dirname, './storage/foo'))
+    await this.storage.put('./tests/unit/storage/bar', readStream)
+    assert.isTrue(readStream.closed)
+
+    const barContents = await this.storage.get('./tests/unit/storage/bar')
+    assert.equal(barContents, 'Foo related content')
+  })
+
+  test('append to exisiting file', async (assert) => {
+    await this.storage.put('./tests/unit/storage/object', ' World')
+    await this.storage.put('./tests/unit/storage/greeting', 'Hello')
+
+    const readStream = fs.createReadStream(path.join(__dirname, './storage/object'))
+
+    await this.storage.append('./tests/unit/storage/greeting', readStream)
+    assert.isTrue(readStream.closed)
+
+    const barContents = await this.storage.get('./tests/unit/storage/greeting')
+    assert.equal(barContents, 'Hello World')
+  })
 })
