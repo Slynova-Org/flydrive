@@ -112,7 +112,7 @@ class AwsS3 {
    *
    * @return {Promise<Boolean>}
    */
-  async delete (location, params = {}) {
+  delete (location, params = {}) {
     return new Promise((resolve, reject) => {
       const clonedParams = Object.assign({}, params, {
         Bucket: this._bucket.pull(),
@@ -139,7 +139,7 @@ class AwsS3 {
    *
    * @return {Promise<Object>}
    */
-  async getObject (location, params) {
+  getObject (location, params) {
     return new Promise((resolve, reject) => {
       const clonedParams = Object.assign({}, params, {
         Bucket: this._bucket.pull(),
@@ -169,6 +169,7 @@ class AwsS3 {
    */
   async get (location, encoding = 'utf-8', params = {}) {
     const { Body } = await this.getObject(location, params)
+
     return Buffer.isBuffer(Body) ? Body.toString(encoding) : Body
   }
 
@@ -187,6 +188,7 @@ class AwsS3 {
       Bucket: this._bucket.pull(),
       Key: location
     })
+
     return this.s3.getObject(clonedParams).createReadStream()
   }
 
@@ -205,9 +207,11 @@ class AwsS3 {
   getUrl (location, bucket) {
     bucket = bucket || this._bucket.pull()
     const { href } = this.s3.endpoint
+
     if (href.startsWith('https://s3.amazonaws')) {
       return `https://${bucket}.s3.amazonaws.com/${location}`
     }
+
     return `${href}${bucket}/${location}`
   }
 
@@ -289,6 +293,7 @@ class AwsS3 {
   async move (src, dest, destBucket, params = {}) {
     const url = await this.copy(src, dest, destBucket, params)
     await this.delete(src)
+
     return url
   }
 }

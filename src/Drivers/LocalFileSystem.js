@@ -20,11 +20,11 @@ const CE = require('../Exceptions')
  */
 const isReadableStream = function (stream) {
   return stream !== null &&
-  typeof (stream) === 'object' &&
-  typeof (stream.pipe) === 'function' &&
-  typeof (stream._read) === 'function' &&
-  typeof (stream._readableState) === 'object' &&
-  stream.readable !== false
+    typeof (stream) === 'object' &&
+    typeof (stream.pipe) === 'function' &&
+    typeof (stream._read) === 'function' &&
+    typeof (stream._readableState) === 'object' &&
+    stream.readable !== false
 }
 
 class LocalFileSystem {
@@ -58,7 +58,7 @@ class LocalFileSystem {
    *
    * @param {String} location
    */
-  async exists (location) {
+  exists (location) {
     return fs.pathExists(this._fullPath(location))
   }
 
@@ -80,6 +80,7 @@ class LocalFileSystem {
       if (e.code === 'ENOENT') {
         throw CE.FileNotFound.file(location)
       }
+
       throw e
     }
   }
@@ -178,6 +179,7 @@ class LocalFileSystem {
    */
   async delete (location) {
     await fs.remove(this._fullPath(location))
+    return true
   }
 
   /**
