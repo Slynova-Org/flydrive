@@ -15,6 +15,15 @@ function fullPath (relativePath) {
   return path.join(process.cwd(), `./tests/unit/storage/${relativePath}`)
 }
 
+function streamToString (stream) {
+  return new Promise((resolve, reject) => {
+    const chunk = []
+    stream.on('data', (line) => (chunk.push(line)))
+    stream.on('error', reject)
+    stream.on('close', () => resolve(chunk.join('\n')))
+  })
+}
+
 test.group('Local Driver', group => {
   group.before(async () => {
     this.storage = new LocalFileSystem({ root: path.join(__dirname, '../../') })
@@ -106,5 +115,46 @@ test.group('Local Driver', group => {
 
     assert.equal(content, 'dummy content')
     await this.storage.delete(dummyFile)
+  })
+
+  test('create file from stream', async (assert) => {
+    await this.storage.put('./tests/unit/storage/foo', 'Foo related content')
+    const readStream = fs.createReadStream(path.join(__dirname, './storage/foo'))
+    await this.storage.put('./tests/unit/storage/bar', readStream)
+    assert.isTrue(readStream.closed)
+
+    const barContents = await this.storage.get('./tests/unit/storage/bar')
+    assert.equal(barContents, 'Foo related content')
+  })
+
+  test('append to exisiting file', async (assert) => {
+    await this.storage.put('./tests/unit/storage/object', ' World')
+    await this.storage.put('./tests/unit/storage/greeting', 'Hello')
+
+    const readStream = fs.createReadStream(path.join(__dirname, './storage/object'))
+
+    await this.storage.append('./tests/unit/storage/greeting', readStream)
+    assert.isTrue(readStream.closed)
+
+    const barContents = await this.storage.get('./tests/unit/storage/greeting')
+    assert.equal(barContents, 'Hello World')
+  })
+
+  test('throw exception when unable to find file', async (assert) => {
+    assert.plan(1)
+
+    const readStream = this.storage.getStream('./tests/unit/storage/foo')
+    try {
+      await streamToString(readStream)
+    } catch ({ code }) {
+      assert.equal(code, 'ENOENT')
+    }
+  })
+
+  test('get stream of a given file', async (assert) => {
+    await this.storage.put('./tests/unit/storage/foo', 'Foo')
+    const readStream = this.storage.getStream('./tests/unit/storage/foo')
+    const content = await streamToString(readStream)
+    assert.equal(content, 'Foo')
   })
 })

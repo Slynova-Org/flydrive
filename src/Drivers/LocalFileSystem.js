@@ -7,7 +7,25 @@
 
 const fs = require('fs-extra')
 const path = require('path')
+const createOutputStream = require('create-output-stream')
 const CE = require('../Exceptions')
+
+/**
+ * Returns a boolean indication if stream param
+ * is a readable stream or not.
+ *
+ * @param {*} stream
+ *
+ * @return {Boolean}
+ */
+const isReadableStream = function (stream) {
+  return stream !== null &&
+  typeof (stream) === 'object' &&
+  typeof (stream.pipe) === 'function' &&
+  typeof (stream._read) === 'function' &&
+  typeof (stream._readableState) === 'object' &&
+  stream.readable !== false
+}
 
 class LocalFileSystem {
   /**
@@ -51,9 +69,9 @@ class LocalFileSystem {
    * @async
    *
    * @param  {String} location
-   * @param  {String} [encoding]
+   * @param  {String|Object} [encoding]
    *
-   * @return {String}
+   * @return {String|Buffer}
    */
   async get (location, encoding) {
     try {
@@ -67,18 +85,43 @@ class LocalFileSystem {
   }
 
   /**
+   * Returns a read stream for a file location. This method
+   * is same as `fs.createReadStream` but added for
+   * convenience.
+   *
+   * @method getStream
+   *
+   * @param {String} location
+   * @param {Object|String} options
+   *
+   * @return {ReadableStream}
+   */
+  getStream (location, options) {
+    return fs.createReadStream(this._fullPath(location), options)
+  }
+
+  /**
    * Create a new file. This method will create
    * missing directories on the fly.
    *
    * @method put
    *
    * @param  {String} location
-   * @param  {Mixed}  content
+   * @param  {String|Buffer|Stream}  content
    * @param  {Object} [options = {}]
    *
    * @return {Boolean}
    */
   async put (location, content, options = {}) {
+    if (isReadableStream(content)) {
+      return new Promise((resolve, reject) => {
+        const ws = createOutputStream(this._fullPath(location), options)
+        ws.on('close', () => resolve(true))
+        ws.on('error', reject)
+        content.pipe(ws)
+      })
+    }
+
     await fs.outputFile(this._fullPath(location), content, options)
     return true
   }
@@ -89,7 +132,7 @@ class LocalFileSystem {
    * @method prepend
    *
    * @param  {String} location
-   * @param  {Mixed}  content
+   * @param  {String|Buffer}  content
    * @param  {Object} [options = {}]
    *
    * @return {Boolean}
@@ -109,12 +152,16 @@ class LocalFileSystem {
    * @method append
    *
    * @param  {String} location
-   * @param  {Mixed}  content
+   * @param  {String|Buffer|Stream}  content
    * @param  {Object} [options = {}]
    *
    * @return {Boolean}
    */
   async append (location, content, options) {
+    if (isReadableStream(content)) {
+      return this.put(location, content, Object.assign({ flags: 'a' }, options))
+    }
+
     await fs.appendFile(this._fullPath(location), content, options)
     return true
   }
