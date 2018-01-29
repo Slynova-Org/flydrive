@@ -40,7 +40,7 @@
   "devDependencies": {
     "aws-sdk": "^2.128.0",
     "coveralls": "^3.0.0",
-    "dotenv": "^4.0.0",
+    "dotenv": "^5.0.0",
     "japa": "^1.0.5",
     "japa-cli": "^1.0.1",
     "nyc": "^11.2.1",
