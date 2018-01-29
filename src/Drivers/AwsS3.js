@@ -18,7 +18,8 @@ class AwsS3 {
     this.s3 = new (require('aws-sdk/clients/s3'))({
       accessKeyId: config.key,
       secretAccessKey: config.secret,
-      region: config.region
+      region: config.region,
+      endpoint: config.endpoint ? config.endpoint : null
     })
 
     this._bucket = new Resetable(config.bucket)
