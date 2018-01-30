@@ -79,7 +79,7 @@ test.group('S3 Driver', () => {
       const s3Driver = new S3Driver(Object.assign({}, config, { secret: '2020' }))
       await s3Driver.put('dummy-file.txt', 'Hello')
     } catch (error) {
-      assert.equal(error.message, 'The request signature we calculated does not match the signature you provided. Check your key and signing method.')
+      assert.equal(error.code, 'SignatureDoesNotMatch')
     }
   }).timeout(0)
 
@@ -124,7 +124,7 @@ test.group('S3 Driver', () => {
     try {
       await readStream(stream)
     } catch (error) {
-      assert.equal(error.message, 'The specified key does not exist.')
+      assert.equal(error.code, 'NoSuchKey')
     }
   }).timeout(10 * 1000)
 

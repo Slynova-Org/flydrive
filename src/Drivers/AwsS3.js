@@ -15,11 +15,11 @@ const Resetable = require('resetable')
  */
 class AwsS3 {
   constructor (config) {
-    this.s3 = new (require('aws-sdk/clients/s3'))({
+    this.s3 = new (require('aws-sdk/clients/s3'))(Object.assign({}, {
       accessKeyId: config.key,
       secretAccessKey: config.secret,
       region: config.region
-    })
+    }, config))
 
     this._bucket = new Resetable(config.bucket)
   }
@@ -206,13 +206,13 @@ class AwsS3 {
    */
   getUrl (location, bucket) {
     bucket = bucket || this._bucket.pull()
-    const { href } = this.s3.endpoint
-
-    if (href.startsWith('https://s3.amazonaws')) {
-      return `https://${bucket}.s3.amazonaws.com/${location}`
+    const { href, host, protocol } = this.s3.endpoint
+  
+    if (this.s3.config.region === null) {
+      return `${protocol}//${bucket}.${host}/${location}`
     }
 
-    return `${href}${bucket}/${location}`
+    return `${protocol}//${host}/${bucket}/${location}`
   }
 
   /**
