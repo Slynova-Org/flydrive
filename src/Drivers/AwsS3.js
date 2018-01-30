@@ -15,11 +15,11 @@ const Resetable = require('resetable')
  */
 class AwsS3 {
   constructor (config) {
-    this.s3 = new (require('aws-sdk/clients/s3'))({
+    this.s3 = new (require('aws-sdk/clients/s3'))(Object.assign({}, {
       accessKeyId: config.key,
       secretAccessKey: config.secret,
       region: config.region
-    })
+    }, config))
 
     this._bucket = new Resetable(config.bucket)
   }
