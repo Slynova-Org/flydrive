@@ -1,5 +1,4 @@
 const Resetable = require('resetable')
-const ali = require('ali-oss')
 
 /**
  * Aliyun driver for using with flydriver
@@ -9,7 +8,7 @@ const ali = require('ali-oss')
  */
 class Aliyun {
   constructor (config) {
-    this.oss = ali.Wrapper(Object.assign({}, {
+    this.oss = require('ali-oss').Wrapper(Object.assign({}, {
       accessKeyId: config.key,
       accessKeySecret: config.secret,
       region: config.region,
