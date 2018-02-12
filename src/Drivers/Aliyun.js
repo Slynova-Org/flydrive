@@ -14,9 +14,7 @@ class Aliyun {
       region: config.region,
       secure: config.secure
     }, config))
-
     this._bucket = new Resetable(config.bucket)
-
   }
 
   /**
@@ -131,7 +129,6 @@ class Aliyun {
    * @return {Stream}
    */
   getStream (location, params = {}) {
-
     return new Promise((resolve, reject) => {
       this.oss.getStream(location, params)
       .then(response => {
