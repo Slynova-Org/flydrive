@@ -39,10 +39,12 @@ module.exports = {
       'region': 'AWS_S3_REGION',
       'bucket': 'AWS_S3_BUCKET'
     },
-    'driver': 'drive',
-    'clientId': 'DRIVE_CLIENT_ID',
-    'clientSecret': 'DRIVE_CLIENT_SECRET',
-    'access_token': 'GD_ACCESS_TOKEN',
-    'refresh_token': 'GD_REFRESH_TOKEN'
+    'drive': {
+      'driver': 'drive',
+      'clientId': 'DRIVE_CLIENT_ID',
+      'clientSecret': 'DRIVE_CLIENT_SECRET',
+      'access_token': 'GD_ACCESS_TOKEN',
+      'refresh_token': 'GD_REFRESH_TOKEN'
+    }
   }
 }
