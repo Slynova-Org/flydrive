@@ -292,12 +292,11 @@ class GoogleDrive {
    *
    * @param  {String} src
    * @param  {String} dest
-   * @param  {String} [meta = {}]
    * @param  {Object} [params = {}]
    *
    * @return {Promise<String>}
    */
-  async move (src, dest, meta, params = {}) {
+  async move (src, dest, params = {}) {
     return new Promise(async (resolve, reject) => {
       let srcFile = JSON.parse(await this.get(src, {fields: 'id, name, mimeType, parents', alt: null, encoding: 'utf-8'}))
       let srcId = srcFile.id
