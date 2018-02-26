@@ -95,8 +95,7 @@ class GoogleDrive {
   /**
    * Use a different token at runtime
    * Can be useful when you want to work on different google driver
-   * @param refresh
-   * @param token (must contains a refresh token so that th oauthclient can refresh a new access token)
+   * @param token (must contains a refresh token so that the oauthclient can refresh a new access token)
    * @returns {Promise.<GoogleDrive>}
    */
   with (token) {
@@ -138,7 +137,7 @@ class GoogleDrive {
     })
   }
   /**
-   * Finds if a file exists or not
+   * Finds if a file exists or not by it's id
    *
    * @method exists
    * @async
@@ -164,15 +163,14 @@ class GoogleDrive {
         resolve(JSON.parse(body))
       })
     })
-  }/**
+  }
+  /**
    * Finds if a file exists or not
    *
    * @method exists
    * @async
    *
    * @param  {String} fileName
-   * @param  {Object} [params]
-   *
    * @return {Promise<Boolean>}
    */
   async exists (fileName) {
@@ -236,7 +234,6 @@ class GoogleDrive {
    * @param  {String} location
    * @param  {Object} [params = {}]
    * @param  {String} [dest = 'utf-8']
-   * @param  {String} [cb = 'utf-8']
    *
    * @return {Promise<String>}
    */
@@ -251,7 +248,6 @@ class GoogleDrive {
   }
   /**
    * Copy file from one location to another within
-   * or accross s3 buckets.
    *
    * @method copy
    *
@@ -291,8 +287,6 @@ class GoogleDrive {
   }
   /**
    * Moves file from one location to another. This
-   * method will call `copy` and `delete` under
-   * the hood.
    *
    * @method move
    *
