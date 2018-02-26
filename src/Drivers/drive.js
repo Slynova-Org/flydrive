@@ -32,17 +32,19 @@ module.exports = function (accessToken) {
     var options = defaults
     options.qs = extend(options.qs, p.params)
     if (p.meta) {
-      if (p.meta.media && p.meta.media.body) {
+      if (p.meta.media && p.meta.media) {
         options.multipart = [
           {
             'content-type': 'application/json',
             body: JSON.stringify(p.meta.resource)
-          },
-          {
-            'content-type': p.meta.media.mimeType,
-            body: (p.meta.media.body)
           }
         ]
+        if (p.meta.media.body) {
+          options.multipart.push({
+            'content-type': p.meta.media.mimeType,
+            body: (p.meta.media.body)
+          })
+        }
       } else {
         options.headers['Content-Type'] = 'application/json'
         options.body = JSON.stringify(p.meta.resource || p.meta)
