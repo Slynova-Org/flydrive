@@ -73,7 +73,7 @@ class GoogleDrive {
    * That method try to resolve a file id based on its full path
    *
    * @param fullPath
-   * @token
+   * @param token
    * @private
    */
   __resolveFileId (fullPath, token) {
