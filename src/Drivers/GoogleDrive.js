@@ -6,10 +6,9 @@
  * @copyright Slynova - Romain Lanz <romain.lanz@slynova.ch>
  */
 
-const GoogleAuth = require('google-auth-library')
-const async = require('async')
 class GoogleDrive {
   constructor (config) {
+    const GoogleAuth = require('google-auth-library')
     this.drive = require('./drive')
     this.clientId = config.clientId
     this.clientSecret = config.clientSecret
@@ -37,6 +36,7 @@ class GoogleDrive {
         pageSize: 1
       }
       let id = null
+      const async = require('async')
       async.doWhilst((cb) => {
         params.pageToken = pageToken
         this.drive(token).files().list(params, (err, response, body) => {
@@ -295,7 +295,9 @@ class GoogleDrive {
         fileName = destinationParents.splice(destinationParents.length - 1)[0]
         let fpath = destinationParents.join('/')
         destParentId = await this.exists(fpath)
-        if (destParentId === null) return resolve(null)
+        if (destParentId === null) {
+          destParentId = 'root'
+        }
       }
       let srcId = null
       if (meta.sourceId || params.sourceId) {
@@ -366,7 +368,7 @@ class GoogleDrive {
         fileName = filesArr.splice(filesArr.length - 1)[0]
         destParentId = await this.exists(filesArr.join('/'))
       }
-      if(!srcParentId) srcParentId=''
+      if (!srcParentId) srcParentId = ''
       if (!destParentId) destParentId = ''
       let parentToRemoves = ''
       if (srcParentId) {
