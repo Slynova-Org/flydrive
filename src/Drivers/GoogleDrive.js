@@ -173,12 +173,14 @@ class GoogleDrive {
    * @async
    *
    * @param  {String} fileName
+   * @param  {String} params
    * @return {Promise<Boolean>}
    */
-  async exists (fileName) {
+  async exists (fileName, params = {}) {
     return new Promise(async (resolve, reject) => {
       try {
         const token = await this.__token()
+        if (params.fileId) return resolve(await this.idExists(params.fileId))
         const id = await this.__resolveFileId(fileName, token)
         resolve(id)
       } catch (err) {
@@ -198,13 +200,21 @@ class GoogleDrive {
    *
    * @return {Promise<String>}
    */
-  put (location, content, params) {
+  put (location, content, params = {}) {
     return new Promise(async (resolve, reject) => {
-      let parents = location.split(/\//)
-      if (parents.length === 0) return resolve(null)
-      const fileName = parents.splice(parents.length - 1)[0]
-      let fpath = parents.join('/')
-      let parentId = await this.exists(fpath)
+      let parentId = null
+      let fileName
+      if (params.parentId) {
+        parentId = params.parentId
+        delete params.parentId
+        fileName = location
+      } else {
+        let parents = location.split(/\//)
+        if (parents.length === 0) return resolve(null)
+        fileName = parents.splice(parents.length - 1)[0]
+        let fpath = parents.join('/')
+        parentId = await this.exists(fpath)
+      }
       if (parentId === null) parentId = 'root'
       let metadata = content.metadata || {}
       let clonedParams = Object.assign({}, params, {
@@ -241,7 +251,11 @@ class GoogleDrive {
    */
   async get (location, params = {}, dest = null) {
     try {
-      const fileId = await this.exists(location)
+      let fileId = null
+      if (params.fileId) {
+        fileId = params.fileId
+        delete params.fileId
+      } else fileId = await this.exists(location)
       const copiedParams = Object.assign({}, params)
       return await this.download(await this.__token(), fileId, copiedParams, dest)
     } catch (e) {
@@ -262,14 +276,30 @@ class GoogleDrive {
    */
   copy (src, dest, meta = {}, params = {}) {
     return new Promise(async (resolve, reject) => {
-      let destinationParents = dest.split(/\//)
-      if (destinationParents.length === 0) return resolve(null)
-      const fileName = destinationParents.splice(destinationParents.length - 1)[0]
-      let fpath = destinationParents.join('/')
-      let srcId = await this.exists(src)
-      if (srcId === null) return reject(GoogleDrive.__onError('Sourcce file not found', 404))
-      let destParentId = await this.exists(fpath)
-      if (destParentId === null) return resolve(null)
+      let destParentId = null
+      let fileName = null
+      if (meta.destinationParentId || params.destinationParentId) {
+        destParentId = meta.destinationParentId || params.destinationParentId
+        delete meta.destinationParentId
+        delete params.destinationParentId
+        fileName = dest
+        if (destParentId === null) return resolve(null)
+      } else {
+        let destinationParents = dest.split(/\//)
+        if (destinationParents.length === 0) return resolve(null)
+        fileName = destinationParents.splice(destinationParents.length - 1)[0]
+        let fpath = destinationParents.join('/')
+        destParentId = await this.exists(fpath)
+        if (destParentId === null) return resolve(null)
+      }
+      let srcId = null
+      if (meta.sourceId || params.sourceId) {
+        srcId = meta.sourceId || params.sourceId
+        if (srcId === null) return reject(GoogleDrive.__onError('Source file not found', 404))
+      } else {
+        srcId = await this.exists(src)
+        if (srcId === null) return reject(GoogleDrive.__onError('Source file not found', 404))
+      }
       let clonedParams = Object.assign({}, params)
       meta = Object.assign({resource: {}, media: null}, meta)
       let resource = Object.assign({
@@ -300,16 +330,33 @@ class GoogleDrive {
    */
   async move (src, dest, params = {}) {
     return new Promise(async (resolve, reject) => {
-      let srcFile = JSON.parse(await this.get(src, {fields: 'id, name, mimeType, parents', alt: null, encoding: 'utf-8'}))
+      let srcFile = null
+      if (params.sourceId) {
+        srcFile = JSON.parse(await this.get(src, {fileId: params.sourceId, fields: 'id, name, mimeType, parents', alt: null, encoding: 'utf-8'}))
+        delete params.sourceId
+      } else {
+        srcFile = JSON.parse(await this.get(src, {fields: 'id, name, mimeType, parents', alt: null, encoding: 'utf-8'}))
+      }
       let srcId = srcFile.id
       if (!srcId) return reject(GoogleDrive.__onError('Source not found', 404))
       let srcParentId = null
       if (srcFile.parents.length > 0) {
-        let filesArr = src.split('/')
-        filesArr.splice(filesArr.length - 1)
-        srcParentId = await this.exists(filesArr.join('/'))
+        if (params.sourceParentId) {
+          srcParentId = params.sourceParentId
+          delete params.sourceParentId
+        } else {
+          let filesArr = src.split('/')
+          filesArr.splice(filesArr.length - 1)
+          srcParentId = await this.exists(filesArr.join('/'))
+        }
       }
-      let destParentId = await this.exists(dest)
+      let destParentId = null
+      if (params.destinationParentId) {
+        destParentId = params.destinationParentId
+        delete params.destinationParentId
+      } else {
+        destParentId = await this.exists(dest)
+      }
       if (!destParentId) destParentId = 'root'
       let parentToRemoves = ''
       if (srcParentId) {
@@ -351,7 +398,9 @@ class GoogleDrive {
    */
   delete (location, params = {}) {
     return new Promise(async (resolve, reject) => {
-      const fileId = await this.exists(location)
+      let fileId = null
+      if (params.fileId) fileId = params.fileId
+      else fileId = await this.exists(location)
       if (!fileId) return reject(GoogleDrive.__onError('Not found!!!! ', 404))
       this.drive(await this.__token()).files(fileId).delete((error, response) => {
         if (error) {
@@ -387,7 +436,10 @@ class GoogleDrive {
    * @return {Stream}
    */
   async getStream (location, params = {}) {
-    const fileId = await this.exists(location)
+    let fileId = null
+    if (params.fileId) {
+      fileId = params.fileId
+    } else fileId = await this.exists(location)
     if (!fileId) return null
     const clonedParams = Object.assign({}, params, {
       alt: 'media'
