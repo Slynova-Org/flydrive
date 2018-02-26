@@ -7,5 +7,6 @@
 
 module.exports = {
   local: require('./LocalFileSystem'),
-  s3: require('./AwsS3')
+  s3: require('./AwsS3'),
+  drive: require('./GoogleDrive')
 }
