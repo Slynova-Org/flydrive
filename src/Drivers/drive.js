@@ -31,37 +31,28 @@ module.exports = function (accessToken) {
   function makeRequest (p) {
     var options = defaults
     options.qs = extend(options.qs, p.params)
-    if (p.meta) {
-      if (p.meta.media && p.meta.media) {
-        options.multipart = [
-          {
-            'content-type': 'application/json',
-            body: JSON.stringify(p.meta.resource)
-          }
-        ]
-        if (p.meta.media.body) {
-          options.multipart.push({
-            'content-type': p.meta.media.mimeType,
-            body: (p.meta.media.body)
-          })
+    if (p.meta.media) {
+      options.multipart = [
+        {
+          'content-type': 'application/json',
+          body: JSON.stringify(p.meta.resource)
         }
-      } else {
-        options.headers['Content-Type'] = 'application/json'
-        options.body = JSON.stringify(p.meta.resource || p.meta)
+      ]
+      if (p.meta.media.body) {
+        options.multipart.push({
+          'content-type': p.meta.media.mimeType,
+          body: (p.meta.media.body)
+        })
       }
     } else {
       options.headers['Content-Type'] = 'application/json'
-      options.body = null
+      options.body = JSON.stringify(p.meta.resource)
     }
     return request.defaults(options)
   }
 
-  function extractParams (meta, params, cb) {
-    if ((!cb) && (!params) && (typeof meta === 'function')) {
-      return {meta: {}, params: {}, cb: meta}
-    } else if ((!cb) && (typeof params === 'function')) {
-      return {meta: meta, params: {}, cb: params}
-    } else return {meta: meta, params: params, cb: cb}
+  function extractParams (cb, meta, params) {
+    return {meta: meta || {}, params: params || {}, cb: cb}
   }
 
   const resources = {}
@@ -69,11 +60,11 @@ module.exports = function (accessToken) {
   resources.files = function (fileId) {
     return {
       list: function (params, cb) {
-        var p = extractParams(undefined, params, cb)
+        var p = extractParams(cb, undefined, params)
         return makeRequest(p).get(baseUrl + '/files', p.cb)
       },
       create: function (meta, params, cb) {
-        var p = extractParams(meta, params, cb)
+        var p = extractParams(cb, meta, params)
         let req = makeRequest(p)
         return req.post(uploadUrl + '/files', p.cb)
       },
@@ -82,60 +73,36 @@ module.exports = function (accessToken) {
           cb = encoding
           encoding = undefined
         }
-        var p = extractParams(undefined, params, cb)
+        var p = extractParams(cb, undefined, params)
         return makeRequest(p).get(baseUrl + '/files/' + fileId, {encoding}, p.cb)
       },
       patch: function (meta, params, cb) {
-        var p = extractParams(meta, params, cb)
+        var p = extractParams(cb, meta, params)
         return makeRequest(p).patch(baseUrl + '/files/' + fileId, p.cb)
       },
       update: function (meta, params, cb) {
-        var p = extractParams(meta, params, cb)
+        var p = extractParams(cb, meta, params)
         return makeRequest(p).patch(baseUrl + '/files/' + fileId, p.cb)
       },
       copy: function (meta, params, cb) {
-        var p = extractParams(meta, params, cb)
+        var p = extractParams(cb, meta, params)
         return makeRequest(p).post(baseUrl + '/files/' + fileId + '/copy', p.cb)
       },
       delete: function (cb) {
-        var p = extractParams(undefined, undefined, cb)
+        var p = extractParams(cb)
         return makeRequest(p).del(baseUrl + '/files/' + fileId, p.cb)
       },
       touch: function (cb) {
-        var p = extractParams(undefined, undefined, cb)
+        var p = extractParams(cb)
         return makeRequest(p).post(baseUrl + '/files/' + fileId, p.cb)
       },
       trash: function (cb) {
-        var p = extractParams(undefined, undefined, cb)
+        var p = extractParams(cb)
         return makeRequest(p).post(baseUrl + '/files/' + fileId + '/trash', p.cb)
       },
       untrash: function (cb) {
-        var p = extractParams(undefined, undefined, cb)
+        var p = extractParams(cb)
         return makeRequest(p).post(baseUrl + '/files/' + fileId + '/untrash', p.cb)
-      },
-      permissions: function (permId) {
-        return {
-          list: function (params, cb) {
-            var p = extractParams(undefined, params, cb)
-            return makeRequest(p).get(baseUrl + '/files/' + fileId + '/permissions', p.cb)
-          },
-          patch: function (meta, params, cb) {
-            var p = extractParams(meta, params, cb)
-            return makeRequest(p).patch(baseUrl + '/files/' + fileId + '/permissions/' + permId, p.cb)
-          },
-          update: function (meta, params, cb) {
-            var p = extractParams(meta, params, cb)
-            return makeRequest(p).put(baseUrl + '/files/' + fileId + '/permissions/' + permId, p.cb)
-          },
-          insert: function (meta, params, cb) {
-            var p = extractParams(meta, params, cb)
-            return makeRequest(p).post(baseUrl + '/files/' + fileId + '/permissions', p.cb)
-          },
-          getIdForEmail: function (email, params, cb) {
-            var p = extractParams(undefined, params, cb)
-            return makeRequest(p).get(baseUrl + '/permissionIds/' + email, p.cb)
-          }
-        }
       }
     }
   }
