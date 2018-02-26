@@ -411,7 +411,8 @@ class GoogleDrive {
         if (error) {
           return reject(error)
         }
-        if (response.statusCode !== 200) {
+        if (response.statusCode !== 200 && response.statusCode !== 204) {
+          console.log(response.statusMessage)
           return resolve(false)
         }
         resolve(true)
