@@ -336,14 +336,16 @@ class GoogleDrive {
   async move (src, dest, params = {}) {
     return new Promise(async (resolve, reject) => {
       let srcFile = null
+      let fileName = null
       if (params.sourceId) {
         srcFile = JSON.parse(await this.get(src, {fileId: params.sourceId, fields: 'id, name, mimeType, parents', alt: null, encoding: 'utf-8'}))
         delete params.sourceId
       } else {
         srcFile = JSON.parse(await this.get(src, {fields: 'id, name, mimeType, parents', alt: null, encoding: 'utf-8'}))
       }
+      if (!srcFile) return reject(GoogleDrive.__onError('Source not found', 404))
+      fileName = srcFile.name
       let srcId = srcFile.id
-      if (!srcId) return reject(GoogleDrive.__onError('Source not found', 404))
       let srcParentId = null
       if (srcFile.parents.length > 0) {
         if (params.sourceParentId) {
@@ -360,9 +362,12 @@ class GoogleDrive {
         destParentId = params.destinationParentId
         delete params.destinationParentId
       } else {
-        destParentId = await this.exists(dest)
+        let filesArr = dest.split('/')
+        fileName = filesArr.splice(filesArr.length - 1)[0]
+        destParentId = await this.exists(filesArr.join('/'))
       }
-      if (!destParentId) destParentId = 'root'
+      if(!srcParentId) srcParentId=''
+      if (!destParentId) destParentId = ''
       let parentToRemoves = ''
       if (srcParentId) {
         let ind = srcFile.parents.indexOf(srcParentId)
@@ -377,7 +382,7 @@ class GoogleDrive {
         removeParents: parentToRemoves
       })
       let resource = {
-        name: srcFile.name,
+        name: fileName,
         mimeType: srcFile.mimeType
       }
       this.drive(await this.__token()).files(srcId).update({resource}, clonedParams, (err, response, body) => {
