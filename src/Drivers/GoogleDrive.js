@@ -181,7 +181,11 @@ class GoogleDrive {
     return new Promise(async (resolve, reject) => {
       try {
         const token = await this.__token()
-        if (params.fileId) return resolve(await this.idExists(params.fileId))
+        if (params.fileId) {
+          const file = await this.idExists(params.fileId)
+          if (file) return resolve(file.id)
+          else return resolve(null)
+        }
         const id = await this.__resolveFileId(fileName, token)
         resolve(id)
       } catch (err) {
