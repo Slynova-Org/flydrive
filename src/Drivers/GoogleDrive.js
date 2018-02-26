@@ -309,7 +309,7 @@ class GoogleDrive {
         srcParentId = await this.exists(filesArr.join('/'))
       }
       let destParentId = await this.exists(dest)
-      if (!destParentId) return reject(GoogleDrive.__onError('Destination file not found'), 404)
+      if (!destParentId) destParentId = 'root'
       let parentToRemoves = ''
       if (srcParentId) {
         let ind = srcFile.parents.indexOf(srcParentId)
