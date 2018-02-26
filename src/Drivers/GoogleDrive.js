@@ -73,6 +73,7 @@ class GoogleDrive {
    * That method try to resolve a file id based on its full path
    *
    * @param fullPath
+   * @token
    * @private
    */
   __resolveFileId (fullPath, token) {
@@ -96,7 +97,7 @@ class GoogleDrive {
    * Use a different token at runtime
    * Can be useful when you want to work on different google driver
    * @param token (must contains a refresh token so that the oauthclient can refresh a new access token)
-   * @returns {Promise.<GoogleDrive>}
+   * @returns {GoogleDrive}
    */
   with (token) {
     if (typeof token === 'string') {
@@ -128,7 +129,7 @@ class GoogleDrive {
   /**
    * retrieve a new token from a refresh token
    * @param refreshToken
-   * @returns {Promise}
+   * @returns {Promise<String>}
    */
   getNewTokenFromRefresh (refreshToken) {
     return new Promise((resolve, reject) => {
@@ -148,7 +149,7 @@ class GoogleDrive {
    * @param  {String} fileId
    * @param  {Object} [params]
    *
-   * @return {Promise<Object || null>}
+   * @return {Promise<Object|null>}
    */
   idExists (fileId, params) {
     return new Promise(async (resolve, reject) => {
@@ -174,7 +175,7 @@ class GoogleDrive {
    *
    * @param  {String} fileName
    * @param  {String} params
-   * @return {Promise<Boolean>}
+   * @return {Promise<String|null>}
    */
   async exists (fileName, params = {}) {
     return new Promise(async (resolve, reject) => {
@@ -198,7 +199,7 @@ class GoogleDrive {
    * @param  {String} content
    * @param  {Object} [params]
    *
-   * @return {Promise<String>}
+   * @return {Promise<Object|null>}
    */
   put (location, content, params = {}) {
     return new Promise(async (resolve, reject) => {
@@ -247,7 +248,7 @@ class GoogleDrive {
    * @param  {Object} [params = {}]
    * @param  {String} [dest = 'utf-8']
    *
-   * @return {Promise<String>}
+   * @return {Promise<Buffer|String|Object|null>}
    */
   async get (location, params = {}, dest = null) {
     try {
@@ -272,7 +273,7 @@ class GoogleDrive {
    * @param  {String} meta [meta = {}]
    * @param  {Object} [params = {}]
    *
-   * @return {Promise<String>}
+   * @return {Promise<Object|null>}
    */
   copy (src, dest, meta = {}, params = {}) {
     return new Promise(async (resolve, reject) => {
@@ -326,7 +327,7 @@ class GoogleDrive {
    * @param  {String} dest
    * @param  {Object} [params = {}]
    *
-   * @return {Promise<String>}
+   * @return {Promise<Object>}
    */
   async move (src, dest, params = {}) {
     return new Promise(async (resolve, reject) => {
@@ -406,6 +407,9 @@ class GoogleDrive {
         if (error) {
           return reject(error)
         }
+        if (response.statusCode !== 200) {
+          return resolve(false)
+        }
         resolve(true)
       })
     })
@@ -433,7 +437,7 @@ class GoogleDrive {
    * @param  {String}  location
    * @param  {Object}  [params = {}]
    *
-   * @return {Stream}
+   * @return {Stream|null}
    */
   async getStream (location, params = {}) {
     let fileId = null
