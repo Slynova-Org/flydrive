@@ -62,7 +62,7 @@ class GoogleDrive {
       }, () => {
         return !!pageToken
       }, (err) => {
-        if (err) reject(err)
+        if (err) return reject(err)
         else {
           resolve(id)
         }
@@ -217,7 +217,7 @@ class GoogleDrive {
         resource
       }
       this.drive(await this.__token()).files(parentId).create(meta, clonedParams, (err, response, body) => {
-        if (err) reject(err)
+        if (err) return reject(err)
         if (response.statusCode !== 200) return reject(GoogleDrive.__onError(response.statusMessage, response.statusCode))
         const rep = JSON.parse(body)
         resolve(rep)
@@ -274,7 +274,7 @@ class GoogleDrive {
         parents: [destParentId]
       }, meta.resource)
       this.drive(await this.__token()).files(srcId).copy({resource, media: meta.media}, clonedParams, (err, response, body) => {
-        if (err) reject(err)
+        if (err) return reject(err)
         if (response.statusCode !== 200) {
           return reject(GoogleDrive.__onError(response.statusMessage, response.statusCode))
         }
@@ -326,7 +326,7 @@ class GoogleDrive {
         mimeType: srcFile.mimeType
       }
       this.drive(await this.__token()).files(srcId).update({resource}, clonedParams, (err, response, body) => {
-        if (err) reject(err)
+        if (err) return reject(err)
         if (response.statusCode !== 200) {
           return reject(GoogleDrive.__onError(response.statusMessage, response.statusCode))
         }
