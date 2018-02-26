@@ -375,6 +375,25 @@ class GoogleDrive {
       if (dest) req.pipe(dest)
     })
   }
+  /**
+   * Returns the stream for the given file
+   *
+   * @method getStream
+   *
+   * @param  {String}  location
+   * @param  {Object}  [params = {}]
+   *
+   * @return {Stream}
+   */
+  async getStream (location, params = {}) {
+    const fileId = await this.exists(location)
+    if (!fileId) return null
+    const clonedParams = Object.assign({}, params, {
+      alt: 'media'
+    })
+    const token = await this.__token()
+    return this.drive(token).files(fileId).get(clonedParams, null)
+  }
   static __onError (msg, code) {
     const error = new Error(msg)
     error.code = code
