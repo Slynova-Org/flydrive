@@ -112,6 +112,9 @@ class GoogleDrive {
   __token () {
     return new Promise(async (resolve, reject) => {
       if (!this._oaut2Client) return reject(new Error('No oauth2 token found'))
+      if (typeof this._oaut2Client.credentials === 'string') {
+        return this._oaut2Client.credentials
+      }
       let token = this._oaut2Client.credentials.access_token
       let refreshToken = this._oaut2Client.credentials.refresh_token || this._oaut2Client.credentials.refreshToken
       try {
