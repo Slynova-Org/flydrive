@@ -145,7 +145,7 @@ class GoogleDrive {
    * @param  {String} fileId
    * @param  {Object} [params]
    *
-   * @return {Promise<Boolean>}
+   * @return {Promise<Object || null>}
    */
   idExists (fileId, params) {
     return new Promise(async (resolve, reject) => {
@@ -155,10 +155,9 @@ class GoogleDrive {
         fileId: fileId
       })
       this.drive(await this.__token()).files(fileId).get(clonedParams, (err, resp, body) => {
-        if (err) {
-          if (err.code === 404) {
-            resolve(false)
-          } else reject(err)
+        if (err) return reject(err)
+        if (resp.statusCode !== 200) {
+          return resolve(null)
         }
         resolve(JSON.parse(body))
       })
