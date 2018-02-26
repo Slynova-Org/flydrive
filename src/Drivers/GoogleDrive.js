@@ -42,21 +42,20 @@ class GoogleDrive {
         this.drive(token).files().list(params, (err, response, body) => {
           if (err) return cb(err)
           if (response.statusCode !== 200) return cb(GoogleDrive.__onError(response.statusMessage, response.statusCode))
-          const rep = JSON.parse(body)
-          const files = rep.files
-          if (!files) reject(new Error('an error occured'))
-          if (files.length === 0) resolve(null)
-          for (let i = 0; i < files.length; i++) {
-            const f = files[i]
-            if (f.name === fileName) {
-              id = f.id
-              pageToken = null
-              return cb()
-            }
+          const {files, incompleteSearch, nextPageToken} = JSON.parse(body)
+          if (!files) {
+            return reject(new Error('an error occured'))
           }
-          if (!rep.incompleteSearch) {
+          if (files.length === 0) resolve(null)
+          const f = files.find(f => f.name === fileName)
+          if(f) {
+            id = f.id
             pageToken = null
-          } else pageToken = rep.nextPageToken
+            return cb()
+          }
+          if (!incompleteSearch) {
+            pageToken = null
+          } else pageToken = nextPageToken
           cb()
         })
       }, () => {
@@ -87,8 +86,8 @@ class GoogleDrive {
       while (count < parentCount) {
         // get the top parent id
         parentId = await this._resolveId(parentId, parents[count].trim(), token)
-        if (parentId === null) return resolve(null)// not found
         count++
+        if (parentId === null) break
       }
       return resolve(parentId)
     })
@@ -100,14 +99,7 @@ class GoogleDrive {
    * @returns {GoogleDrive}
    */
   with (token) {
-    if (typeof token === 'string') {
-      this._oaut2Client.credentials = token
-    } else {
-      this._oaut2Client.credentials = Object.assign({}, token)
-      /* if (token.refresh_token || token.refresToken) {
-        this._oaut2Client.credentials.access_token = await this.getNewTokenFromRefresh(token.refresh_token || token.refresToken)
-      } */
-    }
+    this._oaut2Client.credentials = token
     return this
   }
   __token () {
@@ -122,7 +114,7 @@ class GoogleDrive {
         if (refreshToken) token = await this.getNewTokenFromRefresh(refreshToken)
         return resolve(token)
       } catch (err) {
-        reject(err)
+        return null
       }
     })
   }
@@ -135,8 +127,7 @@ class GoogleDrive {
     return new Promise((resolve, reject) => {
       this._oaut2Client.credentials = {refresh_token: refreshToken}
       this._oaut2Client.getRequestMetadata(null, (err, headers) => {
-        if (err) return reject(err)
-        resolve(headers.Authorization.split(/\s/)[1])
+        err ? reject(err) : resolve(headers.Authorization.split(/\s/)[1])
       })
     })
   }
@@ -154,11 +145,10 @@ class GoogleDrive {
   idExists (fileId, params) {
     return new Promise(async (resolve, reject) => {
       //  location is the file full path from the drive root
-      const clonedParams = Object.assign({}, params, {
+      this.drive(await this.__token()).files(fileId).get(Object.assign({}, params, {
         token: this._oaut2Client,
         fileId: fileId
-      })
-      this.drive(await this.__token()).files(fileId).get(clonedParams, (err, resp, body) => {
+      }), (err, resp, body) => {
         if (err) return reject(err)
         if (resp.statusCode !== 200) {
           return resolve(null)
@@ -181,17 +171,31 @@ class GoogleDrive {
     return new Promise(async (resolve, reject) => {
       try {
         const token = await this.__token()
+        let id = null
         if (params.fileId) {
           const file = await this.idExists(params.fileId)
-          if (file) return resolve(file.id)
-          else return resolve(null)
+          id = (file && file.id) || null
+        } else {
+          id = await this.__resolveFileId(fileName, token)
         }
-        const id = await this.__resolveFileId(fileName, token)
         resolve(id)
       } catch (err) {
         reject(err)
       }
     })
+  }
+  async __resolveParentId (filePath) {
+    let parents = filePath.split(/\//)
+    let ret = {parentId: null, fileName: ''}
+    if (parents.length < 2) {
+      ret = {parentId: 'root', fileName: filePath}
+    } else {
+      const fileName = parents.splice(parents.length - 1)[0]
+      let fpath = parents.join('/')
+      const parentId = await this.exists(fpath)
+      ret = {parentId, fileName}
+    }
+    return ret
   }
   /**
    * Create a new file from string or buffer
@@ -214,27 +218,20 @@ class GoogleDrive {
         delete params.parentId
         fileName = location
       } else {
-        let parents = location.split(/\//)
-        if (parents.length === 0) return resolve(null)
-        fileName = parents.splice(parents.length - 1)[0]
-        let fpath = parents.join('/')
-        parentId = await this.exists(fpath)
+        const tmp = this.__resolveParentId(location)
+        parentId = tmp.parentId || 'root'
+        fileName = tmp.fileName
       }
-      if (parentId === null) parentId = 'root'
-      let metadata = content.metadata || {}
-      let clonedParams = Object.assign({}, params, {
-        uploadType: 'multipart'
-      })
-      let resource = Object.assign({}, metadata, {
-        name: fileName,
-        parents: [parentId]
-      })
-      let media = content.media || {}
       let meta = {
-        media,
-        resource
+        media: content.media || {},
+        resource: Object.assign({}, content.metadata || {}, {
+          name: fileName,
+          parents: [parentId]
+        })
       }
-      this.drive(await this.__token()).files(parentId).create(meta, clonedParams, (err, response, body) => {
+      this.drive(await this.__token()).files(parentId).create(meta, Object.assign({}, params, {
+        uploadType: 'multipart'
+      }), (err, response, body) => {
         if (err) return reject(err)
         if (response.statusCode !== 200) return reject(GoogleDrive.__onError(response.statusMessage, response.statusCode))
         const rep = JSON.parse(body)
@@ -429,13 +426,11 @@ class GoogleDrive {
   download (token, fileId, params, dest) {
     return new Promise((resolve, reject) => {
       params = Object.assign({alt: false}, params)
-
-      const encoding = params.encoding || null
-      let req = this.drive(token).files(fileId).get(params, encoding, (err, resp, body) => {
+      let req = this.drive(token).files(fileId).get(params, params.encoding || null, (err, resp, body) => {
+        if (err) return reject(err)
         if (resp.statusCode !== 200) {
           return reject(GoogleDrive.__onError(resp.statusMessage, resp.statusCode))
         }
-        if (err) return reject(err)
         return resolve(body)
       })
       if (dest) req.pipe(dest)
@@ -452,16 +447,10 @@ class GoogleDrive {
    * @return {Stream|null}
    */
   async getStream (location, params = {}) {
-    let fileId = null
-    if (params.fileId) {
-      fileId = params.fileId
-    } else fileId = await this.exists(location)
-    if (!fileId) return null
-    const clonedParams = Object.assign({}, params, {
+    let fileId = params.fileId || await this.exists(location)
+    return fileId ? this.drive(await this.__token(), Object.assign({}, params, {
       alt: 'media'
-    })
-    const token = await this.__token()
-    return this.drive(token).files(fileId).get(clonedParams, null)
+    })) : null
   }
   static __onError (msg, code) {
     const error = new Error(msg)
