@@ -39,15 +39,15 @@ module.exports = function (accessToken) {
             body: JSON.stringify(p.meta.resource)
           }
         ]
-        if(p.meta.media.body){
+        if (p.meta.media.body) {
           options.multipart.push({
             'content-type': p.meta.media.mimeType,
             body: (p.meta.media.body)
           })
         }
-      }else{
+      } else {
         options.headers['Content-Type'] = 'application/json'
-        options.body = JSON.stringify(p.meta.resource || p.meta);
+        options.body = JSON.stringify(p.meta.resource || p.meta)
       }
     } else {
       options.headers['Content-Type'] = 'application/json'
