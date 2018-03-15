@@ -5,7 +5,7 @@ const path = require('path')
 const test = require('japa')
 
 const CE = require('../../src/Exceptions')
-const LocalFileSystem = require('../../src/Drivers/LocalFileSystem')
+const { local: LocalFileSystem } = require('../../src/Drivers')
 
 function isWindowsDefenderError (error) {
   return error.code === 'EPERM'
