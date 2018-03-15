@@ -1,3 +1,5 @@
+'use strict'
+
 /**
  * node-flydrive
  *
@@ -34,7 +36,7 @@ const proxyHandler = {
     }
 
     return disk[name]
-  }
+  },
 }
 
 class StorageManager {

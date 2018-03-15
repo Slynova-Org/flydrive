@@ -1,3 +1,5 @@
+'use strict'
+
 /**
  * node-flydrive
  *
@@ -18,7 +20,7 @@ const CE = require('../Exceptions')
  *
  * @return {Boolean}
  */
-const isReadableStream = function (stream) {
+function isReadableStream (stream) {
   return stream !== null &&
     typeof (stream) === 'object' &&
     typeof (stream.pipe) === 'function' &&

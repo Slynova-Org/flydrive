@@ -1,3 +1,5 @@
+'use strict'
+
 /**
  * node-flydrive
  *
@@ -29,7 +31,7 @@ const proxyHandler = {
     }
 
     return target.driver[name]
-  }
+  },
 }
 
 class Storage {
