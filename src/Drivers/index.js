@@ -7,6 +7,8 @@
  * @copyright Slynova - Romain Lanz <romain.lanz@slynova.ch>
  */
 
+const CE = require('../Exceptions')
+
 const pathMap = {
   local: './LocalFileSystem',
   s3: './AwsS3',
@@ -15,6 +17,12 @@ const pathMap = {
 const proxyHandler = {
   get (target, name) {
     /* eslint-disable global-require, import/no-dynamic-require */
+    const path = pathMap[name]
+
+    if (path === void 0) {
+      throw CE.DriverNotSupported.driver(name)
+    }
+
     return require(pathMap[name])
   },
 }

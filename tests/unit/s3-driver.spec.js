@@ -9,12 +9,13 @@ const test = require('japa')
 const path = require('path')
 const fs = require('fs-extra')
 
-const readStream = function (stream) {
+function readStreamPromised (stream) {
   return new Promise((resolve, reject) => {
     let body = ''
 
+    /* eslint-disable no-return-assign */
     stream
-      .on('data', (chunk) => (body += chunk))
+      .on('data', chunk => (body += chunk))
       .on('end', () => resolve(body))
       .on('error', reject)
   })
@@ -23,11 +24,12 @@ const readStream = function (stream) {
 const { s3: S3Driver } = require('../../src/Drivers')
 
 require('dotenv').load()
+
 const config = {
   key: process.env.SES_KEY,
   secret: process.env.SES_SECRET,
   bucket: process.env.SES_BUCKET,
-  region: process.env.SES_REGION
+  region: process.env.SES_REGION,
 }
 
 test.group('S3 Driver', () => {
@@ -83,7 +85,7 @@ test.group('S3 Driver', () => {
     }
   }).timeout(0)
 
-  test('delete existing file', async (assert) => {
+  test('delete existing file', async () => {
     const s3Driver = new S3Driver(config)
     await s3Driver.put('dummy-file.txt', 'Hello')
     await s3Driver.delete('dummy-file.txt')
@@ -100,7 +102,7 @@ test.group('S3 Driver', () => {
     const s3Driver = new S3Driver(config)
     await s3Driver.put('dummy-file.txt', 'Hello')
     const stream = s3Driver.getStream('dummy-file.txt')
-    const content = await readStream(stream)
+    const content = await readStreamPromised(stream)
     assert.equal(content, 'Hello')
   }).timeout(0)
 
@@ -122,7 +124,7 @@ test.group('S3 Driver', () => {
     const stream = s3Driver.getStream('non-existing.txt')
 
     try {
-      await readStream(stream)
+      await readStreamPromised(stream)
     } catch (error) {
       assert.equal(error.message, 'The specified key does not exist.')
     }

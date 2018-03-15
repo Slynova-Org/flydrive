@@ -109,7 +109,7 @@ class StorageManager {
       throw CE.InvalidConfig.missingDiskDriver(name)
     }
 
-    const Driver = Drivers[diskConfig.driver] || this._drivers[diskConfig.driver]
+    const Driver = this._drivers[diskConfig.driver] || Drivers[diskConfig.driver]
 
     /**
      * Unable to pull driver from the drivers list

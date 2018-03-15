@@ -16,7 +16,7 @@
   "license": "MIT",
   "main": "src/StorageManager.js",
   "scripts": {
-    "lint": "eslint ./**/*.js",
+    "lint": "eslint src/**/*.js tests/**/*.js",
     "pretest": "npm run lint",
     "posttest": "npm run coverage",
     "test:local": "FORCE_COLOR=true node bin/index.js --local",

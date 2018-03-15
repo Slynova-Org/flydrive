@@ -8,6 +8,7 @@
  */
 
 const Resetable = require('resetable')
+/* eslint-disable import/no-extraneous-dependencies */
 const S3 = require('aws-sdk/clients/s3')
 
 /**
@@ -245,7 +246,8 @@ class AwsS3 {
         if (error) {
           return reject(error)
         }
-        resolve(url)
+
+        return resolve(url)
       })
     })
   }
