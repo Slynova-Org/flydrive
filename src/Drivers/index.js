@@ -16,13 +16,13 @@ const pathMap = {
 
 const proxyHandler = {
   get (target, name) {
-    /* eslint-disable global-require, import/no-dynamic-require */
     const path = pathMap[name]
 
     if (path === void 0) {
       throw CE.DriverNotSupported.driver(name)
     }
 
+    /* eslint-disable global-require, import/no-dynamic-require */
     return require(pathMap[name])
   },
 }
