@@ -12,6 +12,7 @@ const CE = require('../Exceptions')
 const pathMap = {
   local: './LocalFileSystem',
   s3: './AwsS3',
+  ftp: './FTP',
 }
 
 const proxyHandler = {
