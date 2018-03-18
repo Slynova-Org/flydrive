@@ -39,5 +39,14 @@ module.exports = {
       region: 'AWS_S3_REGION',
       bucket: 'AWS_S3_BUCKET',
     },
+
+    spaces: {
+      driver: 's3',
+      key: 'SPACES_KEY',
+      secret: 'SPACES_SECRET',
+      endpoint: 'SPACES_ENDPOINT',
+      bucket: 'SPACES_BUCKET',
+      region: 'SPACES_REGION',
+    }
   },
 }
