@@ -47,6 +47,6 @@ module.exports = {
       endpoint: 'SPACES_ENDPOINT',
       bucket: 'SPACES_BUCKET',
       region: 'SPACES_REGION',
-    }
+    },
   },
 }
