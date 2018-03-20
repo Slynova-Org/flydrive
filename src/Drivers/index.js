@@ -19,7 +19,7 @@ const proxyHandler = {
   get (target, name) {
     const path = pathMap[name]
 
-    if (path === void 0) {
+    if (path === undefined) {
       throw CE.DriverNotSupported.driver(name)
     }
 

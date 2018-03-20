@@ -39,6 +39,7 @@ class AwsS3 {
    */
   bucket (bucket) {
     this._bucket.set(bucket)
+
     return this
   }
 
@@ -63,11 +64,13 @@ class AwsS3 {
       this.s3.headObject(clonedParams, (error) => {
         if (error && error.statusCode === 404) {
           resolve(false)
+
           return
         }
 
         if (error) {
           reject(error)
+
           return
         }
 
@@ -301,6 +304,7 @@ class AwsS3 {
    */
   async move (src, dest, destBucket, params = {}) {
     const url = await this.copy(src, dest, destBucket, params)
+
     await this.delete(src)
 
     return url

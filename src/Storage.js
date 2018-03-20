@@ -42,6 +42,7 @@ class Storage {
    */
   constructor (driver) {
     this.driver = driver
+
     return new Proxy(this, proxyHandler)
   }
 }
