@@ -21,12 +21,12 @@ const CE = require('../Exceptions')
  * @return {Boolean}
  */
 function isReadableStream (stream) {
-  return stream !== null &&
-    typeof (stream) === 'object' &&
-    typeof (stream.pipe) === 'function' &&
-    typeof (stream._read) === 'function' &&
-    typeof (stream._readableState) === 'object' &&
-    stream.readable !== false
+  return stream !== null
+    && typeof (stream) === 'object'
+    && typeof (stream.pipe) === 'function'
+    && typeof (stream._read) === 'function'
+    && typeof (stream._readableState) === 'object'
+    && stream.readable !== false
 }
 
 class LocalFileSystem {
@@ -119,6 +119,7 @@ class LocalFileSystem {
     if (isReadableStream(content)) {
       return new Promise((resolve, reject) => {
         const ws = createOutputStream(this._fullPath(location), options)
+
         ws.on('close', () => resolve(true))
         ws.on('error', reject)
         content.pipe(ws)
@@ -126,6 +127,7 @@ class LocalFileSystem {
     }
 
     await fs.outputFile(this._fullPath(location), content, options)
+
     return true
   }
 
@@ -143,6 +145,7 @@ class LocalFileSystem {
   async prepend (location, content, options) {
     if (await this.exists(location)) {
       const actualContent = await this.get(location, 'utf-8')
+
       return this.put(location, `${content}${actualContent}`, options)
     }
 
@@ -166,6 +169,7 @@ class LocalFileSystem {
     }
 
     await fs.appendFile(this._fullPath(location), content, options)
+
     return true
   }
 
@@ -181,6 +185,7 @@ class LocalFileSystem {
    */
   async delete (location) {
     await fs.remove(this._fullPath(location))
+
     return true
   }
 
@@ -198,6 +203,7 @@ class LocalFileSystem {
    */
   async move (src, dest, options = {}) {
     await fs.move(this._fullPath(src), this._fullPath(dest), options)
+
     return true
   }
 
@@ -215,6 +221,7 @@ class LocalFileSystem {
    */
   async copy (src, dest, options) {
     await fs.copy(this._fullPath(src), this._fullPath(dest), options)
+
     return true
   }
 }

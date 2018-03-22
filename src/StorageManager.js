@@ -31,6 +31,7 @@ const proxyHandler = {
      * Fallback to driver instance
      */
     const disk = target.disk()
+
     if (typeof (disk[name]) === 'function') {
       return disk[name].bind(disk)
     }
@@ -73,6 +74,7 @@ class StorageManager {
    */
   extend (name, handler) {
     this._drivers[name] = handler
+
     return this
   }
 

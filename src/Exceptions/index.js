@@ -12,7 +12,9 @@ const NE = require('node-exceptions')
 class DriverNotSupported extends NE.RuntimeException {
   static driver (name) {
     const exception = new this(`Driver ${name} is not supported`, 400)
+
     exception.driver = name
+
     return exception
   }
 }
@@ -20,7 +22,9 @@ class DriverNotSupported extends NE.RuntimeException {
 class FileNotFound extends NE.RuntimeException {
   static file (path) {
     const exception = new this(`The file ${path} doesn't exist`, 404)
+
     exception.file = path
+
     return exception
   }
 }
@@ -42,8 +46,10 @@ class InvalidConfig extends NE.RuntimeException {
 class MethodNotSupported extends NE.RuntimeException {
   static method (name, driver) {
     const exception = new this(`Method ${name} is not supported for the driver ${driver}`, 400)
+
     exception.method = name
     exception.driver = driver
+
     return exception
   }
 }

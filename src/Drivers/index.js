@@ -12,14 +12,18 @@ const CE = require('../Exceptions')
 const pathMap = {
   local: './LocalFileSystem',
   s3: './AwsS3',
+<<<<<<< HEAD
   ftp: './FTP',
+=======
+  spaces: './AwsS3',
+>>>>>>> upstream/develop
 }
 
 const proxyHandler = {
   get (target, name) {
     const path = pathMap[name]
 
-    if (path === void 0) {
+    if (path === undefined) {
       throw CE.DriverNotSupported.driver(name)
     }
 
