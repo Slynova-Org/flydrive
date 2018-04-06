@@ -158,5 +158,5 @@ test.group('S3 Driver', () => {
     const list = await s3Driver.list()
     assert.isArray(list)
     assert.include(list[0], { Key: 'buffer-file.txt' })
-  })
+  }).timeout(10 * 1000)
 })
