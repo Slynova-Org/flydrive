@@ -31,7 +31,7 @@ class FileNotFound extends NE.RuntimeException {
 
 class DirectoryNotFound extends NE.RuntimeException {
   static directory (directory) {
-    const exception = new this(`The file ${directory} doesn't exist`, 404)
+    const exception = new this(`The directory ${directory} doesn't exist`, 404)
 
     exception.file = directory
 
