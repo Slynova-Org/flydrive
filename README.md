@@ -40,6 +40,7 @@ There's currently 3 drivers available:
 * Local
 * Amazon S3 (You need to install `aws-sdk` package to be able to use this driver)
 * Digital Ocean Spaces (You need to install `aws-sdk` package to be able to use this driver)
+* FTP (You need to install `jsftp` package to be able to use this driver)
 
 :point_right: [Read the Official Documentation](https://github.com/Slynova-Org/node-flydrive/wiki)
 
