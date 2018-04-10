@@ -25,7 +25,9 @@ class FTP {
 
     this.ftp = new JSFtp(this.config)
     this.ftp.auth(this.config.user, this.config.pass, (err) => {
-      if (err) { throw err }
+      if (err) {
+        throw err
+      }
       this.connected = true
     })
   }
@@ -41,27 +43,43 @@ class FTP {
    * @return {Promise<Boolean>}
    */
   async exists (location) {
-    if (this.connected === false) { await this._reconnect() }
+    if (this.connected === false) {
+      await this._reconnect()
+    }
 
     const existsFolder = new Promise((resolve, reject) => {
       const pathWithoutLastFolder = path.parse(location).dir
       const lastFolder = path.parse(location).base
+
       this.ftp.ls(pathWithoutLastFolder || '.', (err, res) => {
-        if (err) { return reject(err) }
+        if (err) {
+          return reject(err)
+        }
+
         return resolve(res.findIndex(element => element.name === lastFolder) !== -1)
       })
     })
 
     const existsFile = new Promise((resolve, reject) => {
       this.ftp.get(location, (err) => {
-        if (err === null) { return resolve(true) }
-        if (err.code === 550) { return resolve(false) }
+        if (err === null) {
+          return resolve(true)
+        }
+
+        if (err.code === 550) {
+          return resolve(false)
+        }
+
         return reject(err)
       })
     })
 
     const exists = await Promise.all([existsFolder, existsFile])
-    if (this.longLive === false) { await this._disconnect() }
+
+    if (this.longLive === false) {
+      await this._disconnect()
+    }
+
     return exists[0] === true || exists[1] === true
   }
 
@@ -77,20 +95,29 @@ class FTP {
    */
   get (location) {
     return new Promise(async (resolve) => {
-      if (!this.connected) { await this._reconnect() }
+      if (!this.connected) {
+        await this._reconnect()
+      }
 
       let str = ''
+
       this.ftp.get(location, (err, socket) => {
-        if (err) { throw err }
+        if (err) {
+          throw err
+        }
 
         socket.on('data', (d) => {
           str += d.toString()
         })
 
         socket.on('close', async (err2) => {
-          if (this.longLive === false) { await this._disconnect() }
+          if (this.longLive === false) {
+            await this._disconnect()
+          }
 
-          if (err2) { throw err2 }
+          if (err2) {
+            throw err2
+          }
           resolve(str)
         })
 
@@ -112,10 +139,17 @@ class FTP {
    */
   put (location, content) {
     return new Promise(async (resolve) => {
-      if (!this.connected) { await this._reconnect() }
+      if (!this.connected) {
+        await this._reconnect()
+      }
       this.ftp.put(Buffer.from(content), location, async (err) => {
-        if (this.longLive === false) { await this._disconnect() }
-        if (err) { throw err }
+        if (this.longLive === false) {
+          await this._disconnect()
+        }
+
+        if (err) {
+          throw err
+        }
         resolve()
       })
     })
@@ -133,6 +167,7 @@ class FTP {
    */
   async append (location, content) {
     const currentContent = await this.get(location)
+
     await this.put(location, currentContent + content)
   }
 
@@ -148,6 +183,7 @@ class FTP {
    */
   async prepend (location, content) {
     const currentContent = await this.get(location)
+
     await this.put(location, content + currentContent)
   }
 
@@ -162,7 +198,9 @@ class FTP {
    * @return {Promise<Boolean>}
    */
   async delete (location) {
-    if (!this.connected) { await this._reconnect() }
+    if (!this.connected) {
+      await this._reconnect()
+    }
     const deleteFile = new Promise((resolve) => {
       this.ftp.raw('dele', location, err => resolve(err))
     })
@@ -173,9 +211,13 @@ class FTP {
 
     const errs = await Promise.all([deleteFile, deleteFolder])
 
-    if (this.longLive === false) { await this._disconnect() }
+    if (this.longLive === false) {
+      await this._disconnect()
+    }
 
-    if (errs[0] !== null && errs[1] !== null) { throw (errs[0] ? errs[0] : errs[1]) }
+    if (errs[0] !== null && errs[1] !== null) {
+      throw (errs[0] ? errs[0] : errs[1])
+    }
   }
 
   /**
@@ -190,11 +232,19 @@ class FTP {
    * @return {Boolean}
    */
   async move (from, to) {
-    if (!this.connected) { await this._reconnect() }
+    if (!this.connected) {
+      await this._reconnect()
+    }
+
     return new Promise((resolve) => {
       this.ftp.rename(from, to, async (err) => {
-        if (this.longLive === false) { await this._disconnect() }
-        if (err) { throw err }
+        if (this.longLive === false) {
+          await this._disconnect()
+        }
+
+        if (err) {
+          throw err
+        }
         resolve()
       })
     })
@@ -218,17 +268,22 @@ class FTP {
   _disconnect () {
     return new Promise((resolve) => {
       this.ftp.raw('quit', '', (err) => {
-        if (err) { throw err }
+        if (err) {
+          throw err
+        }
         this.connected = false
         resolve()
       })
     })
   }
+
   _reconnect () {
     return new Promise((resolve) => {
       this.ftp = new JSFtp(this.config)
       this.ftp.auth(this.config.user, this.config.pass, (err) => {
-        if (err) { throw err }
+        if (err) {
+          throw err
+        }
         this.connected = true
         resolve()
       })

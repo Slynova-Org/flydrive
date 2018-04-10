@@ -12,11 +12,8 @@ const CE = require('../Exceptions')
 const pathMap = {
   local: './LocalFileSystem',
   s3: './AwsS3',
-<<<<<<< HEAD
-  ftp: './FTP',
-=======
   spaces: './AwsS3',
->>>>>>> upstream/develop
+  ftp: './FTP',
 }
 
 const proxyHandler = {

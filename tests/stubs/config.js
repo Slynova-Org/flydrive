@@ -40,15 +40,6 @@ module.exports = {
       bucket: 'AWS_S3_BUCKET',
     },
 
-<<<<<<< HEAD
-    ftp: {
-      driver: 'ftp',
-      host: 'FTP_HOST',
-      port: 21,
-      user: 'FTP_USER',
-      pass: 'FTP_PASS',
-      longLive: false,
-=======
     spaces: {
       driver: 's3',
       key: 'SPACES_KEY',
@@ -56,7 +47,15 @@ module.exports = {
       endpoint: 'SPACES_ENDPOINT',
       bucket: 'SPACES_BUCKET',
       region: 'SPACES_REGION',
->>>>>>> upstream/develop
+    },
+
+    ftp: {
+      driver: 'ftp',
+      host: 'FTP_HOST',
+      port: 21,
+      user: 'FTP_USER',
+      pass: 'FTP_PASS',
+      longLive: false,
     },
   },
 }
