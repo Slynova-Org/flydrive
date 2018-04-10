@@ -3,8 +3,6 @@
 </p>
 
 <p align="center">
-  <a href="https://travis-ci.org/Slynova-Org/node-flydrive"><img src="https://img.shields.io/travis/Slynova-Org/node-flydrive/master.svg?style=flat-square" alt="Build Status"></a>
-  <a href="https://coveralls.io/github/Slynova-Org/node-flydrive?branch=master"><img src="https://img.shields.io/coveralls/Slynova-Org/node-flydrive/master.svg?style=flat-square" alt="Coverage Status"></a>
   <a href="https://www.npmjs.com/package/@slynova/flydrive"><img src="https://img.shields.io/npm/v/@slynova/flydrive.svg?style=flat-square" alt="Version"></a>
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/npm/l/@slynova/flydrive.svg?style=flat-square" alt="License"></a>
 </p>
