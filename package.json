@@ -11,7 +11,8 @@
   ],
   "author": "Romain Lanz <romain.lanz@slynova.ch>",
   "contributors": [
-    "Harminder Virk <virk@adonisjs.com>"
+    "Harminder Virk <virk@adonisjs.com>",
+    "Xavier Stouder <xavier@stouder.io>"
   ],
   "license": "MIT",
   "main": "src/StorageManager.js",
