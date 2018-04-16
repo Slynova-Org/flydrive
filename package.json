@@ -1,13 +1,14 @@
 {
   "name": "@slynova/flydrive",
-  "version": "0.2.0",
+  "version": "0.3.0",
   "description": "Flexible and Fluent way to manage storage in Node.js.",
   "keywords": [
     "storage",
     "filesystem",
     "file",
     "aws",
-    "s3"
+    "s3",
+    "ftp"
   ],
   "author": "Romain Lanz <romain.lanz@slynova.ch>",
   "contributors": [
