@@ -84,7 +84,7 @@ class StorageManager {
    * @param  {string} name
    * @return {object}
    */
-  disk (name) {
+  disk (name, config) {
     name = name || this._config.default
 
     /**
@@ -120,7 +120,7 @@ class StorageManager {
       throw CE.DriverNotSupported.driver(diskConfig.driver)
     }
 
-    return new Storage(new Driver(diskConfig))
+    return new Storage(new Driver(config || diskConfig))
   }
 }
 
