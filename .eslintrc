@@ -1,0 +1,6 @@
+{
+  "extends": "@slynova",
+  "env": {
+    "node": true
+  }
+}

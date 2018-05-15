@@ -34,7 +34,7 @@ test.group('Storage Manager', (group) => {
 
   test('throw exception when disk config is missing', (assert) => {
     const storageManager = new StorageManager({
-      default: 'local'
+      default: 'local',
     })
     const fn = () => storageManager.disk()
     assert.throw(fn, 'E_INVALID_CONFIG: Make sure to define config for local disk')
@@ -45,9 +45,9 @@ test.group('Storage Manager', (group) => {
       default: 'local',
       disks: {
         local: {
-          root: ''
-        }
-      }
+          root: '',
+        },
+      },
     })
     const fn = () => storageManager.disk()
     assert.throw(fn, 'E_INVALID_CONFIG: Make sure to define driver for local disk')
@@ -59,9 +59,9 @@ test.group('Storage Manager', (group) => {
       disks: {
         local: {
           root: '',
-          driver: 'foo'
-        }
-      }
+          driver: 'foo',
+        },
+      },
     })
     const fn = () => storageManager.disk()
     assert.throw(fn, 'Driver foo is not supported')
@@ -73,9 +73,9 @@ test.group('Storage Manager', (group) => {
       disks: {
         local: {
           root: '',
-          driver: 'local'
-        }
-      }
+          driver: 'local',
+        },
+      },
     })
     const localDriver = storageManager.disk('local')
     assert.instanceOf(localDriver, Storage)
@@ -88,9 +88,9 @@ test.group('Storage Manager', (group) => {
       disks: {
         local: {
           root: path.join(__dirname, '../../'),
-          driver: 'local'
-        }
-      }
+          driver: 'local',
+        },
+      },
     })
 
     await fs.outputFile(fullPath('i_exist'), '')
@@ -103,9 +103,9 @@ test.group('Storage Manager', (group) => {
       default: 'local',
       disks: {
         local: {
-          driver: 'foo'
-        }
-      }
+          driver: 'foo',
+        },
+      },
     })
 
     class FooDriver {}

@@ -5,7 +5,7 @@ const path = require('path')
 const test = require('japa')
 
 const CE = require('../../src/Exceptions')
-const LocalFileSystem = require('../../src/Drivers/LocalFileSystem')
+const { local: LocalFileSystem } = require('../../src/Drivers')
 
 function isWindowsDefenderError (error) {
   return error.code === 'EPERM'
@@ -18,13 +18,13 @@ function fullPath (relativePath) {
 function streamToString (stream) {
   return new Promise((resolve, reject) => {
     const chunk = []
-    stream.on('data', (line) => (chunk.push(line)))
+    stream.on('data', line => chunk.push(line))
     stream.on('error', reject)
     stream.on('close', () => resolve(chunk.join('\n')))
   })
 }
 
-test.group('Local Driver', group => {
+test.group('Local Driver', (group) => {
   group.before(async () => {
     this.storage = new LocalFileSystem({ root: path.join(__dirname, '../../') })
     await fs.ensureDir(fullPath('.'))

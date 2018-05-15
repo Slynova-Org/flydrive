@@ -1,3 +1,5 @@
+'use strict'
+
 /**
  * node-flydrive
  *
@@ -29,7 +31,7 @@ const proxyHandler = {
     }
 
     return target.driver[name]
-  }
+  },
 }
 
 class Storage {
@@ -40,6 +42,7 @@ class Storage {
    */
   constructor (driver) {
     this.driver = driver
+
     return new Proxy(this, proxyHandler)
   }
 }

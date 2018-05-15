@@ -1,4 +1,5 @@
 tests
+.eslintrc
 .editorconfig
 .travis.yml
 japaFile.js

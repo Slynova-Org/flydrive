@@ -1,3 +1,5 @@
+'use strict'
+
 /**
  * node-flydrive
  *
@@ -29,12 +31,13 @@ const proxyHandler = {
      * Fallback to driver instance
      */
     const disk = target.disk()
+
     if (typeof (disk[name]) === 'function') {
       return disk[name].bind(disk)
     }
 
     return disk[name]
-  }
+  },
 }
 
 class StorageManager {
@@ -71,6 +74,7 @@ class StorageManager {
    */
   extend (name, handler) {
     this._drivers[name] = handler
+
     return this
   }
 
@@ -107,7 +111,7 @@ class StorageManager {
       throw CE.InvalidConfig.missingDiskDriver(name)
     }
 
-    const Driver = Drivers[diskConfig.driver] || this._drivers[diskConfig.driver]
+    const Driver = this._drivers[diskConfig.driver] || Drivers[diskConfig.driver]
 
     /**
      * Unable to pull driver from the drivers list

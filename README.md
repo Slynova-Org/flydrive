@@ -3,10 +3,7 @@
 </p>
 
 <p align="center">
-  <a href="https://travis-ci.org/Slynova-Org/node-flydrive"><img src="https://img.shields.io/travis/Slynova-Org/node-flydrive/master.svg?style=flat-square" alt="Build Status"></a>
-  <a href="https://coveralls.io/github/Slynova-Org/node-flydrive?branch=master"><img src="https://img.shields.io/coveralls/Slynova-Org/node-flydrive/master.svg?style=flat-square" alt="Coverage Status"></a>
   <a href="https://www.npmjs.com/package/@slynova/flydrive"><img src="https://img.shields.io/npm/v/@slynova/flydrive.svg?style=flat-square" alt="Version"></a>
-  <a href="https://www.npmjs.com/package/@slynova/flydrive"><img src="https://img.shields.io/npm/dt/@slynova/flydrive.svg?style=flat-square" alt="Downloads"></a>
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/npm/l/@slynova/flydrive.svg?style=flat-square" alt="License"></a>
 </p>
 
@@ -36,10 +33,12 @@ const StorageManager = require('@slynova/flydrive')
 const storage = new StorageManager(config)
 ```
 
-There's currently 2 drivers available:
+There's currently 4 drivers available:
 
 * Local
 * Amazon S3 (You need to install `aws-sdk` package to be able to use this driver)
+* Digital Ocean Spaces (You need to install `aws-sdk` package to be able to use this driver)
+* FTP (You need to install `jsftp` package to be able to use this driver)
 
 :point_right: [Read the Official Documentation](https://github.com/Slynova-Org/node-flydrive/wiki)
 

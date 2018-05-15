@@ -21,18 +21,19 @@ function readStreamPromised (stream) {
   })
 }
 
-const { s3: S3Driver } = require('../../src/Drivers')
+const { spaces: S3Driver } = require('../../src/Drivers')
 
 require('dotenv').load()
 
 const config = {
-  key: process.env.SES_KEY,
-  secret: process.env.SES_SECRET,
-  bucket: process.env.SES_BUCKET,
-  region: process.env.SES_REGION,
+  key: process.env.SPACES_KEY,
+  secret: process.env.SPACES_SECRET,
+  endpoint: process.env.SPACES_ENDPOINT,
+  bucket: process.env.SPACES_BUCKET,
+  region: process.env.SPACES_REGION,
 }
 
-test.group('S3 Driver', () => {
+test.group('Spaces Driver', () => {
   test('return false when file doesn\'t exists', async (assert) => {
     const s3Driver = new S3Driver(config)
     const exists = await s3Driver.exists('some-file.jpg')
@@ -45,7 +46,7 @@ test.group('S3 Driver', () => {
     const url = await s3Driver.put('some-file.txt', 'This is the text file')
     const exists = await s3Driver.exists('some-file.txt')
 
-    assert.equal(url, `https://${process.env.SES_BUCKET}.${s3Driver.s3.endpoint.host}/some-file.txt`)
+    assert.equal(url, `https://${process.env.SPACES_BUCKET}.${s3Driver.s3.endpoint.host}/some-file.txt`)
     assert.isTrue(exists)
   }).timeout(0)
 
@@ -56,7 +57,7 @@ test.group('S3 Driver', () => {
     const exists = await s3Driver.exists('buffer-file.txt')
 
     assert.isTrue(exists)
-    assert.equal(url, `https://${process.env.SES_BUCKET}.${s3Driver.s3.endpoint.host}/buffer-file.txt`)
+    assert.equal(url, `https://${process.env.SPACES_BUCKET}.${s3Driver.s3.endpoint.host}/buffer-file.txt`)
   }).timeout(0)
 
   test('create a new file from stream', async (assert) => {
@@ -71,7 +72,7 @@ test.group('S3 Driver', () => {
     await fs.remove(dummyFile)
 
     assert.isTrue(readStream.closed)
-    assert.equal(url, `https://${process.env.SES_BUCKET}.${s3Driver.s3.endpoint.host}/stream-file.txt`)
+    assert.equal(url, `https://${process.env.SPACES_BUCKET}.${s3Driver.s3.endpoint.host}/stream-file.txt`)
     assert.isTrue(exists)
   }).timeout(0)
 
@@ -81,7 +82,7 @@ test.group('S3 Driver', () => {
       const s3Driver = new S3Driver(Object.assign({}, config, { secret: '2020' }))
       await s3Driver.put('dummy-file.txt', 'Hello')
     } catch (error) {
-      assert.equal(error.message, 'The request signature we calculated does not match the signature you provided. Check your key and signing method.')
+      assert.equal(error.code, 'SignatureDoesNotMatch')
     }
   }).timeout(0)
 
@@ -109,13 +110,7 @@ test.group('S3 Driver', () => {
   test('get public url to a file', (assert) => {
     const s3Driver = new S3Driver(config)
     const url = s3Driver.getUrl('dummy-file1.txt')
-    assert.equal(url, `https://${s3Driver.s3.endpoint.host}/${process.env.SES_BUCKET}/dummy-file1.txt`)
-  })
-
-  test('get public url to a file when region is not defined', (assert) => {
-    const s3Driver = new S3Driver(Object.assign({}, config, { region: null }))
-    const url = s3Driver.getUrl('dummy-file1.txt')
-    assert.equal(url, `https://${process.env.SES_BUCKET}.s3.amazonaws.com/dummy-file1.txt`)
+    assert.equal(url, `https://${s3Driver.s3.endpoint.host}/${process.env.SPACES_BUCKET}/dummy-file1.txt`)
   })
 
   test('throw exception when getting stream for non-existing file', async (assert) => {
@@ -126,7 +121,7 @@ test.group('S3 Driver', () => {
     try {
       await readStreamPromised(stream)
     } catch (error) {
-      assert.equal(error.message, 'The specified key does not exist.')
+      assert.equal(error.code, 'NoSuchKey')
     }
   }).timeout(10 * 1000)
 
@@ -134,7 +129,7 @@ test.group('S3 Driver', () => {
     const s3Driver = new S3Driver(config)
     await s3Driver.put('dummy-file1.txt', 'Hello')
     const url = await s3Driver.copy('dummy-file1.txt', 'dummy-file2.txt')
-    assert.equal(url, `https://${s3Driver.s3.endpoint.host}/${process.env.SES_BUCKET}/dummy-file2.txt`)
+    assert.equal(url, `https://${s3Driver.s3.endpoint.host}/${process.env.SPACES_BUCKET}/dummy-file2.txt`)
   }).timeout(10 * 1000)
 
   test('move file from one location to other', async (assert) => {
@@ -143,7 +138,7 @@ test.group('S3 Driver', () => {
     const url = await s3Driver.move('dummy-file1.txt', 'dummy-file2.txt')
     const exists = await s3Driver.exists('dummy-file1.txt')
 
-    assert.equal(url, `https://${s3Driver.s3.endpoint.host}/${process.env.SES_BUCKET}/dummy-file2.txt`)
+    assert.equal(url, `https://${s3Driver.s3.endpoint.host}/${process.env.SPACES_BUCKET}/dummy-file2.txt`)
     assert.isFalse(exists)
   }).timeout(10 * 1000)
 

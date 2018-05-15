@@ -2,4 +2,7 @@ node_modules
 npm-debug.log
 .nyc_output
 coverage
+package-lock.json
+yarn.lock
+yarn-error.log
 .env
