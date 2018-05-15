@@ -133,7 +133,7 @@ class FTP {
    * @async
    *
    * @param  {String} location
-   * @param  {String} content
+   * @param  {String|Buffer|Stream} content
    *
    * @return {Promise<String>}
    */
@@ -142,7 +142,7 @@ class FTP {
       if (!this.connected) {
         await this._reconnect()
       }
-      this.ftp.put(Buffer.from(content), location, async (err) => {
+      this.ftp.put(content, location, async (err) => {
         if (this.longLive === false) {
           await this._disconnect()
         }
@@ -154,7 +154,7 @@ class FTP {
       })
     })
   }
-
+ 
   /**
    * Appends content to the file
    *

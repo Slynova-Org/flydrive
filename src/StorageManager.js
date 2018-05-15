@@ -120,7 +120,7 @@ class StorageManager {
       throw CE.DriverNotSupported.driver(diskConfig.driver)
     }
 
-    return new Storage(new Driver(config || diskConfig))
+    return new Storage(new Driver(Object.assign({},diskConfig, config)))
   }
 }
 
