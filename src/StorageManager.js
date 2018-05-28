@@ -82,6 +82,7 @@ class StorageManager {
    * Get a disk instance.
    *
    * @param  {string} name
+   * @param {Object} config
    * @return {object}
    */
   disk (name, config) {
