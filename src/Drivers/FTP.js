@@ -133,7 +133,7 @@ class FTP {
    * @async
    *
    * @param  {String} location
-   * @param  {String|Buffer|Stream} content
+   * @param  {String} content
    *
    * @return {Promise<String>}
    */
