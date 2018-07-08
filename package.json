@@ -24,6 +24,8 @@
     "test:local": "FORCE_COLOR=true node bin/index.js --local",
     "test": "./node_modules/.bin/nyc npm run test:local",
     "test:win": "set FORCE_COLOR=true && node bin/index.js --win",
+    "test:docker": "echo 'Running without coverage' && npm run test",
+    "docker:test": "docker-compose run node-flydrive npm run test:docker",
     "coverage": "nyc report --reporter=text-lcov | coveralls"
   },
   "repository": {

@@ -1,0 +1,44 @@
+version: '3'
+services:
+
+  node-flydrive:
+    container_name: node-flydrive
+    build:
+      context: .
+      dockerfile: ./Dockerfile.dev
+    depends_on:
+      - localstack-s3
+      - ftp-server
+    env_file:
+      - ./.env.test
+    volumes:
+      - .:/home/node/app
+      - /home/node/app/node_modules
+    command: tail -f /dev/null
+
+  # Based on http://bluesock.org/~willkg/blog/dev/using_localstack_for_s3.html
+  # More examples at https://medium.com/@andyalky/developing-aws-apps-locally-with-localstack-7f3d64663ce4
+  localstack-s3:
+    container_name: localstack-s3
+    image: localstack/localstack
+    env_file:
+      - ./.env.test
+    ports:
+      - "5000:5000"
+      - "8080:8080"
+    restart: on-failure
+
+  ftp-server:
+    container_name: ftp-server
+    image: mcreations/ftp
+    ports:
+       - "21:21"
+       - "30000-30059:30000-30059"
+    environment:
+      HOST: "localhost"
+      FTP_USER: "test"
+      FTP_PASS: "test"
+      PASV_MIN_PORT: 30000
+      PASV_MAX_PORT: 30059
+    restart: on-failure
+
