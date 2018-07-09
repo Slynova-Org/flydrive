@@ -42,3 +42,16 @@ services:
       PASV_MAX_PORT: 30059
     restart: on-failure
 
+  # Tests fail over this service::unhandled rejections
+  # ftp-server:
+  #   container_name: ftp-server
+  #   image: stilliard/pure-ftpd:hardened
+  #   ports:
+  #      - "21:21"
+  #      - "30000-30059:30000-30059"
+  #   environment:
+  #     FTP_USER_NAME: "test"
+  #     FTP_USER_PASS: "test"
+  #     FTP_USER_HOME: "/home/test"
+  #   restart: on-failure
+

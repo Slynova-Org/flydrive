@@ -243,6 +243,7 @@ class FTP {
         }
 
         if (err) {
+          console.log(err)
           throw err
         }
         resolve()

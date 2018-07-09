@@ -1,0 +1,24 @@
+#!/bin/sh
+export $(egrep -v '^#' .env.test | xargs -d '\n')
+
+# Give time for the services to respond before starting the test suite
+docker-compose up -d -V --force-recreate localstack-s3 ftp-server;
+
+# Wait for FTP service to be started, which is quite slow
+attempt_counter=0
+max_attempts=6
+FTP_HOST="ftp://$FTP_USER:$FTP_PASS@$(docker-machine ip):$FTP_PORT"
+
+until $(curl --output /dev/null --silent --head --fail $FTP_HOST); do
+    if [ ${attempt_counter} -eq ${max_attempts} ];then
+      echo "Can't connect to FTP service"
+      exit 1
+    fi
+
+    printf '.'
+    attempt_counter=$(($attempt_counter+1))
+    sleep 5
+done
+
+# test:local without coverage
+docker-compose run node-flydrive npm run test:local;

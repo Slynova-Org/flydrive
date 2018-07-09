@@ -15,11 +15,6 @@ test.group('FTP Driver', (group) => {
 
   const ftpDriver = new FTPDriver(config)
 
-  group.afterEach(async () => {
-    // prevent ftp max clients errors
-    await ftpDriver._disconnect()
-  })
-
   test('return false when file doesn\'t exists', async (assert) => {
     const exists = await ftpDriver.exists('some-file.jpg')
     assert.isFalse(exists)
@@ -51,7 +46,6 @@ test.group('FTP Driver', (group) => {
     assert.equal(content, 'Hello, World!')
   }).timeout(5000)
 
-  // .delete should return something
   test('delete file', async () => {
     await ftpDriver.put('dummy-file.txt', 'Hello')
     await ftpDriver.delete('dummy-file.txt')
@@ -62,7 +56,6 @@ test.group('FTP Driver', (group) => {
     const firstContent = await ftpDriver.get('dummy-file.txt')
     await ftpDriver.copy('dummy-file.txt', 'dummy-file2.txt')
     const secondContent = await ftpDriver.get('dummy-file2.txt')
-
     assert.equal(firstContent, secondContent)
   }).timeout(5000)
 
