@@ -1,0 +1,12 @@
+image: ubuntu
+
+install:
+  - nvm use 9.11.2
+  - npm install
+
+test_script:
+  - node --version
+  - npm --version
+  - npm test
+
+build: off
