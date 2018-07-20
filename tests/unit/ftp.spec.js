@@ -2,6 +2,13 @@ const test = require('japa')
 
 const { ftp: FTPDriver } = require('../../src/Drivers')
 
+const FtpSrv = require('ftp-srv');
+const ftpServer = new FtpSrv("ftp://127.0.0.1:9000");
+ftpServer.on('login', (data, resolve, reject) => { resolve() });
+ftpServer.on('client-error', ({connection, context, error}) => { console.log("Error!", error) });
+
+const ftpServerListen = ftpServer.listen()
+
 require('dotenv').load()
 
 const config = {
@@ -13,14 +20,6 @@ const config = {
 const ftpDriver = new FTPDriver(config)
 
 test.group('FTP Driver', () => {
-
-
-
-  test('return false when file doesn\'t exists', async (assert) => {
-    const exists = await ftpDriver.exists('some-file.jpg')
-    assert.isFalse(exists)
-  }).timeout(20000)
-
   test('return true when file exists', async (assert) => {
     await ftpDriver.put('some-file.txt', 'Hello')
     const exists = await ftpDriver.exists('some-file.txt')
