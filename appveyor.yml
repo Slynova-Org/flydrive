@@ -10,3 +10,9 @@ test_script:
   - npm test
 
 build: off
+
+environment:
+  FTP_HOST: ftp.dlptest.com
+  FTP_USER: dlpuser@dlptest.com
+  FTP_PASS: 3D6XZV9MKdhM5fF
+  FTP_PORT: 21
