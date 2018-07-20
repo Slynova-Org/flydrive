@@ -4,3 +4,4 @@ npm-debug.log
 coverage
 yarn-error.log
 .env
+example/downloads/
