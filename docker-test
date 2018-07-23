@@ -2,7 +2,7 @@
 export $(egrep -v '^#' .env.test | xargs -d '\n')
 
 # Give time for the services to respond before starting the test suite
-docker-compose up -d -V --force-recreate localstack-s3 ftp-server;
+docker-compose up -d -V --build --remove-orphans --force-recreate localstack-s3 ftp-server;
 
 # Wait for FTP service to be started, which is quite slow
 attempt_counter=0
