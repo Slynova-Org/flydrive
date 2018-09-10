@@ -17,7 +17,7 @@ module.exports = {
    |
    |
    */
-  'default': 'local',
+  default: 'local',
 
   /*
    |--------------------------------------------------------------------------
@@ -26,18 +26,36 @@ module.exports = {
    | Supported: "local", "s3"
    |
    */
-  'disks': {
-    'local': {
-      'driver': 'local',
-      'root': process.cwd()
+  disks: {
+    local: {
+      driver: 'local',
+      root: process.cwd(),
     },
 
-    's3': {
-      'driver': 's3',
-      'key': 'AWS_S3_KEY',
-      'secret': 'AWS_S3_SECRET',
-      'region': 'AWS_S3_REGION',
-      'bucket': 'AWS_S3_BUCKET'
-    }
-  }
+    s3: {
+      driver: 's3',
+      key: 'AWS_S3_KEY',
+      secret: 'AWS_S3_SECRET',
+      region: 'AWS_S3_REGION',
+      bucket: 'AWS_S3_BUCKET',
+    },
+
+    spaces: {
+      driver: 's3',
+      key: 'SPACES_KEY',
+      secret: 'SPACES_SECRET',
+      endpoint: 'SPACES_ENDPOINT',
+      bucket: 'SPACES_BUCKET',
+      region: 'SPACES_REGION',
+    },
+
+    ftp: {
+      driver: 'ftp',
+      host: 'FTP_HOST',
+      port: 21,
+      user: 'FTP_USER',
+      pass: 'FTP_PASS',
+      longLive: false,
+    },
+  },
 }

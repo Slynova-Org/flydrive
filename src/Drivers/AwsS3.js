@@ -1,3 +1,5 @@
+'use strict'
+
 /**
  * node-flydrive
  *
@@ -6,6 +8,8 @@
  */
 
 const Resetable = require('resetable')
+/* eslint-disable import/no-extraneous-dependencies */
+const S3 = require('aws-sdk/clients/s3')
 
 /**
  * Aws driver for using s3 with flydriver
@@ -15,10 +19,10 @@ const Resetable = require('resetable')
  */
 class AwsS3 {
   constructor (config) {
-    this.s3 = new (require('aws-sdk/clients/s3'))(Object.assign({}, {
+    this.s3 = new S3(Object.assign({}, {
       accessKeyId: config.key,
       secretAccessKey: config.secret,
-      region: config.region
+      region: config.region,
     }, config))
 
     this._bucket = new Resetable(config.bucket)
@@ -35,6 +39,7 @@ class AwsS3 {
    */
   bucket (bucket) {
     this._bucket.set(bucket)
+
     return this
   }
 
@@ -53,17 +58,19 @@ class AwsS3 {
     return new Promise((resolve, reject) => {
       const clonedParams = Object.assign({}, params, {
         Bucket: this._bucket.pull(),
-        Key: location
+        Key: location,
       })
 
       this.s3.headObject(clonedParams, (error) => {
         if (error && error.statusCode === 404) {
           resolve(false)
+
           return
         }
 
         if (error) {
           reject(error)
+
           return
         }
 
@@ -89,14 +96,15 @@ class AwsS3 {
       const clonedParams = Object.assign({}, params, {
         Key: location,
         Body: content,
-        Bucket: this._bucket.pull()
+        Bucket: this._bucket.pull(),
       })
 
       this.s3.upload(clonedParams, (error, response) => {
         if (error) {
           return reject(error)
         }
-        resolve(response.Location)
+
+        return resolve(response.Location)
       })
     })
   }
@@ -116,14 +124,15 @@ class AwsS3 {
     return new Promise((resolve, reject) => {
       const clonedParams = Object.assign({}, params, {
         Bucket: this._bucket.pull(),
-        Key: location
+        Key: location,
       })
 
-      this.s3.deleteObject(clonedParams, (error, response) => {
+      this.s3.deleteObject(clonedParams, (error) => {
         if (error) {
           return reject(error)
         }
-        resolve(true)
+
+        return resolve(true)
       })
     })
   }
@@ -143,14 +152,15 @@ class AwsS3 {
     return new Promise((resolve, reject) => {
       const clonedParams = Object.assign({}, params, {
         Bucket: this._bucket.pull(),
-        Key: location
+        Key: location,
       })
 
       this.s3.getObject(clonedParams, (error, response) => {
         if (error) {
           return reject(error)
         }
-        resolve(response)
+
+        return resolve(response)
       })
     })
   }
@@ -186,7 +196,7 @@ class AwsS3 {
   getStream (location, params = {}) {
     const clonedParams = Object.assign({}, params, {
       Bucket: this._bucket.pull(),
-      Key: location
+      Key: location,
     })
 
     return this.s3.getObject(clonedParams).createReadStream()
@@ -232,14 +242,15 @@ class AwsS3 {
       const clonedParams = Object.assign({}, params, {
         Key: location,
         Bucket: this._bucket.pull(),
-        Expires: expiry || 900
+        Expires: expiry || 900,
       })
 
       this.s3.getSignedUrl('getObject', clonedParams, (error, url) => {
         if (error) {
           return reject(error)
         }
-        resolve(url)
+
+        return resolve(url)
       })
     })
   }
@@ -264,14 +275,15 @@ class AwsS3 {
       const clonedParams = Object.assign({}, params, {
         Key: dest,
         CopySource: `/${bucket}/${src}`,
-        Bucket: destBucket || bucket
+        Bucket: destBucket || bucket,
       })
 
-      this.s3.copyObject(clonedParams, (error, response) => {
+      this.s3.copyObject(clonedParams, (error) => {
         if (error) {
           return reject(error)
         }
-        resolve(this.getUrl(dest, destBucket))
+
+        return resolve(this.getUrl(dest, destBucket))
       })
     })
   }
@@ -292,6 +304,7 @@ class AwsS3 {
    */
   async move (src, dest, destBucket, params = {}) {
     const url = await this.copy(src, dest, destBucket, params)
+
     await this.delete(src)
 
     return url
