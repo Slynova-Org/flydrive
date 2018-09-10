@@ -14,7 +14,8 @@ const pathMap = {
   s3: './AwsS3',
   spaces: './AwsS3',
   ftp: './FTP',
-  oss: './Aliyun'
+  oss: './Aliyun',
+  cos: './TencentCOS'
 }
 
 const proxyHandler = {
