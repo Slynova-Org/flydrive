@@ -1,4 +1,5 @@
 const Resetable = require('resetable')
+const OSS = require('ali-oss')
 
 /**
  * Aliyun driver for using with flydriver
@@ -8,12 +9,13 @@ const Resetable = require('resetable')
  */
 class Aliyun {
   constructor (config) {
-    this.oss = require('ali-oss').Wrapper(Object.assign({}, {
+    this.oss = new OSS(Object.assign({}, {
       accessKeyId: config.key,
       accessKeySecret: config.secret,
       region: config.region,
-      secure: config.secure
+      secure: config.secure,
     }, config))
+    
     this._bucket = new Resetable(config.bucket)
   }
 
@@ -28,6 +30,7 @@ class Aliyun {
    */
   bucket (bucket) {
     this._bucket.set(bucket)
+    
     return this
   }
 
@@ -43,9 +46,10 @@ class Aliyun {
    * @return {Promise<Boolean>}
    */
   exists (location, params) {
-    const successStatuses = [200, 304]
     return new Promise((resolve, reject) => {
-      this.oss.head(location, params = {})
+      const successStatuses = [200, 304]
+
+      this.oss.head(location, params)
         .then((response) => {
           if (successStatuses.indexOf(response.status) >= 0) {
             resolve(true)
@@ -71,8 +75,14 @@ class Aliyun {
    */
   put (location, content, params) {
     return new Promise((resolve, reject) => {
-      this.oss.put(location, content)
-       .then(response => resolve(response.name))
+      this.oss.put(location, content, params)
+       .then((response) => {
+         if (response.status === 200) {
+          resolve(response.name)
+         } else {
+           reject(response)
+         }
+       })
        .catch(error => reject(error))
     })
   }
