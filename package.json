@@ -8,6 +8,10 @@
     "file",
     "aws",
     "s3",
+    "alibaba cloud",
+    "oss",
+    "tencent cloud",
+    "cos",
     "ftp"
   ],
   "author": "Romain Lanz <romain.lanz@slynova.ch>",
@@ -42,6 +46,8 @@
   "devDependencies": {
     "@slynova/eslint-config": "^1.0.5",
     "aws-sdk": "^2.240.1",
+    "ali-oss": "^6.0.1",
+    "cos-nodejs-sdk-v5": "^2.4.10",
     "coveralls": "^3.0.1",
     "dotenv": "^5.0.0",
     "eslint": "^4.19.1",
