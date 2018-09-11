@@ -97,7 +97,6 @@ class TencentCOS {
    */
   put (location, content, params) {
     return new Promise((resolve, reject) => {
-      console.error(content)
       const clonedParams = Object.assign({}, params, {
         Bucket: this._bucket.pull(),
         Region: this.config.region,
@@ -162,7 +161,6 @@ class TencentCOS {
         Bucket: this._bucket.pull(),
         Region: this.config.region,
         Key: location,
-        Output: location
       })
 
       this.cos.getObject(clonedParams, (error, response) => {
@@ -188,7 +186,6 @@ class TencentCOS {
    */
   async get (location, encoding = 'utf-8', params = {}) {
     const { Body } = await this.getObject(location, params)
-
     return Buffer.isBuffer(Body) ? Body.toString(encoding) : Body
   }
 
@@ -202,14 +199,14 @@ class TencentCOS {
    *
    * @return {Stream}
    */
-  getStream (location, params = {}) {
+  async getStream (location, params = {}) {
     const clonedParams = Object.assign({}, params, {
       Region: this.config.region,
       Bucket: this._bucket.pull(),
       Key: location,
     })
-
-    return this.cos.getObject(clonedParams).createReadStream()
+    const { Body } = await this.getObject(location, params)
+    return Body
   }
 
   /**
