@@ -9,18 +9,13 @@ const COS = require('cos-nodejs-sdk-v5')
  */
 class TencentCOS {
   constructor (config) {
-    // this.config = Object.assign({}, {
-    //   bucket: config.bucket,
-    //   region: config.region,
-    //   secure: config.secure,
-    // }, config)
-    this.cos = new COS(Object.assign({}, {
-      AppId: config.AppId,
-      SecretId: config.SecretId,
-      SecretKey: config.SecretKey,
-      bucket: config.bucket,
+    this.config = Object.assign({}, {
       region: config.region,
       secure: config.secure,
+    }, config)
+    this.cos = new COS(Object.assign({}, {
+      SecretId: config.SecretId,
+      SecretKey: config.SecretKey,
     }, config))
     
     this._bucket = new Resetable(config.bucket)
@@ -56,7 +51,7 @@ class TencentCOS {
     return new Promise((resolve, reject) => {
       const clonedParams = Object.assign({}, params, {
         Bucket: this._bucket.pull(),
-        Region: this.cos.region,
+        Region: this.config.region,
         Key: location,
       })
 
@@ -92,11 +87,13 @@ class TencentCOS {
    */
   put (location, content, params) {
     return new Promise((resolve, reject) => {
+      console.error(content)
       const clonedParams = Object.assign({}, params, {
         Bucket: this._bucket.pull(),
-        Region: this.cos.region,
+        Region: this.config.region,
         Key: location,
         Body: content,
+        ContentLength: content.byteCount
       })
       
       this.cos.putObject(clonedParams, (error, response) => {
@@ -124,7 +121,7 @@ class TencentCOS {
     return new Promise((resolve, reject) => {
       const clonedParams = Object.assign({}, params, {
         Bucket: this._bucket.pull(),
-        Region: this.cos.region,
+        Region: this.config.region,
         Key: location,
       })
 
@@ -153,7 +150,7 @@ class TencentCOS {
     return new Promise((resolve, reject) => {
       const clonedParams = Object.assign({}, params, {
         Bucket: this._bucket.pull(),
-        Region: this.cos.region,
+        Region: this.config.region,
         Key: location,
         Output: location
       })
@@ -197,7 +194,7 @@ class TencentCOS {
    */
   getStream (location, params = {}) {
     const clonedParams = Object.assign({}, params, {
-      Region: this.cos.region,
+      Region: this.config.region,
       Bucket: this._bucket.pull(),
       Key: location,
     })
@@ -219,7 +216,7 @@ class TencentCOS {
    */
   getUrl (location, bucket) {
     bucket = bucket || this._bucket.pull()
-    const { secure, region } = this.cos.options
+    const { secure, region } = this.cos.config
     const protocol = secure ? 'https://' : 'http://'
     return `${protocol}${bucket}.cos.${region}.myqcloud.com/${location}`
   }
@@ -245,7 +242,7 @@ class TencentCOS {
         Key: dest,
         CopySource: `/${bucket}/${src}`,
         Bucket: destBucket || bucket,
-        Region: this.cos.region
+        Region: this.config.region
       })
 
       this.cos.sliceCopyFile(clonedParams, (error) => {
