@@ -1,4 +1,14 @@
+'use strict'
+
+/**
+ * node-flydrive
+ *
+ * @license MIT
+ * @copyright Slynova - Romain Lanz <romain.lanz@slynova.ch>
+ */
+
 const Resetable = require('resetable')
+/* eslint-disable import/no-extraneous-dependencies */
 const OSS = require('ali-oss')
 
 /**
