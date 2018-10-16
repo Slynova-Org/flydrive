@@ -29,6 +29,16 @@ class FileNotFound extends NE.RuntimeException {
   }
 }
 
+class DirectoryNotFound extends NE.RuntimeException {
+  static directory (directory) {
+    const exception = new this(`The directory ${directory} doesn't exist`, 404)
+
+    exception.file = directory
+
+    return exception
+  }
+}
+
 class InvalidConfig extends NE.RuntimeException {
   static missingDiskName () {
     return new this('Make sure to define a default disk name inside config file', 500, 'E_INVALID_CONFIG')
@@ -57,6 +67,7 @@ class MethodNotSupported extends NE.RuntimeException {
 module.exports = {
   DriverNotSupported,
   FileNotFound,
+  DirectoryNotFound,
   InvalidConfig,
   MethodNotSupported,
 }

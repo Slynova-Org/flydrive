@@ -309,6 +309,43 @@ class AwsS3 {
 
     return url
   }
+
+  /**
+   * Get a list of all the contents for the current bucket.
+   * S3 only returns objects in sets of 1000 so we need to
+   * keep track of the marker.
+   *
+   * @method list
+   *
+   * @param prefix
+   *
+   * @returns {Promise<Array>}
+   */
+  async list (prefix = '') {
+    let marker = 0
+    let isTruncated = true
+    let list = []
+
+    do {
+      // eslint-disable-next-line no-await-in-loop
+      const listResult = await (
+        this.s3.listObjects({
+          Bucket: this._bucket.get(),
+          Marker: marker.toString(),
+          Prefix: prefix,
+        }).promise()
+      )
+
+      if (!listResult.IsTruncated) {
+        isTruncated = false
+      } else {
+        marker = listResult.NextMarker
+      }
+      list = list.concat(listResult.Contents)
+    } while (isTruncated)
+
+    return list
+  }
 }
 
 module.exports = AwsS3

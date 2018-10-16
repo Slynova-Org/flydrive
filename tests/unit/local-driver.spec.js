@@ -157,4 +157,18 @@ test.group('Local Driver', (group) => {
     const content = await streamToString(readStream)
     assert.equal(content, 'Foo')
   })
+
+  test('list files in directory and verify contains specific file', async (assert) => {
+    const list = this.storage.list(__dirname)
+    assert.isArray(list)
+    assert.include(list[0].path, 'local-driver.spec.js')
+  })
+
+  test('throw exception when listing non existent directory', async (assert) => {
+    try {
+      this.storage.list('/doesnt-exist-1234')
+    } catch (error) {
+      assert.instanceOf(error, CE.DirectoryNotFound)
+    }
+  })
 })

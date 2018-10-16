@@ -11,6 +11,7 @@ const fs = require('fs-extra')
 const path = require('path')
 const createOutputStream = require('create-output-stream')
 const CE = require('../Exceptions')
+const klaw = require('klaw-sync')
 
 /**
  * Returns a boolean indication if stream param
@@ -223,6 +224,27 @@ class LocalFileSystem {
     await fs.copy(this._fullPath(src), this._fullPath(dest), options)
 
     return true
+  }
+
+  /**
+   * Return a list of files in a given directory
+   *
+   * @method list
+   *
+   * @param directory
+   *
+   * @returns {Array}
+   */
+  list (directory) {
+    try {
+      return klaw(directory, { nodir: true })
+    } catch (e) {
+      if (e.code === 'ENOENT') {
+        throw CE.DirectoryNotFound.directory(directory)
+      }
+
+      throw e
+    }
   }
 }
 

@@ -152,4 +152,11 @@ test.group('S3 Driver', () => {
     const url = await s3Driver.getSignedUrl('dummy-file1.txt')
     assert.isDefined(url)
   }).timeout(10 * 1000)
+
+  test('get a list of the current bucket', async (assert) => {
+    const s3Driver = new S3Driver(config)
+    const list = await s3Driver.list()
+    assert.isArray(list)
+    assert.include(list[0], { Key: 'buffer-file.txt' })
+  }).timeout(10 * 1000)
 })
