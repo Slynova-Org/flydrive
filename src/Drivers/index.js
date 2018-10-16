@@ -13,6 +13,7 @@ const pathMap = {
   local: './LocalFileSystem',
   s3: './AwsS3',
   spaces: './AwsS3',
+  ftp: './FTP',
 }
 
 const proxyHandler = {

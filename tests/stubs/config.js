@@ -48,5 +48,14 @@ module.exports = {
       bucket: 'SPACES_BUCKET',
       region: 'SPACES_REGION',
     },
+
+    ftp: {
+      driver: 'ftp',
+      host: 'FTP_HOST',
+      port: 21,
+      user: 'FTP_USER',
+      pass: 'FTP_PASS',
+      longLive: false,
+    },
   },
 }

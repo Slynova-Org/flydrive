@@ -113,4 +113,26 @@ test.group('Storage Manager', (group) => {
 
     assert.instanceOf(storageManager.disk('local').driver, FooDriver)
   })
+
+  test('get disk with custom config', async assert => {
+    const storageManager = new StorageManager({
+      default: 'local',
+      disks: {
+        local: {
+          root: '',
+          driver: 'local',
+        },
+      },
+    })
+    const localWithDefaultConfig = storageManager.disk('local');
+    const localWithCustomConfig = storageManager.disk('local', {
+      root: '/test'
+    })
+    assert.instanceOf(localWithDefaultConfig, Storage)
+    assert.instanceOf(localWithCustomConfig, Storage)
+    assert.instanceOf(localWithDefaultConfig.driver, LocalFileSystem)
+    assert.instanceOf(localWithCustomConfig.driver, LocalFileSystem)
+    assert.notEqual(localWithDefaultConfig.driver.root, localWithCustomConfig.driver.root)
+    assert.equal('/test', localWithCustomConfig.driver.root)
+  })
 })
