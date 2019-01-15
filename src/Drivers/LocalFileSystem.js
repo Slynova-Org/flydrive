@@ -104,6 +104,30 @@ class LocalFileSystem {
   }
 
   /**
+   * Returns file size in bytes
+   *
+   * @method getSize
+   * @async
+   *
+   * @param  {String} location
+   *
+   * @return {Number}
+   */
+  async getSize (location) {
+    try {
+      const stat = await fs.stat(this._fullPath(location))
+
+      return stat.size
+    } catch (e) {
+      if (e.code === 'ENOENT') {
+        throw CE.FileNotFound.file(location)
+      }
+
+      throw e
+    }
+  }
+
+  /**
    * Create a new file. This method will create
    * missing directories on the fly.
    *
