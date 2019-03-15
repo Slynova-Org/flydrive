@@ -62,6 +62,13 @@ export class LocalFileSystem extends Storage {
   }
 
   /**
+   * Returns the driver.
+   */
+  public driver() {
+    return fs
+  }
+
+  /**
    * Determines if a file or folder already exists.
    */
   public exists(location: string) {

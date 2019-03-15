@@ -47,6 +47,15 @@ export default abstract class Storage {
   }
 
   /**
+   * Returns the driver.
+   *
+   * Supported in: "local", "s3", "gcs"
+   */
+  public driver(): any {
+    throw new MethodNotSupported('driver', this.constructor.name)
+  }
+
+  /**
    * Determines if a file or folder already exists.
    *
    * Supported in: "local", "s3", "gcs"
