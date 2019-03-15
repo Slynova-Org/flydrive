@@ -11,7 +11,7 @@ import fs from 'fs-extra'
 import createOutputStream from 'create-output-stream'
 import Storage from '../Storage'
 import { FileNotFound } from '../Exceptions'
-import { isReadableStream } from '../../utils'
+import { isReadableStream, pipeline } from '../../utils'
 
 export class LocalFileSystem extends Storage {
   constructor(protected $config: LocalFileSystemConfig) {
@@ -145,13 +145,10 @@ export class LocalFileSystem extends Storage {
     const fullPath = this._fullPath(location)
 
     if (isReadableStream(content)) {
-      return new Promise<boolean>((resolve, reject) => {
-        const ws = createOutputStream(fullPath, options)
+      const ws = createOutputStream(fullPath, options)
+      await pipeline(content, ws)
 
-        ws.on('error', () => reject(false))
-        ws.on('close', () => resolve(true))
-        ;(content as Stream).pipe(ws)
-      })
+      return true
     }
 
     await fs.outputFile(fullPath, content, options)

@@ -25,6 +25,7 @@
     "node-exceptions": "^4.0.1"
   },
   "devDependencies": {
+    "@google-cloud/storage": "^2.4.3",
     "@types/fs-extra": "^5.0.5",
     "@types/node": "^11.11.3",
     "@typescript-eslint/eslint-plugin": "^1.4.2",
