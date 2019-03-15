@@ -1,3 +1,6 @@
+import { Readable, pipeline as nodePipeline } from 'stream'
+import { promisify } from 'util'
+
 /**
  * @slynova/flydrive
  *
@@ -9,7 +12,7 @@
  * Returns a boolean indication if stream param
  * is a readable stream or not.
  */
-export function isReadableStream(stream: any): boolean {
+export function isReadableStream(stream: any): stream is Readable {
   return (
     stream !== null &&
     typeof stream === 'object' &&
@@ -19,3 +22,5 @@ export function isReadableStream(stream: any): boolean {
     stream.readable !== false
   )
 }
+
+export const pipeline = promisify(nodePipeline)

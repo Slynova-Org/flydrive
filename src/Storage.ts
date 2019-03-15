@@ -21,7 +21,7 @@ export default abstract class Storage {
   /**
    * Use a different bucket at runtime.
    *
-   * Supported in: "s3"
+   * Supported in: "s3", "gcs"
    */
   bucket(name: string): void {
     throw new MethodNotSupported('bucket', this.constructor.name)
@@ -30,7 +30,7 @@ export default abstract class Storage {
   /**
    * Copy a file to a location.
    *
-   * Supported in: "local", "s3"
+   * Supported in: "local", "s3", "gcs"
    */
   copy(src: string, dest: string, options: object): Promise<boolean> {
     throw new MethodNotSupported('copy', this.constructor.name)
@@ -40,7 +40,7 @@ export default abstract class Storage {
    * Delete existing file.
    * This method will not throw an exception if file doesn't exists.
    *
-   * Supported in: "local", "s3"
+   * Supported in: "local", "s3", "gcs"
    */
   delete(location: string): Promise<boolean> {
     throw new MethodNotSupported('delete', this.constructor.name)
@@ -49,7 +49,7 @@ export default abstract class Storage {
   /**
    * Determines if a file or folder already exists.
    *
-   * Supported in: "local", "s3"
+   * Supported in: "local", "s3", "gcs"
    */
   exists(location: string): Promise<boolean> {
     throw new MethodNotSupported('exists', this.constructor.name)
@@ -58,7 +58,7 @@ export default abstract class Storage {
   /**
    * Returns the file contents.
    *
-   * Supported in: "local", "s3"
+   * Supported in: "local", "s3", "gcs"
    */
   get(location: string, encoding?: object | string): Promise<Buffer | string> {
     throw new MethodNotSupported('get', this.constructor.name)
@@ -76,16 +76,16 @@ export default abstract class Storage {
   /**
    * Returns signed url for an existing file.
    *
-   * Supported in: "s3"
+   * Supported in: "s3", "gcs"
    */
-  getSignedUrl(location: string, expiry: number = 900): string {
+  getSignedUrl(location: string, expiry: number = 900): Promise<string> {
     throw new MethodNotSupported('getSignedUrl', this.constructor.name)
   }
 
   /**
    * Returns file size in bytes.
    *
-   * Supported in: "local"
+   * Supported in: "local", "gcs"
    */
   getSize(location: string): Promise<number> {
     throw new MethodNotSupported('getSize', this.constructor.name)
@@ -94,7 +94,7 @@ export default abstract class Storage {
   /**
    * Returns the stream for the given file.
    *
-   * Supported in: "s3"
+   * Supported in: "local", "s3", "gcs"
    */
   getStream(location: string, options: object | string): Stream {
     throw new MethodNotSupported('getStream', this.constructor.name)
@@ -105,7 +105,7 @@ export default abstract class Storage {
    * validates the existence of file or it's visibility
    * status.
    *
-   * Supported in: "s3"
+   * Supported in: "s3", "gcs"
    */
   getUrl(location: string): string {
     throw new MethodNotSupported('getUrl', this.constructor.name)
@@ -114,7 +114,7 @@ export default abstract class Storage {
   /**
    * Move file to a new location.
    *
-   * Supported in: "local", "s3"
+   * Supported in: "local", "s3", "gcs"
    */
   move(src: string, dest: string): Promise<boolean> {
     throw new MethodNotSupported('move', this.constructor.name)
@@ -124,7 +124,7 @@ export default abstract class Storage {
    * Creates a new file.
    * This method will create missing directories on the fly.
    *
-   * Supported in: "local", "s3"
+   * Supported in: "local", "s3", "gcs"
    */
   put(location: string, content: Buffer | Stream | string, options: object): Promise<boolean> {
     throw new MethodNotSupported('put', this.constructor.name)
