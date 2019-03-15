@@ -16,7 +16,7 @@
     "Michaël Zasso <targos@pm.me>"
   ],
   "scripts": {
-    "test": "ts-node japaFile"
+    "test": "node japaFile"
   },
   "dependencies": {
     "@adonisjs/manager": "^1.1.1",

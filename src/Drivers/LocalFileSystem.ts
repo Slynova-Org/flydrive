@@ -7,8 +7,8 @@
 
 import { Stream } from 'stream'
 import { isAbsolute, join } from 'path'
-import * as fs from 'fs-extra'
-import * as createOutputStream from 'create-output-stream'
+import fs from 'fs-extra'
+import createOutputStream from 'create-output-stream'
 import Storage from '../Storage'
 import { FileNotFound } from '../Exceptions'
 import { isReadableStream } from '../../utils'
@@ -71,11 +71,11 @@ export class LocalFileSystem extends Storage {
   /**
    * Returns the file contents.
    */
-  public get(location: string, encoding: string = 'utf8'): Promise<Buffer | string> {
+  public async get(location: string, encoding: string = 'utf8'): Promise<Buffer | string> {
     const fullPath = this._fullPath(location)
 
     try {
-      return fs.readFile(fullPath, encoding)
+      return await fs.readFile(fullPath, encoding)
     } catch (e) {
       if (e.code === 'ENOENT') {
         throw new FileNotFound(fullPath)
@@ -107,7 +107,7 @@ export class LocalFileSystem extends Storage {
   /**
    * Returns a read stream for a file location.
    */
-  public getStream(location: string, options?: fs.ReadStreamOptions | string): fs.ReadStream {
+  public getStream(location: string, options?: ReadStreamOptions | string): fs.ReadStream {
     return fs.createReadStream(this._fullPath(location), options)
   }
 
@@ -162,4 +162,15 @@ export class LocalFileSystem extends Storage {
 
 export type LocalFileSystemConfig = {
   root: string
+}
+
+export type ReadStreamOptions = {
+  flags?: string
+  encoding?: string
+  fd?: number
+  mode?: number
+  autoClose?: boolean
+  start?: number
+  end?: number
+  highWaterMark?: number
 }

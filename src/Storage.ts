@@ -96,7 +96,7 @@ export default abstract class Storage {
    *
    * Supported in: "s3"
    */
-  getStream(location: string, options: object | string): ReadableStream {
+  getStream(location: string, options: object | string): Stream {
     throw new MethodNotSupported('getStream', this.constructor.name)
   }
 

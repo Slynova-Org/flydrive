@@ -5,9 +5,9 @@
  * @copyright Slynova - Romain Lanz <romain.lanz@slynova.ch>
  */
 
-import * as test from 'japa'
-import * as path from 'path'
-import * as fs from 'fs-extra'
+import test from 'japa'
+import path from 'path'
+import fs from 'fs-extra'
 import { Readable } from 'stream'
 
 import * as CE from '../../src/Exceptions'
@@ -20,7 +20,7 @@ function isWindowsDefenderError(error: { code: string }): boolean {
 }
 
 function fullPath(relativePath: string): string {
-  return path.join(process.cwd(), `./tests/unit/storage/${relativePath}`)
+  return path.join(process.cwd(), `./test/unit/storage/${relativePath}`)
 }
 
 function streamToString(stream: Readable): Promise<string> {
@@ -161,8 +161,8 @@ test.group('Local Driver', group => {
   test('create file from stream', async assert => {
     await storage.put('./test/unit/storage/foo', 'Foo related content')
     const readStream = fs.createReadStream(path.join(__dirname, './storage/foo'))
+
     await storage.put('./test/unit/storage/bar', readStream)
-    assert.isTrue(readStream.close)
 
     const barContents = await storage.get('./test/unit/storage/bar')
     assert.equal(barContents, 'Foo related content')
@@ -173,9 +173,7 @@ test.group('Local Driver', group => {
     await storage.put('./test/unit/storage/greeting', 'Hello')
 
     const readStream = fs.createReadStream(path.join(__dirname, './storage/object'))
-
     await storage.append('./test/unit/storage/greeting', readStream)
-    assert.isTrue(readStream.close)
 
     const barContents = await storage.get('./test/unit/storage/greeting')
     assert.equal(barContents, 'Hello World')

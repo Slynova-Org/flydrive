@@ -1,14 +1,16 @@
 {
+  "exclude": ["node_modules"],
   "compilerOptions": {
-    "target": "es2017",
-    "module": "commonjs",
-    "lib": ["es2017"],
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "removeComments": true,
+    "allowSyntheticDefaultImports": true,
     "declaration": true,
+    "esModuleInterop": true,
+    "lib": ["es2017"],
+    "module": "commonjs",
     "moduleResolution": "node",
+    "noUnusedLocals": true,
+    "noUnusedParameters": false,
+    "removeComments": false,
     "strictNullChecks": true,
-    "allowSyntheticDefaultImports": true
+    "target": "es2017"
   }
 }
