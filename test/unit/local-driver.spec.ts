@@ -196,4 +196,10 @@ test.group('Local Driver', group => {
     const content = await streamToString(readStream)
     assert.equal(content, 'Foo')
   })
+
+  test('get size of a given file', async assert => {
+    await storage.put('./test/unit/storage/foo', 'Foo content')
+    const size = await storage.getSize('./test/unit/storage/foo')
+    assert.equal(size, 11)
+  })
 })
