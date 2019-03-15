@@ -67,7 +67,7 @@ export class GoogleCloudStorage extends Storage {
   public async getSize(location: string): Promise<number> {
     const file = this._file(location)
     const [metadata] = await file.getMetadata()
-    return metadata.size
+    return Number(metadata.size)
   }
 
   public getStream(location: string): Readable {
