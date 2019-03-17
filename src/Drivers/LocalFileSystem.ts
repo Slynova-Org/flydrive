@@ -11,7 +11,7 @@ import fs from 'fs-extra'
 import createOutputStream from 'create-output-stream'
 import Storage from '../Storage'
 import { FileNotFound } from '../Exceptions'
-import { isReadableStream, pipeline } from '../../utils'
+import { isReadableStream, pipeline } from '../utils'
 
 export class LocalFileSystem extends Storage {
   constructor(protected $config: LocalFileSystemConfig) {
