@@ -11,11 +11,13 @@ import Storage from '../Storage'
 import { isReadableStream, pipeline } from '../../utils'
 
 export class GoogleCloudStorage extends Storage {
+  protected $config: GoogleCloudStorageConfig
   protected $driver: GCSDriver
   protected $bucket: Bucket
 
   public constructor(config: GoogleCloudStorageConfig) {
     super()
+    this.$config = config
     this.$driver = new GCSDriver(config)
     this.$bucket = this.$driver.bucket(config.bucket)
   }
@@ -26,9 +28,12 @@ export class GoogleCloudStorage extends Storage {
 
   /**
    * Use a different bucket at runtime.
+   * This method returns a new instance of GoogleCloudStorage.
    */
-  public bucket(name: string): void {
-    this.$bucket = this.$driver.bucket(name)
+  public bucket(name: string): GoogleCloudStorage {
+    const newStorage = new GoogleCloudStorage(this.$config)
+    newStorage.$bucket = newStorage.$driver.bucket(name)
+    return newStorage
   }
 
   /**
