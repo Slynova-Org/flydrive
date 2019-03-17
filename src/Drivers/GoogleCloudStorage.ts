@@ -16,7 +16,8 @@ export class GoogleCloudStorage extends Storage {
 
   public constructor(config: GoogleCloudStorageConfig) {
     super()
-    this.$driver = new GCSDriver(config)
+    const GCSStorage = require('@google-cloud/storage').Storage;
+    this.$driver = new GCSStorage(config)
     this.$bucket = this.$driver.bucket(config.bucket)
   }
 
