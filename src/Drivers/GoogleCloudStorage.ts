@@ -8,7 +8,7 @@
 import { Readable } from 'stream'
 import { Storage as GCSDriver, StorageOptions, Bucket, File } from '@google-cloud/storage'
 import Storage from '../Storage'
-import { isReadableStream, pipeline } from '../../utils'
+import { isReadableStream, pipeline } from '../utils'
 
 export class GoogleCloudStorage extends Storage {
   protected $config: GoogleCloudStorageConfig
@@ -18,7 +18,8 @@ export class GoogleCloudStorage extends Storage {
   public constructor(config: GoogleCloudStorageConfig) {
     super()
     this.$config = config
-    this.$driver = new GCSDriver(config)
+    const GCSStorage = require('@google-cloud/storage').Storage;
+    this.$driver = new GCSStorage(config)
     this.$bucket = this.$driver.bucket(config.bucket)
   }
 
