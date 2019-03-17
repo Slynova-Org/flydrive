@@ -11,7 +11,7 @@ import fs from 'fs-extra'
 import { Readable } from 'stream'
 
 import * as CE from '../../src/Exceptions'
-import { LocalFileSystem } from '../../src/Drivers'
+import { LocalFileSystem } from '../../src/Drivers/LocalFileSystem'
 
 let storage: LocalFileSystem
 

@@ -4,7 +4,7 @@ import test from 'japa'
 import uuid from 'uuid/v4'
 import { Storage } from '@google-cloud/storage'
 
-import { GoogleCloudStorage } from '../../src/Drivers'
+import { GoogleCloudStorage } from '../../src/Drivers/GoogleCloudStorage'
 
 function streamToString(stream: Readable): Promise<string> {
   return new Promise((resolve, reject) => {

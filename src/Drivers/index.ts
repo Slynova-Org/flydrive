@@ -5,5 +5,10 @@
  * @copyright Slynova - Romain Lanz <romain.lanz@slynova.ch>
  */
 
-export * from './GoogleCloudStorage'
-export * from './LocalFileSystem'
+import { GoogleCloudStorage } from './GoogleCloudStorage'
+import { LocalFileSystem } from './LocalFileSystem'
+
+export default {
+  gcs: GoogleCloudStorage,
+  local: LocalFileSystem,
+}
