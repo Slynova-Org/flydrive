@@ -8,7 +8,12 @@
     "filesystem",
     "file",
     "aws",
-    "s3"
+    "s3",
+    "promise",
+    "async",
+    "spaces",
+    "google",
+    "cloud"
   ],
   "author": "Romain Lanz <romain.lanz@slynova.ch>",
   "contributors": [
