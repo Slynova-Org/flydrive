@@ -42,8 +42,8 @@ Once you instantiated the manager, you can use the `StorageManager#disk()` metho
 
 ```javascript
 storage.disk() // Returns the default disk (specified in the config)
-storage.disk('s3') // Returns the driver for the disk "s3"
-storage.disk('s3', customConfig) // Overwrite the default configuration of the disk
+storage.disk('awsCloud') // Returns the driver for the disk "s3"
+storage.disk('awsCloud', customConfig) // Overwrite the default configuration of the disk
 ```
 
 ## Driver's API
