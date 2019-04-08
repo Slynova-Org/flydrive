@@ -6,41 +6,39 @@
  */
 
 import { Readable } from 'stream'
-import { Storage as GCSDriver, StorageOptions, Bucket, File } from '@google-cloud/storage'
+import { Storage as GCSDriver, StorageOptions, Bucket, File, GetSignedUrlConfig } from '@google-cloud/storage'
 import Storage from '../Storage'
 import { isReadableStream, pipeline } from '../utils'
 
 export class GoogleCloudStorage extends Storage {
-  protected $config: GoogleCloudStorageConfig
-  protected $driver: GCSDriver
-  protected $bucket: Bucket
+  protected storageDriver: GCSDriver
+  protected storageBucket: Bucket
 
-  public constructor(config: GoogleCloudStorageConfig) {
+  constructor(protected config: GoogleCloudStorageConfig) {
     super()
-    this.$config = config
     const GCSStorage = require('@google-cloud/storage').Storage;
-    this.$driver = new GCSStorage(config)
-    this.$bucket = this.$driver.bucket(config.bucket)
+    this.storageDriver = new GCSStorage(config)
+    this.storageBucket = this.storageDriver.bucket(config.bucket)
   }
 
   private _file(path: string): File {
-    return this.$bucket.file(path)
+    return this.storageBucket.file(path)
   }
 
   /**
    * Use a different bucket at runtime.
    * This method returns a new instance of GoogleCloudStorage.
    */
-  public bucket(name: string): GoogleCloudStorage {
-    const newStorage = new GoogleCloudStorage(this.$config)
-    newStorage.$bucket = newStorage.$driver.bucket(name)
+  bucket(name: string): GoogleCloudStorage {
+    const newStorage = new GoogleCloudStorage(this.config)
+    newStorage.storageBucket = newStorage.storageDriver.bucket(name)
     return newStorage
   }
 
   /**
    * Copy a file to a location.
    */
-  public async copy(src: string, dest: string): Promise<boolean> {
+  async copy(src: string, dest: string): Promise<boolean> {
     const srcFile = this._file(src)
     const destFile = this._file(dest)
 
@@ -53,7 +51,7 @@ export class GoogleCloudStorage extends Storage {
    * Delete existing file.
    * This method will not throw an exception if file doesn't exists.
    */
-  public async delete(location: string): Promise<boolean> {
+  async delete(location: string): Promise<boolean> {
     await this._file(location).delete()
     return true
   }
@@ -61,14 +59,14 @@ export class GoogleCloudStorage extends Storage {
   /**
    * Returns the driver.
    */
-  public driver(): GCSDriver {
-    return this.$driver
+  driver(): GCSDriver {
+    return this.storageDriver
   }
 
   /**
    * Determines if a file or folder already exists.
    */
-  public async exists(location: string): Promise<boolean> {
+  async exists(location: string): Promise<boolean> {
     const [result] = await this._file(location).exists()
     return result
   }
@@ -76,7 +74,7 @@ export class GoogleCloudStorage extends Storage {
   /**
    * Returns the file contents.
    */
-  public async get(location: string, encoding?: string): Promise<Buffer | string> {
+  async get(location: string, encoding?: string): Promise<Buffer | string | Readable> {
     const file = this._file(location)
     const [content] = await file.download()
     return encoding ? content.toString(encoding) : content
@@ -85,19 +83,21 @@ export class GoogleCloudStorage extends Storage {
   /**
    * Returns signed url for an existing file.
    */
-  public async getSignedUrl(location: string, expiry: number = 900): Promise<string> {
+  async getSignedUrl(location: string, expiry?: number): Promise<string> {
     const file = this._file(location)
-    const [result] = await file.getSignedUrl({
+    const defaultExpiryTime: number = 900
+    let requestParams: GetSignedUrlConfig = {
       action: 'read',
-      expires: Date.now() + expiry * 1000,
-    })
+      expires: Date.now() + (expiry === undefined ? defaultExpiryTime : expiry) * 1000
+    }
+    const [result] = await file.getSignedUrl(requestParams)
     return result
   }
 
   /**
    * Returns file size in bytes.
    */
-  public async getSize(location: string): Promise<number> {
+  async getSize(location: string): Promise<number> {
     const file = this._file(location)
     const [metadata] = await file.getMetadata()
     return Number(metadata.size)
@@ -106,7 +106,7 @@ export class GoogleCloudStorage extends Storage {
   /**
    * Returns the stream for the given file.
    */
-  public getStream(location: string): Readable {
+  getStream(location: string): Readable {
     return this._file(location).createReadStream()
   }
 
@@ -115,14 +115,14 @@ export class GoogleCloudStorage extends Storage {
    * validates the existence of file or it's visibility
    * status.
    */
-  public getUrl(location: string): string {
-    return `https://storage.cloud.google.com/${this.$bucket.name}/${location}`
+  getUrl(location: string): string {
+    return `https://storage.cloud.google.com/${this.storageBucket.name}/${location}`
   }
 
   /**
    * Move file to a new location.
    */
-  public async move(src: string, dest: string): Promise<boolean> {
+  async move(src: string, dest: string): Promise<boolean> {
     const srcFile = this._file(src)
     const destFile = this._file(dest)
 
@@ -135,7 +135,7 @@ export class GoogleCloudStorage extends Storage {
    * Creates a new file.
    * This method will create missing directories on the fly.
    */
-  public async put(location: string, content: Buffer | Readable | string): Promise<boolean> {
+  async put(location: string, content: Buffer | Readable | string): Promise<boolean> {
     const file = this._file(location)
     if (isReadableStream(content)) {
       const destStream = file.createWriteStream()

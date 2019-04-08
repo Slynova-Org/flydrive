@@ -14,7 +14,7 @@ import { FileNotFound } from '../Exceptions'
 import { isReadableStream, pipeline } from '../utils'
 
 export class LocalFileSystem extends Storage {
-  constructor(protected $config: LocalFileSystemConfig) {
+  constructor(protected config: LocalFileSystemConfig) {
     super()
   }
 
@@ -22,13 +22,13 @@ export class LocalFileSystem extends Storage {
    * Returns full path to the storage root directory.
    */
   private _fullPath(relativePath: string): string {
-    return isAbsolute(relativePath) ? relativePath : join(this.$config.root, relativePath)
+    return isAbsolute(relativePath) ? relativePath : join(this.config.root, relativePath)
   }
 
   /**
    * Appends content to a file.
    */
-  public async append(
+  async append(
     location: string,
     content: Buffer | Stream | string,
     options?: fs.WriteFileOptions
@@ -45,7 +45,7 @@ export class LocalFileSystem extends Storage {
   /**
    * Copy a file to a location.
    */
-  public async copy(src: string, dest: string, options?: fs.CopyOptions): Promise<boolean> {
+  async copy(src: string, dest: string, options?: fs.CopyOptions): Promise<boolean> {
     await fs.copy(this._fullPath(src), this._fullPath(dest), options)
 
     return true
@@ -55,7 +55,7 @@ export class LocalFileSystem extends Storage {
    * Delete existing file.
    * This method will not throw an exception if file doesn't exists.
    */
-  public async delete(location: string): Promise<boolean> {
+  async delete(location: string): Promise<boolean> {
     await fs.remove(this._fullPath(location))
 
     return true
@@ -64,21 +64,21 @@ export class LocalFileSystem extends Storage {
   /**
    * Returns the driver.
    */
-  public driver() {
+  driver() {
     return fs
   }
 
   /**
    * Determines if a file or folder already exists.
    */
-  public exists(location: string) {
+  exists(location: string) {
     return fs.pathExists(this._fullPath(location))
   }
 
   /**
    * Returns the file contents.
    */
-  public async get(location: string, encoding: string = 'utf8'): Promise<Buffer | string> {
+  async get(location: string, encoding: string = 'utf8'): Promise<Buffer | string> {
     const fullPath = this._fullPath(location)
 
     try {
@@ -95,7 +95,7 @@ export class LocalFileSystem extends Storage {
   /**
    * Returns file size in bytes.
    */
-  public async getSize(location: string): Promise<number> {
+  async getSize(location: string): Promise<number> {
     const fullPath = this._fullPath(location)
 
     try {
@@ -114,14 +114,14 @@ export class LocalFileSystem extends Storage {
   /**
    * Returns a read stream for a file location.
    */
-  public getStream(location: string, options?: ReadStreamOptions | string): fs.ReadStream {
+  getStream(location: string, options?: ReadStreamOptions | string): fs.ReadStream {
     return fs.createReadStream(this._fullPath(location), options)
   }
 
   /**
    * Move file to a new location.
    */
-  public async move(src: string, dest: string): Promise<boolean> {
+  async move(src: string, dest: string): Promise<boolean> {
     await fs.move(this._fullPath(src), this._fullPath(dest))
 
     return true
@@ -130,7 +130,7 @@ export class LocalFileSystem extends Storage {
   /**
    * Prepends content to a file.
    */
-  public async prepend(location: string, content: Buffer | string, options?: fs.WriteFileOptions): Promise<boolean> {
+  async prepend(location: string, content: Buffer | string, options?: fs.WriteFileOptions): Promise<boolean> {
     if (await this.exists(location)) {
       const actualContent = await this.get(location, 'utf-8')
 
@@ -144,7 +144,7 @@ export class LocalFileSystem extends Storage {
    * Creates a new file.
    * This method will create missing directories on the fly.
    */
-  public async put(
+  async put(
     location: string,
     content: Buffer | Stream | string,
     options?: fs.WriteFileOptions

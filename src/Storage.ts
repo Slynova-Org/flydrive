@@ -5,10 +5,28 @@
  * @copyright Slynova - Romain Lanz <romain.lanz@slynova.ch>
  */
 
-import { Stream } from 'stream'
+import { Stream, Readable } from 'stream'
 import { MethodNotSupported } from './Exceptions'
 
-export default abstract class Storage {
+export interface StorageInterface {
+  append: (location: string, content: Buffer | Stream | string, options: Object) => Promise<boolean>
+  bucket: (name: string) => void,
+  copy: (src: string, dest: string, options: object) => Promise<boolean>
+  delete: (location: string) => Promise<boolean>
+  driver: () => any
+  exists: (location: string) => Promise<boolean>
+  get: (location: string, encoding?: object | string) => Promise<Buffer | string | Readable>
+  getObject: (location: string) => Promise<any>
+  getSignedUrl: (location: string, expiry?: number) => Promise<string>
+  getSize: (location: string) => Promise<number>
+  getStream: (location: string, options: object | string) => Stream
+  getUrl: (location: string) => string
+  move: (src: string, dest: string) => Promise<boolean>
+  put: (location: string, content: Buffer | Stream | string, options: object) => Promise<boolean>
+  prepend: (location: string, content: Buffer | string, options: object) => Promise<boolean>
+}
+
+export default abstract class Storage implements StorageInterface {
   /**
    * Appends content to a file.
    *
@@ -69,7 +87,7 @@ export default abstract class Storage {
    *
    * Supported drivers: "local", "s3", "gcs"
    */
-  get(location: string, encoding?: object | string): Promise<Buffer | string> {
+  get(location: string, encoding?: object | string): Promise<Buffer | string | Readable> {
     throw new MethodNotSupported('get', this.constructor.name)
   }
 
@@ -87,7 +105,7 @@ export default abstract class Storage {
    *
    * Supported drivers: "s3", "gcs"
    */
-  getSignedUrl(location: string, expiry: number = 900): Promise<string> {
+  getSignedUrl(location: string, expiry?: number): Promise<string> {
     throw new MethodNotSupported('getSignedUrl', this.constructor.name)
   }
 

@@ -7,8 +7,10 @@
 
 import { GoogleCloudStorage } from './GoogleCloudStorage'
 import { LocalFileSystem } from './LocalFileSystem'
+import { S3Storage } from './S3Storage'
 
 export default {
   gcs: GoogleCloudStorage,
   local: LocalFileSystem,
+  s3: S3Storage,
 }

@@ -100,8 +100,8 @@ test.group('Storage Manager', group => {
     assert.instanceOf(localWithDefaultConfig, LocalFileSystem)
     assert.instanceOf(localWithCustomConfig, LocalFileSystem)
     // @ts-ignore
-    assert.notEqual(localWithDefaultConfig.$config.root, localWithCustomConfig.$config.root)
+    assert.notEqual(localWithDefaultConfig.config.root, localWithCustomConfig.config.root)
     // @ts-ignore
-    assert.equal('/test', localWithCustomConfig.$config.root)
+    assert.equal('/test', localWithCustomConfig.config.root)
   })
 })

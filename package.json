@@ -1,6 +1,6 @@
 {
   "name": "@slynova/flydrive",
-  "version": "0.3.1",
+  "version": "0.4.0",
   "description": "Flexible and Fluent way to manage storage in Node.js.",
   "main": "./build/index.js",
   "license": "MIT",
@@ -29,19 +29,23 @@
     "tsc": "tsc"
   },
   "dependencies": {
+    "@google-cloud/storage": "^2.4.3",
+    "aws-sdk": "^2.422.0",
     "create-output-stream": "^0.0.1",
+    "dotenv": "^7.0.0",
     "fs-extra": "^7.0.1",
     "node-exceptions": "^4.0.1"
   },
   "devDependencies": {
-    "@google-cloud/storage": "^2.4.3",
+    "@types/dotenv": "^6.1.1",
     "@types/fs-extra": "^5.0.5",
+    "@types/lodash": "^4.14.123",
     "@types/node": "^11.11.3",
     "@typescript-eslint/eslint-plugin": "^1.4.2",
-    "aws-sdk": "^2.422.0",
     "eslint": "^5.15.1",
     "eslint-config-prettier": "^4.1.0",
     "japa": "^2.0.7",
+    "lodash": "^4.17.11",
     "prettier": "1.16.4",
     "rimraf": "^2.6.3",
     "ts-node": "^8.0.3",

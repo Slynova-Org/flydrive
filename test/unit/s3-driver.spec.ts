@@ -1,10 +1,9 @@
 import { Readable } from 'stream'
 import test from 'japa'
 import uuid from 'uuid/v4'
-import { Storage } from '@google-cloud/storage'
+import * as aws from 'aws-sdk'
 import config from '../config'
-
-import { GoogleCloudStorage } from '../../src/Drivers/GoogleCloudStorage'
+import { S3Storage } from '../../src/Drivers/S3Storage'
 
 function streamToString(stream: Readable): Promise<string> {
   return new Promise((resolve, reject) => {
@@ -16,11 +15,14 @@ function streamToString(stream: Readable): Promise<string> {
   })
 }
 
-const testBucket = config.GCS_BUCKET
-const storage = new GoogleCloudStorage({
+const testBucket = config.S3_BUCKET
+const testRegion = config.S3_REGION
+
+const storage = new S3Storage({
   bucket: testBucket,
-  projectId: config.GCS_PROJECT_ID,
-  keyFilename: config.GCS_KEYFILE,
+  accessKeyId: config.S3_KEY,
+  secretAccessKey: config.S3_SECRET,
+  region: testRegion,
 })
 
 // used to isolate tests in case of failures or other sessions running at the same time
@@ -30,7 +32,7 @@ let otherFile
 
 const testString = 'test-data'
 
-test.group('GCS Driver', group => {
+test.group('S3 Driver', group => {
   group.beforeEach(async () => {
     folder = uuid()
     testFile = `${folder}/test.txt`
@@ -45,16 +47,6 @@ test.group('GCS Driver', group => {
     try {
       await storage.delete(otherFile)
     } catch (e) {}
-  })
-
-  test('change of bucket', async assert => {
-    assert.plan(1)
-    const newStorage = storage.bucket('other-bucket')
-    try {
-      await newStorage.put(testFile, testString)
-    } catch (error) {
-      assert.match(error, /does not have storage\.objects\.create access to other-bucket\/[^/]+\/test/)
-    }
   })
 
   test('copy a file', async assert => {
@@ -74,7 +66,7 @@ test.group('GCS Driver', group => {
 
   test('get driver instance', assert => {
     const driver = storage.driver()
-    assert.instanceOf(driver, Storage)
+    assert.instanceOf(driver, aws.S3)
   })
 
   test('get file content as Buffer', async assert => {
@@ -90,7 +82,7 @@ test.group('GCS Driver', group => {
 
   test('get a signed URL', async assert => {
     const signedUrl = await storage.getSignedUrl(testFile)
-    assert.isTrue(signedUrl.startsWith(`https://storage.googleapis.com/${testBucket}/${folder}`))
+    assert.isTrue(signedUrl.startsWith(`https://${testBucket}.s3.${testRegion}.amazonaws.com/${folder}`))
   })
 
   test('get the size of a file', async assert => {
@@ -106,7 +98,7 @@ test.group('GCS Driver', group => {
 
   test('get a public URL', assert => {
     const url = storage.getUrl(testFile)
-    assert.strictEqual(url, `https://storage.cloud.google.com/${testBucket}/${testFile}`)
+    assert.strictEqual(url, `https://${testBucket}.s3.${testRegion}.amazonaws.com/${testFile}`)
   })
 
   test('move a file', async assert => {
