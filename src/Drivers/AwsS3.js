@@ -78,6 +78,42 @@ class AwsS3 {
       })
     })
   }
+  
+  /**
+   * Return file metadata
+   *
+   * @method exists
+   * @async
+   *
+   * @param  {String} location
+   * @param  {Object} [params]
+   *
+   * @return {Promise<Object>}
+   */
+  read (location, params) {
+    return new Promise((resolve, reject) => {
+      const clonedParams = Object.assign({}, params, {
+        Bucket: this._bucket.pull(),
+        Key: location,
+      })
+
+      this.s3.headObject(clonedParams, (error, data) => {
+        if (error && error.statusCode === 404) {
+          resolve(false)
+
+          return
+        }
+
+        if (error) {
+          reject(error)
+
+          return
+        }
+
+        resolve(data)
+      })
+    })
+  }
 
   /**
    * Create a new file from string or buffer
