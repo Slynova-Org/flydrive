@@ -21,6 +21,9 @@
     "Harminder Virk <virk@adonisjs.com>",
     "Michaël Zasso <targos@pm.me>"
   ],
+  "files": [
+    "build"
+  ],
   "scripts": {
     "build": "npm run clean && npm run tsc",
     "clean": "rimraf build",
