@@ -44,7 +44,7 @@
     "aws-sdk": "^2.240.1",
     "coveralls": "^3.0.1",
     "dotenv": "^6.0.0",
-    "eslint": "^5.0.0",
+    "eslint": "^6.0.0",
     "eslint-plugin-import": "^2.11.0",
     "japa": "^1.0.5",
     "japa-cli": "^1.0.1",
