@@ -5,7 +5,7 @@
  * @copyright Slynova - Romain Lanz <romain.lanz@slynova.ch>
  */
 
-import { Stream } from 'stream'
+import { Readable } from 'stream'
 import { MethodNotSupported } from './Exceptions'
 
 export default abstract class Storage {
@@ -14,7 +14,7 @@ export default abstract class Storage {
    *
    * Supported drivers: "local"
    */
-  append(location: string, content: Buffer | Stream | string, options: object): Promise<boolean> {
+  append(location: string, content: Buffer | Readable | string, options: object): Promise<boolean> {
     throw new MethodNotSupported('append', this.constructor.name)
   }
 
@@ -74,15 +74,6 @@ export default abstract class Storage {
   }
 
   /**
-   * Returns an S3 object for a given file.
-   *
-   * Supported drivers: "s3"
-   */
-  getObject(location: string): Promise<any> {
-    throw new MethodNotSupported('getObject', this.constructor.name)
-  }
-
-  /**
    * Returns signed url for an existing file.
    *
    * Supported drivers: "s3", "gcs"
@@ -105,7 +96,7 @@ export default abstract class Storage {
    *
    * Supported drivers: "local", "s3", "gcs"
    */
-  getStream(location: string, options: object | string): Stream {
+  getStream(location: string, options: object | string): Readable {
     throw new MethodNotSupported('getStream', this.constructor.name)
   }
 
@@ -135,7 +126,7 @@ export default abstract class Storage {
    *
    * Supported drivers: "local", "s3", "gcs"
    */
-  put(location: string, content: Buffer | Stream | string, options: object): Promise<boolean> {
+  put(location: string, content: Buffer | Readable | string, options: object): Promise<boolean> {
     throw new MethodNotSupported('put', this.constructor.name)
   }
 
