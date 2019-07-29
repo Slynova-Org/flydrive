@@ -17,7 +17,10 @@ function streamToString(stream: Readable): Promise<string> {
 }
 
 const testBucket = 'flydrive-test'
-const storage = new GoogleCloudStorage({ bucket: testBucket })
+const storage = new GoogleCloudStorage({
+  ...(process.env.GCS_KEYFILNAME && { keyFilename: process.env.GCS_KEYFILNAME }),
+  bucket: testBucket
+})
 
 // used to isolate tests in case of failures or other sessions running at the same time
 let folder
