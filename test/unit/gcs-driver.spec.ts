@@ -34,7 +34,6 @@ test.group('GCS Driver', group => {
     await storage.put(testFile, testString)
   })
   group.afterEach(async () => {
-    storage.bucket(testBucket)
     try {
       await storage.delete(testFile)
     } catch (e) {}
@@ -45,9 +44,9 @@ test.group('GCS Driver', group => {
 
   test('change of bucket', async assert => {
     assert.plan(1)
-    storage.bucket('other-bucket')
+    const newStorage = storage.bucket('other-bucket')
     try {
-      await storage.put(testFile, testString)
+      await newStorage.put(testFile, testString)
     } catch (error) {
       assert.match(error, /does not have storage\.objects\.create access to other-bucket\/[^/]+\/test/)
     }
