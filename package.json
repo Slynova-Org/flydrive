@@ -29,6 +29,7 @@
     "clean": "rimraf build",
     "prepublishOnly": "npm run build",
     "test": "node japaFile",
+    "test:docker": "bash docker-test.sh",
     "tsc": "tsc"
   },
   "dependencies": {
