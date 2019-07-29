@@ -28,7 +28,8 @@
     "build": "npm run clean && npm run tsc",
     "clean": "rimraf build",
     "prepublishOnly": "npm run build",
-    "test": "node japaFile",
+    "test": "npm run test:local && npm run test:docker",
+    "test:local": "node japaFile",
     "test:docker": "bash docker-test.sh",
     "tsc": "tsc"
   },
