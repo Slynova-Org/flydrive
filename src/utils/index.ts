@@ -1,5 +1,5 @@
-import { Readable, pipeline as nodePipeline } from 'stream'
-import { promisify } from 'util'
+import { Readable, pipeline as nodePipeline } from 'stream';
+import { promisify } from 'util';
 
 /**
  * @slynova/flydrive
@@ -13,14 +13,14 @@ import { promisify } from 'util'
  * is a readable stream or not.
  */
 export function isReadableStream(stream: any): stream is Readable {
-  return (
-    stream !== null &&
-    typeof stream === 'object' &&
-    typeof stream.pipe === 'function' &&
-    typeof stream._read === 'function' &&
-    typeof stream._readableState === 'object' &&
-    stream.readable !== false
-  )
+	return (
+		stream !== null &&
+		typeof stream === 'object' &&
+		typeof stream.pipe === 'function' &&
+		typeof stream._read === 'function' &&
+		typeof stream._readableState === 'object' &&
+		stream.readable !== false
+	);
 }
 
-export const pipeline = promisify(nodePipeline)
+export const pipeline = promisify(nodePipeline);
