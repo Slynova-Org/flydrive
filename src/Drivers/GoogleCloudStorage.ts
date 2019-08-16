@@ -85,7 +85,7 @@ export class GoogleCloudStorage extends Storage {
 	/**
 	 * Returns signed url for an existing file.
 	 */
-	public async getSignedUrl(location: string, expiry: number = 900): Promise<string> {
+	public async getSignedUrl(location: string, expiry = 900): Promise<string> {
 		const file = this._file(location);
 		const [result] = await file.getSignedUrl({
 			action: 'read',

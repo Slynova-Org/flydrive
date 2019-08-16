@@ -1,7 +1,7 @@
 require('ts-node/register');
 require('dotenv').config();
 
-const { configure } = require('japa');
+const configure = require('japa').configure;
 configure({
 	files: ['test/**/*.spec.ts'],
 	filter: (file) => {

@@ -78,7 +78,7 @@ export default abstract class Storage {
 	 *
 	 * Supported drivers: "s3", "gcs"
 	 */
-	getSignedUrl(location: string, expiry: number = 900): Promise<string> {
+	getSignedUrl(location: string, expiry: number): Promise<string> {
 		throw new MethodNotSupported('getSignedUrl', this.constructor.name);
 	}
 

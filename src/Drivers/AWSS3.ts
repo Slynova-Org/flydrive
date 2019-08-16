@@ -18,6 +18,7 @@ export class AWSS3 extends Storage {
 
 	constructor(config: AWSS3Config) {
 		super();
+		// eslint-disable-next-line @typescript-eslint/no-var-requires
 		const S3 = require('aws-sdk/clients/s3');
 
 		this.$driver = new S3({
@@ -157,7 +158,7 @@ export class AWSS3 extends Storage {
 	/**
 	 * Returns signed url for an existing file
 	 */
-	public getSignedUrl(location: string, expiry: number = 900): Promise<string> {
+	public getSignedUrl(location: string, expiry = 900): Promise<string> {
 		return new Promise((resolve, reject) => {
 			const params = {
 				Key: location,

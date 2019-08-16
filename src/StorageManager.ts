@@ -65,6 +65,7 @@ export default class StorageManager {
 		 */
 		const customDriver = this._extendedDrivers.get(diskConfig.driver);
 		if (customDriver) {
+			// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
 			// @ts-ignore
 			return customDriver();
 		}
