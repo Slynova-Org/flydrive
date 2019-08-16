@@ -12,6 +12,7 @@ import createOutputStream from 'create-output-stream';
 import Storage from '../Storage';
 import { FileNotFound } from '../Exceptions';
 import { isReadableStream, pipeline } from '../utils';
+import { Response, ExistsResponse, ContentResponse, SizeResponse } from '../types';
 
 export class LocalFileSystem extends Storage {
 	constructor(protected $config: LocalFileSystemConfig) {
@@ -32,57 +33,65 @@ export class LocalFileSystem extends Storage {
 		location: string,
 		content: Buffer | Stream | string,
 		options?: fs.WriteFileOptions
-	): Promise<boolean> {
+	): Promise<Response> {
 		if (isReadableStream(content)) {
 			return this.put(location, content, Object.assign({ flags: 'a' }, options));
+		} else {
+			const result = await fs.appendFile(this._fullPath(location), content, options);
+			return { raw: result };
 		}
-
-		await fs.appendFile(this._fullPath(location), content, options);
-
-		return true;
 	}
 
 	/**
 	 * Copy a file to a location.
 	 */
-	public async copy(src: string, dest: string, options?: fs.CopyOptions): Promise<boolean> {
-		await fs.copy(this._fullPath(src), this._fullPath(dest), options);
+	public async copy(src: string, dest: string, options?: fs.CopyOptions): Promise<Response> {
+		const result = await fs.copy(this._fullPath(src), this._fullPath(dest), options);
 
-		return true;
+		return { raw: result };
 	}
 
 	/**
 	 * Delete existing file.
 	 * This method will not throw an exception if file doesn't exists.
 	 */
-	public async delete(location: string): Promise<boolean> {
-		await fs.remove(this._fullPath(location));
+	public async delete(location: string): Promise<Response> {
+		const result = await fs.remove(this._fullPath(location));
 
-		return true;
+		return { raw: result };
 	}
 
 	/**
 	 * Returns the driver.
 	 */
-	public driver() {
+	public driver(): typeof fs {
 		return fs;
 	}
 
 	/**
 	 * Determines if a file or folder already exists.
 	 */
-	public exists(location: string) {
-		return fs.pathExists(this._fullPath(location));
+	public async exists(location: string): Promise<ExistsResponse> {
+		const result = await fs.pathExists(this._fullPath(location));
+		return { exists: true, raw: result };
 	}
 
 	/**
 	 * Returns the file contents.
 	 */
-	public async get(location: string, encoding = 'utf8'): Promise<Buffer | string> {
+	get(location: string, encoding?: string): Promise<ContentResponse<string>>;
+	get(location: string, encoding: null): Promise<ContentResponse<Buffer>>;
+	public async get(location: string, encoding: string | null = 'utf8'): Promise<ContentResponse<Buffer | string>> {
 		const fullPath = this._fullPath(location);
 
 		try {
-			return await fs.readFile(fullPath, encoding);
+			if (typeof encoding === 'string') {
+				const result = await fs.readFile(fullPath, encoding);
+				return { content: result, raw: result };
+			} else {
+				const result = await fs.readFile(fullPath);
+				return { content: result, raw: result };
+			}
 		} catch (e) {
 			if (e.code === 'ENOENT') {
 				throw new FileNotFound(fullPath);
@@ -95,13 +104,12 @@ export class LocalFileSystem extends Storage {
 	/**
 	 * Returns file size in bytes.
 	 */
-	public async getSize(location: string): Promise<number> {
+	public async getSize(location: string): Promise<SizeResponse> {
 		const fullPath = this._fullPath(location);
 
 		try {
 			const stat = await fs.stat(fullPath);
-
-			return stat.size;
+			return { size: stat.size, raw: stat };
 		} catch (e) {
 			if (e.code === 'ENOENT') {
 				throw new FileNotFound(fullPath);
@@ -121,16 +129,16 @@ export class LocalFileSystem extends Storage {
 	/**
 	 * Move file to a new location.
 	 */
-	public async move(src: string, dest: string): Promise<boolean> {
-		await fs.move(this._fullPath(src), this._fullPath(dest));
+	public async move(src: string, dest: string): Promise<Response> {
+		const result = await fs.move(this._fullPath(src), this._fullPath(dest));
 
-		return true;
+		return { raw: result };
 	}
 
 	/**
 	 * Prepends content to a file.
 	 */
-	public async prepend(location: string, content: Buffer | string, options?: fs.WriteFileOptions): Promise<boolean> {
+	public async prepend(location: string, content: Buffer | string, options?: fs.WriteFileOptions): Promise<Response> {
 		if (await this.exists(location)) {
 			const actualContent = await this.get(location, 'utf-8');
 
@@ -148,19 +156,19 @@ export class LocalFileSystem extends Storage {
 		location: string,
 		content: Buffer | Stream | string,
 		options?: fs.WriteFileOptions
-	): Promise<boolean> {
+	): Promise<Response> {
 		const fullPath = this._fullPath(location);
 
 		if (isReadableStream(content)) {
 			const ws = createOutputStream(fullPath, options);
 			await pipeline(content, ws);
 
-			return true;
+			return { raw: undefined };
 		}
 
-		await fs.outputFile(fullPath, content, options);
+		const result = await fs.outputFile(fullPath, content, options);
 
-		return true;
+		return { raw: result };
 	}
 }
 

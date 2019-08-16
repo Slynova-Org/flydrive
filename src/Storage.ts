@@ -7,6 +7,7 @@
 
 import { Readable } from 'stream';
 import { MethodNotSupported } from './Exceptions';
+import { Response, SizeResponse, SignedUrlResponse, ContentResponse, ExistsResponse } from './types';
 
 export default abstract class Storage {
 	/**
@@ -14,7 +15,7 @@ export default abstract class Storage {
 	 *
 	 * Supported drivers: "local"
 	 */
-	append(location: string, content: Buffer | Readable | string, options: object): Promise<boolean> {
+	append(location: string, content: Buffer | Readable | string, options: object): Promise<Response> {
 		throw new MethodNotSupported('append', this.constructor.name);
 	}
 
@@ -32,7 +33,7 @@ export default abstract class Storage {
 	 *
 	 * Supported drivers: "local", "s3", "gcs"
 	 */
-	copy(src: string, dest: string, options: object): Promise<boolean> {
+	copy(src: string, dest: string, options: object): Promise<Response> {
 		throw new MethodNotSupported('copy', this.constructor.name);
 	}
 
@@ -42,7 +43,7 @@ export default abstract class Storage {
 	 *
 	 * Supported drivers: "local", "s3", "gcs"
 	 */
-	delete(location: string): Promise<boolean> {
+	delete(location: string): Promise<Response> {
 		throw new MethodNotSupported('delete', this.constructor.name);
 	}
 
@@ -60,7 +61,7 @@ export default abstract class Storage {
 	 *
 	 * Supported drivers: "local", "s3", "gcs"
 	 */
-	exists(location: string): Promise<boolean> {
+	exists(location: string): Promise<ExistsResponse> {
 		throw new MethodNotSupported('exists', this.constructor.name);
 	}
 
@@ -69,7 +70,9 @@ export default abstract class Storage {
 	 *
 	 * Supported drivers: "local", "s3", "gcs"
 	 */
-	get(location: string, encoding?: object | string): Promise<Buffer | string> {
+	get(location: string, encoding?: string): Promise<ContentResponse<string>>;
+	get(location: string, encoding: null): Promise<ContentResponse<Buffer>>;
+	get(location: string, encoding?: string | null): Promise<ContentResponse<Buffer | string>> {
 		throw new MethodNotSupported('get', this.constructor.name);
 	}
 
@@ -78,7 +81,7 @@ export default abstract class Storage {
 	 *
 	 * Supported drivers: "s3", "gcs"
 	 */
-	getSignedUrl(location: string, expiry: number): Promise<string> {
+	getSignedUrl(location: string, expiry: number): Promise<SignedUrlResponse> {
 		throw new MethodNotSupported('getSignedUrl', this.constructor.name);
 	}
 
@@ -87,7 +90,7 @@ export default abstract class Storage {
 	 *
 	 * Supported drivers: "local", "gcs"
 	 */
-	getSize(location: string): Promise<number> {
+	getSize(location: string): Promise<SizeResponse> {
 		throw new MethodNotSupported('getSize', this.constructor.name);
 	}
 
@@ -96,7 +99,7 @@ export default abstract class Storage {
 	 *
 	 * Supported drivers: "local", "s3", "gcs"
 	 */
-	getStream(location: string, options: object | string): Readable {
+	getStream(location: string): Readable {
 		throw new MethodNotSupported('getStream', this.constructor.name);
 	}
 
@@ -116,7 +119,7 @@ export default abstract class Storage {
 	 *
 	 * Supported drivers: "local", "s3", "gcs"
 	 */
-	move(src: string, dest: string): Promise<boolean> {
+	move(src: string, dest: string): Promise<Response> {
 		throw new MethodNotSupported('move', this.constructor.name);
 	}
 
@@ -126,7 +129,7 @@ export default abstract class Storage {
 	 *
 	 * Supported drivers: "local", "s3", "gcs"
 	 */
-	put(location: string, content: Buffer | Readable | string, options: object): Promise<boolean> {
+	put(location: string, content: Buffer | Readable | string): Promise<Response> {
 		throw new MethodNotSupported('put', this.constructor.name);
 	}
 
@@ -135,7 +138,7 @@ export default abstract class Storage {
 	 *
 	 * Supported drivers: "local"
 	 */
-	prepend(location: string, content: Buffer | string, options: object): Promise<boolean> {
+	prepend(location: string, content: Buffer | string): Promise<Response> {
 		throw new MethodNotSupported('prepend', this.constructor.name);
 	}
 }
