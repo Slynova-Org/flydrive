@@ -81,6 +81,13 @@ export class AWSS3 extends Storage {
 	}
 
 	/**
+	 * Returns the driver.
+	 */
+	public driver(): S3 {
+		return this.$driver;
+	}
+
+	/**
 	 * Determines if a file or folder already exists.
 	 */
 	public exists(location: string): Promise<boolean> {
@@ -184,7 +191,7 @@ export class AWSS3 extends Storage {
 	 * Creates a new file.
 	 * This method will create missing directories on the fly.
 	 */
-	public put(location: string, content: Buffer | Readable | string, options: object): Promise<boolean> {
+	public put(location: string, content: Buffer | Readable | string, options?: object): Promise<boolean> {
 		return new Promise((resolve, reject) => {
 			const params = { Key: location, Body: content, Bucket: this.$bucket };
 

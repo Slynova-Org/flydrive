@@ -30,7 +30,7 @@
     "prepublishOnly": "npm run build",
     "test": "npm run test:local && npm run test:docker",
     "test:local": "node japaFile",
-    "test:docker": "bash docker-test.sh",
+    "test:docker": "./docker-test.sh",
     "tsc": "tsc"
   },
   "dependencies": {
