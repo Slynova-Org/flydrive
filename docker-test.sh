@@ -5,4 +5,4 @@ export $(egrep -v '^#' .env.docker | xargs'\n')
 docker-compose up -d -V --build --remove-orphans --force-recreate localstack-s3;
 
 # Run testing
-docker-compose run flydrive yarn run test:docker
+docker-compose run flydrive yarn run test:local
