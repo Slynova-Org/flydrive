@@ -127,7 +127,7 @@ export class AWSS3 extends Storage {
 		}
 
 		if (content instanceof Uint8Array) {
-			return new Buffer(content);
+			return Buffer.from(content.buffer);
 		}
 
 		return content;
