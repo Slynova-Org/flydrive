@@ -5,33 +5,39 @@
  * @copyright Slynova - Romain Lanz <romain.lanz@slynova.ch>
  */
 
-import { Stream } from 'stream';
-import { isAbsolute, join } from 'path';
+import { Readable } from 'stream';
+import { isAbsolute, join, resolve } from 'path';
 import fs from 'fs-extra';
 import createOutputStream from 'create-output-stream';
 import Storage from '../Storage';
-import { FileNotFound, UnknownException } from '../Exceptions';
+import { FileNotFound, UnknownException, PermissionMissing } from '../Exceptions';
 import { isReadableStream, pipeline } from '../utils';
 import { Response, ExistsResponse, ContentResponse, SizeResponse } from '../types';
 
-function handleError(err: Error & { code?: string }, fullPath: string): never {
-	if (err.code === 'ENOENT') {
-		throw new FileNotFound(err, fullPath);
-	} else {
-		throw new UnknownException(err, fullPath);
+function handleError(err: Error & { code: string; path?: string }, fullPath: string): never {
+	switch (err.code) {
+		case 'ENOENT':
+			throw new PermissionMissing(err, err.path || fullPath);
+		case 'EPERM':
+			throw new FileNotFound(err, err.path || fullPath);
+		default:
+			throw new UnknownException(err, err.path || fullPath);
 	}
 }
 
 export class LocalFileSystem extends Storage {
-	constructor(protected $config: LocalFileSystemConfig) {
+	private $root: string;
+
+	constructor(config: LocalFileSystemConfig) {
 		super();
+		this.$root = resolve(config.root);
 	}
 
 	/**
 	 * Returns full path to the storage root directory.
 	 */
 	private _fullPath(relativePath: string): string {
-		return isAbsolute(relativePath) ? relativePath : join(this.$config.root, relativePath);
+		return isAbsolute(relativePath) ? relativePath : join(this.$root, relativePath);
 	}
 
 	/**
@@ -39,7 +45,7 @@ export class LocalFileSystem extends Storage {
 	 */
 	public async append(
 		location: string,
-		content: Buffer | Stream | string,
+		content: Buffer | Readable | string,
 		options?: fs.WriteFileOptions
 	): Promise<Response> {
 		if (isReadableStream(content)) {
@@ -72,13 +78,12 @@ export class LocalFileSystem extends Storage {
 
 	/**
 	 * Delete existing file.
-	 * This method will not throw an exception if file doesn't exists.
 	 */
 	public async delete(location: string): Promise<Response> {
 		const fullPath = this._fullPath(location);
 
 		try {
-			const result = await fs.remove(this._fullPath(location));
+			const result = await fs.unlink(this._fullPath(location));
 			return { raw: result };
 		} catch (e) {
 			return handleError(e, fullPath);
@@ -96,12 +101,18 @@ export class LocalFileSystem extends Storage {
 	 * Determines if a file or folder already exists.
 	 */
 	public async exists(location: string): Promise<ExistsResponse> {
-		const result = await fs.pathExists(this._fullPath(location));
-		return { exists: true, raw: result };
+		const fullPath = this._fullPath(location);
+
+		try {
+			const result = await fs.pathExists(fullPath);
+			return { exists: result, raw: result };
+		} catch (e) {
+			return handleError(e, fullPath);
+		}
 	}
 
 	/**
-	 * Returns the file contents.
+	 * Returns the file contents as string.
 	 */
 	public async get(location: string, encoding = 'utf8'): Promise<ContentResponse<string>> {
 		const fullPath = this._fullPath(location);
@@ -114,6 +125,9 @@ export class LocalFileSystem extends Storage {
 		}
 	}
 
+	/**
+	 * Returns the file contents as Buffer.
+	 */
 	public async getBuffer(location: string): Promise<ContentResponse<Buffer>> {
 		const fullPath = this._fullPath(location);
 
@@ -165,7 +179,7 @@ export class LocalFileSystem extends Storage {
 	 */
 	public async prepend(location: string, content: Buffer | string, options?: fs.WriteFileOptions): Promise<Response> {
 		try {
-			const actualContent = await this.get(location, 'utf-8');
+			const { content: actualContent } = await this.get(location, 'utf-8');
 
 			return this.put(location, `${content}${actualContent}`, options);
 		} catch {
@@ -179,7 +193,7 @@ export class LocalFileSystem extends Storage {
 	 */
 	public async put(
 		location: string,
-		content: Buffer | Stream | string,
+		content: Buffer | Readable | string,
 		options?: fs.WriteFileOptions
 	): Promise<Response> {
 		const fullPath = this._fullPath(location);

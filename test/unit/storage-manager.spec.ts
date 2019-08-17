@@ -5,6 +5,7 @@
  * @copyright Slynova - Romain Lanz <romain.lanz@slynova.ch>
  */
 
+import { resolve } from 'path';
 import test from 'japa';
 
 import Storage from '../../src/Storage';
@@ -100,8 +101,8 @@ test.group('Storage Manager', (group) => {
 		assert.instanceOf(localWithDefaultConfig, LocalFileSystem);
 		assert.instanceOf(localWithCustomConfig, LocalFileSystem);
 		// @ts-ignore
-		assert.notEqual(localWithDefaultConfig.$config.root, localWithCustomConfig.$config.root);
+		assert.notEqual(localWithDefaultConfig.$root, localWithCustomConfig.$root);
 		// @ts-ignore
-		assert.equal('/test', localWithCustomConfig.$config.root);
+		assert.equal(localWithCustomConfig.$root, resolve('/test'));
 	});
 });
