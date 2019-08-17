@@ -10,9 +10,17 @@ import { isAbsolute, join } from 'path';
 import fs from 'fs-extra';
 import createOutputStream from 'create-output-stream';
 import Storage from '../Storage';
-import { FileNotFound } from '../Exceptions';
+import { FileNotFound, UnknownException } from '../Exceptions';
 import { isReadableStream, pipeline } from '../utils';
 import { Response, ExistsResponse, ContentResponse, SizeResponse } from '../types';
+
+function handleError(err: Error & { code?: string }, fullPath: string): never {
+	if (err.code === 'ENOENT') {
+		throw new FileNotFound(err, fullPath);
+	} else {
+		throw new UnknownException(err, fullPath);
+	}
+}
 
 export class LocalFileSystem extends Storage {
 	constructor(protected $config: LocalFileSystemConfig) {
@@ -37,8 +45,14 @@ export class LocalFileSystem extends Storage {
 		if (isReadableStream(content)) {
 			return this.put(location, content, Object.assign({ flags: 'a' }, options));
 		} else {
-			const result = await fs.appendFile(this._fullPath(location), content, options);
-			return { raw: result };
+			const fullPath = this._fullPath(location);
+
+			try {
+				const result = await fs.appendFile(fullPath, content, options);
+				return { raw: result };
+			} catch (e) {
+				return handleError(e, fullPath);
+			}
 		}
 	}
 
@@ -46,9 +60,14 @@ export class LocalFileSystem extends Storage {
 	 * Copy a file to a location.
 	 */
 	public async copy(src: string, dest: string, options?: fs.CopyOptions): Promise<Response> {
-		const result = await fs.copy(this._fullPath(src), this._fullPath(dest), options);
+		const srcPath = this._fullPath(src);
 
-		return { raw: result };
+		try {
+			const result = await fs.copy(srcPath, this._fullPath(dest), options);
+			return { raw: result };
+		} catch (e) {
+			return handleError(e, srcPath);
+		}
 	}
 
 	/**
@@ -56,9 +75,14 @@ export class LocalFileSystem extends Storage {
 	 * This method will not throw an exception if file doesn't exists.
 	 */
 	public async delete(location: string): Promise<Response> {
-		const result = await fs.remove(this._fullPath(location));
+		const fullPath = this._fullPath(location);
 
-		return { raw: result };
+		try {
+			const result = await fs.remove(this._fullPath(location));
+			return { raw: result };
+		} catch (e) {
+			return handleError(e, fullPath);
+		}
 	}
 
 	/**
@@ -79,25 +103,25 @@ export class LocalFileSystem extends Storage {
 	/**
 	 * Returns the file contents.
 	 */
-	get(location: string, encoding?: string): Promise<ContentResponse<string>>;
-	get(location: string, encoding: null): Promise<ContentResponse<Buffer>>;
-	public async get(location: string, encoding: string | null = 'utf8'): Promise<ContentResponse<Buffer | string>> {
+	public async get(location: string, encoding = 'utf8'): Promise<ContentResponse<string>> {
 		const fullPath = this._fullPath(location);
 
 		try {
-			if (typeof encoding === 'string') {
-				const result = await fs.readFile(fullPath, encoding);
-				return { content: result, raw: result };
-			} else {
-				const result = await fs.readFile(fullPath);
-				return { content: result, raw: result };
-			}
+			const result = await fs.readFile(fullPath, encoding);
+			return { content: result, raw: result };
 		} catch (e) {
-			if (e.code === 'ENOENT') {
-				throw new FileNotFound(fullPath);
-			}
+			return handleError(e, fullPath);
+		}
+	}
 
-			throw e;
+	public async getBuffer(location: string): Promise<ContentResponse<Buffer>> {
+		const fullPath = this._fullPath(location);
+
+		try {
+			const result = await fs.readFile(fullPath);
+			return { content: result, raw: result };
+		} catch (e) {
+			return handleError(e, fullPath);
 		}
 	}
 
@@ -111,11 +135,7 @@ export class LocalFileSystem extends Storage {
 			const stat = await fs.stat(fullPath);
 			return { size: stat.size, raw: stat };
 		} catch (e) {
-			if (e.code === 'ENOENT') {
-				throw new FileNotFound(fullPath);
-			}
-
-			throw e;
+			return handleError(e, fullPath);
 		}
 	}
 
@@ -130,22 +150,27 @@ export class LocalFileSystem extends Storage {
 	 * Move file to a new location.
 	 */
 	public async move(src: string, dest: string): Promise<Response> {
-		const result = await fs.move(this._fullPath(src), this._fullPath(dest));
+		const srcPath = this._fullPath(src);
 
-		return { raw: result };
+		try {
+			const result = await fs.move(src, this._fullPath(dest));
+			return { raw: result };
+		} catch (e) {
+			return handleError(e, srcPath);
+		}
 	}
 
 	/**
 	 * Prepends content to a file.
 	 */
 	public async prepend(location: string, content: Buffer | string, options?: fs.WriteFileOptions): Promise<Response> {
-		if (await this.exists(location)) {
+		try {
 			const actualContent = await this.get(location, 'utf-8');
 
 			return this.put(location, `${content}${actualContent}`, options);
+		} catch {
+			return this.put(location, content, options);
 		}
-
-		return this.put(location, content, options);
 	}
 
 	/**
@@ -159,16 +184,18 @@ export class LocalFileSystem extends Storage {
 	): Promise<Response> {
 		const fullPath = this._fullPath(location);
 
-		if (isReadableStream(content)) {
-			const ws = createOutputStream(fullPath, options);
-			await pipeline(content, ws);
+		try {
+			if (isReadableStream(content)) {
+				const ws = createOutputStream(fullPath, options);
+				await pipeline(content, ws);
+				return { raw: undefined };
+			}
 
-			return { raw: undefined };
+			const result = await fs.outputFile(fullPath, content, options);
+			return { raw: result };
+		} catch (e) {
+			return handleError(e, fullPath);
 		}
-
-		const result = await fs.outputFile(fullPath, content, options);
-
-		return { raw: result };
 	}
 }
 

@@ -66,14 +66,21 @@ export default abstract class Storage {
 	}
 
 	/**
-	 * Returns the file contents.
+	 * Returns the file contents as a string.
 	 *
 	 * Supported drivers: "local", "s3", "gcs"
 	 */
-	get(location: string, encoding?: string): Promise<ContentResponse<string>>;
-	get(location: string, encoding: null): Promise<ContentResponse<Buffer>>;
-	get(location: string, encoding?: string | null): Promise<ContentResponse<Buffer | string>> {
+	get(location: string, encoding?: string): Promise<ContentResponse<string>> {
 		throw new MethodNotSupported('get', this.constructor.name);
+	}
+
+	/**
+	 * Returns the file contents as a Buffer.
+	 *
+	 * Supported drivers: "local", "s3", "gcs"
+	 */
+	getBuffer(location: string): Promise<ContentResponse<Buffer>> {
+		throw new MethodNotSupported('getBuffer', this.constructor.name);
 	}
 
 	/**

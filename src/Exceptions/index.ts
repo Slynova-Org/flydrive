@@ -9,3 +9,4 @@ export * from './DriverNotSupported';
 export * from './FileNotFound';
 export * from './InvalidConfig';
 export * from './MethodNotSupported';
+export * from './UnknownException';
