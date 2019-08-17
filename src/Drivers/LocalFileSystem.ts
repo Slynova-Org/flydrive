@@ -17,9 +17,9 @@ import { Response, ExistsResponse, ContentResponse, SizeResponse } from '../type
 function handleError(err: Error & { code: string; path?: string }, fullPath: string): never {
 	switch (err.code) {
 		case 'ENOENT':
-			throw new PermissionMissing(err, err.path || fullPath);
-		case 'EPERM':
 			throw new FileNotFound(err, err.path || fullPath);
+		case 'EPERM':
+			throw new PermissionMissing(err, err.path || fullPath);
 		default:
 			throw new UnknownException(err, err.path || fullPath);
 	}
