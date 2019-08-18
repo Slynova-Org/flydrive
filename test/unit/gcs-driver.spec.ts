@@ -5,6 +5,7 @@ import uuid from 'uuid/v4';
 import { Storage } from '@google-cloud/storage';
 
 import { GoogleCloudStorage } from '../../src/Drivers/GoogleCloudStorage';
+import { PermissionMissing } from '../../src/Exceptions';
 
 function streamToString(stream: Readable): Promise<string> {
 	return new Promise((resolve, reject) => {
@@ -51,23 +52,25 @@ test.group('GCS Driver', (group) => {
 		try {
 			await newStorage.put(testFile, testString);
 		} catch (error) {
-			assert.match(error, /does not have storage\.objects\.create access to other-bucket\/[^/]+\/test/);
+			assert.instanceOf(error, PermissionMissing);
 		}
 	});
 
 	test('copy a file', async (assert) => {
 		await storage.copy(testFile, otherFile);
 
-		const content = await storage.get(otherFile, 'utf8');
+		const { content } = await storage.get(otherFile, 'utf8');
 		assert.strictEqual(content, testString);
 
-		const exists = await storage.exists(testFile);
+		const { exists } = await storage.exists(testFile);
 		assert.isTrue(exists);
 	});
 
 	test('delete a file', async (assert) => {
 		await storage.delete(testFile);
-		assert.isFalse(await storage.exists(testFile));
+
+		const { exists } = await storage.exists(testFile);
+		assert.isFalse(exists);
 	});
 
 	test('get driver instance', (assert) => {
@@ -76,23 +79,23 @@ test.group('GCS Driver', (group) => {
 	});
 
 	test('get file content as Buffer', async (assert) => {
-		const data = await storage.get(testFile);
-		assert.instanceOf(data, Buffer);
-		assert.strictEqual(data.toString(), testString);
+		const { content } = await storage.getBuffer(testFile);
+		assert.instanceOf(content, Buffer);
+		assert.strictEqual(content.toString(), testString);
 	});
 
 	test('get file content as a string', async (assert) => {
-		const data = await storage.get(testFile, 'utf8');
-		assert.strictEqual(data, testString);
+		const { content } = await storage.get(testFile, 'utf8');
+		assert.strictEqual(content, testString);
 	});
 
 	test('get a signed URL', async (assert) => {
-		const signedUrl = await storage.getSignedUrl(testFile);
+		const { signedUrl } = await storage.getSignedUrl(testFile);
 		assert.isTrue(signedUrl.startsWith(`https://storage.googleapis.com/${testBucket}/${folder}`));
 	});
 
 	test('get the size of a file', async (assert) => {
-		const size = await storage.getSize(testFile);
+		const { size } = await storage.getSize(testFile);
 		assert.strictEqual(size, testString.length);
 	});
 
@@ -110,10 +113,10 @@ test.group('GCS Driver', (group) => {
 	test('move a file', async (assert) => {
 		await storage.move(testFile, otherFile);
 
-		const content = await storage.get(otherFile, 'utf8');
+		const { content } = await storage.get(otherFile, 'utf8');
 		assert.strictEqual(content, testString);
 
-		const exists = await storage.exists(testFile);
+		const { exists } = await storage.exists(testFile);
 		assert.isFalse(exists);
 	});
 
@@ -121,7 +124,7 @@ test.group('GCS Driver', (group) => {
 		const str = 'this-is-a-test';
 
 		await storage.put(testFile, str);
-		const content = await storage.get(testFile, 'utf8');
+		const { content } = await storage.get(testFile, 'utf8');
 		assert.strictEqual(content, str);
 	});
 
@@ -130,7 +133,7 @@ test.group('GCS Driver', (group) => {
 		const buffer = Buffer.from(str);
 
 		await storage.put(testFile, buffer);
-		const content = await storage.get(testFile, 'utf8');
+		const { content } = await storage.get(testFile, 'utf8');
 		assert.strictEqual(content, str);
 	});
 
@@ -138,7 +141,7 @@ test.group('GCS Driver', (group) => {
 		const stream = storage.getStream(testFile);
 
 		await storage.put(otherFile, stream);
-		const content = await storage.get(otherFile, 'utf8');
+		const { content } = await storage.get(otherFile, 'utf8');
 		assert.strictEqual(content, testString);
 	});
 });

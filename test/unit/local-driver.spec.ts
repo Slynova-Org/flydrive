@@ -45,34 +45,30 @@ test.group('Local Driver', (group) => {
 
 	test('find if a file exist', async (assert) => {
 		await fs.outputFile(fullPath('i_exist'), '');
-		const exists = await storage.exists('./test/unit/storage/i_exist');
+		const { exists } = await storage.exists('./test/unit/storage/i_exist');
 		assert.isTrue(exists);
 	});
 
 	test(`find if a file doesn't exist`, async (assert) => {
-		const exists = await storage.exists('./test/unit/storage/i_dont_exists');
+		const { exists } = await storage.exists('./test/unit/storage/i_dont_exists');
 		assert.isFalse(exists);
 	});
 
 	test('find if a folder exist', async (assert) => {
-		const exists = await storage.exists('./test/unit/storage');
+		const { exists } = await storage.exists('./test/unit/storage');
 		assert.isTrue(exists);
 	});
 
 	test('create a file', async (assert) => {
 		await storage.put('./test/unit/storage/im_new', 'im_new');
-		const contents = await storage.get('./test/unit/storage/im_new');
-		assert.equal(contents, 'im_new');
+		const { content } = await storage.get('./test/unit/storage/im_new');
+		assert.equal(content, 'im_new');
 	});
 
 	test('create a file in a deep directory', async (assert) => {
-		try {
-			await storage.put('./test/unit/storage/deep/directory/im_new', 'im_new');
-			const contents = await storage.get('./test/unit/storage/deep/directory/im_new');
-			assert.equal(contents, 'im_new');
-		} catch (e) {
-			console.log(e);
-		}
+		await storage.put('./test/unit/storage/deep/directory/im_new', 'im_new');
+		const { content } = await storage.get('./test/unit/storage/deep/directory/im_new');
+		assert.equal(content, 'im_new');
 	});
 
 	test('delete a file', async (assert) => {
@@ -80,7 +76,7 @@ test.group('Local Driver', (group) => {
 
 		try {
 			await storage.delete('./test/unit/storage/i_will_be_deleted');
-			const exists = await storage.exists('./test/unit/storage/i_will_be_deleted');
+			const { exists } = await storage.exists('./test/unit/storage/i_will_be_deleted');
 			assert.isFalse(exists);
 		} catch (error) {
 			if (!isWindowsDefenderError(error)) {
@@ -90,14 +86,11 @@ test.group('Local Driver', (group) => {
 	});
 
 	test(`delete a file that doesn't exist`, async (assert) => {
+		assert.plan(1);
 		try {
 			await storage.delete('./test/unit/storage/i_dont_exist');
-			const exists = await storage.exists('./test/unit/storage/i_dont_exist');
-			assert.isFalse(exists);
 		} catch (error) {
-			if (!isWindowsDefenderError(error)) {
-				throw error;
-			}
+			assert.instanceOf(error, CE.FileNotFound);
 		}
 	});
 
@@ -105,23 +98,31 @@ test.group('Local Driver', (group) => {
 		await fs.outputFile(fullPath('i_will_be_renamed'), '');
 
 		await storage.move('./test/unit/storage/i_will_be_renamed', './test/unit/storage/im_renamed');
-		assert.isTrue(await storage.exists('./test/unit/storage/im_renamed'));
-		assert.isFalse(await storage.exists('./test/unit/storage/i_will_be_renamed'));
+
+		const { exists: newExists } = await storage.exists('./test/unit/storage/im_renamed');
+		assert.isTrue(newExists);
+
+		const { exists: oldExists } = await storage.exists('./test/unit/storage/i_will_be_renamed');
+		assert.isFalse(oldExists);
 	});
 
 	test('copy a file', async (assert) => {
 		await fs.outputFile(fullPath('i_will_be_copied'), '');
 
 		await storage.copy('./test/unit/storage/i_will_be_copied', './test/unit/storage/im_copied');
-		assert.isTrue(await storage.exists('./test/unit/storage/im_copied'));
-		assert.isTrue(await storage.exists('./test/unit/storage/i_will_be_copied'));
+
+		const { exists: newExists } = await storage.exists('./test/unit/storage/im_copied');
+		assert.isTrue(newExists);
+
+		const { exists: oldExists } = await storage.exists('./test/unit/storage/i_will_be_copied');
+		assert.isTrue(oldExists);
 	});
 
 	test('prepend to a file', async (assert) => {
 		await fs.outputFile(fullPath('i_have_content'), 'world');
 
 		await storage.prepend('./test/unit/storage/i_have_content', 'hello ');
-		const content = await storage.get('./test/unit/storage/i_have_content');
+		const { content } = await storage.get('./test/unit/storage/i_have_content');
 		assert.equal(content, 'hello world');
 	});
 
@@ -129,13 +130,13 @@ test.group('Local Driver', (group) => {
 		await fs.outputFile(fullPath('i_have_content'), 'hello');
 
 		await storage.append('./test/unit/storage/i_have_content', ' universe');
-		const content = await storage.get('./test/unit/storage/i_have_content');
+		const { content } = await storage.get('./test/unit/storage/i_have_content');
 		assert.equal(content, 'hello universe');
 	});
 
 	test('prepend to new file', async (assert) => {
 		await storage.prepend('./test/unit/storage/i_have_content', 'hello');
-		const content = await storage.get('./test/unit/storage/i_have_content', 'utf-8');
+		const { content } = await storage.get('./test/unit/storage/i_have_content', 'utf-8');
 		assert.equal(content, 'hello');
 	});
 
@@ -152,7 +153,7 @@ test.group('Local Driver', (group) => {
 		const dummyFile = path.join(__dirname, './dummy_file');
 
 		await storage.put(dummyFile, 'dummy content');
-		const content = await storage.get(dummyFile, 'utf-8');
+		const { content } = await storage.get(dummyFile, 'utf-8');
 
 		assert.equal(content, 'dummy content');
 		await storage.delete(dummyFile);
@@ -164,8 +165,8 @@ test.group('Local Driver', (group) => {
 
 		await storage.put('./test/unit/storage/bar', readStream);
 
-		const barContents = await storage.get('./test/unit/storage/bar');
-		assert.equal(barContents, 'Foo related content');
+		const { content } = await storage.get('./test/unit/storage/bar');
+		assert.equal(content, 'Foo related content');
 	});
 
 	test('append to exisiting file', async (assert) => {
@@ -175,8 +176,8 @@ test.group('Local Driver', (group) => {
 		const readStream = fs.createReadStream(path.join(__dirname, './storage/object'));
 		await storage.append('./test/unit/storage/greeting', readStream);
 
-		const barContents = await storage.get('./test/unit/storage/greeting');
-		assert.equal(barContents, 'Hello World');
+		const { content } = await storage.get('./test/unit/storage/greeting');
+		assert.equal(content, 'Hello World');
 	});
 
 	test('throw exception when unable to find file', async (assert) => {
@@ -199,7 +200,7 @@ test.group('Local Driver', (group) => {
 
 	test('get size of a given file', async (assert) => {
 		await storage.put('./test/unit/storage/foo', 'Foo content');
-		const size = await storage.getSize('./test/unit/storage/foo');
+		const { size } = await storage.getSize('./test/unit/storage/foo');
 		assert.equal(size, 11);
 	});
 });

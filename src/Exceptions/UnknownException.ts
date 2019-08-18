@@ -7,10 +7,14 @@
 
 import { RuntimeException } from 'node-exceptions';
 
-export class FileNotFound extends RuntimeException {
+export class UnknownException extends RuntimeException {
 	raw: Error;
 	constructor(err: Error, path: string) {
-		super(`The file ${path} doesn't exist`, 500, 'E_FILE_NOT_FOUND');
+		super(
+			`An unknown error happened with the file ${path}. Please open an issue at https://github.com/Slynova-Org/flydrive/issues`,
+			500,
+			'E_UNKNOWN'
+		);
 		this.raw = err;
 	}
 }

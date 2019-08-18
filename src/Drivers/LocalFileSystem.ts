@@ -5,24 +5,39 @@
  * @copyright Slynova - Romain Lanz <romain.lanz@slynova.ch>
  */
 
-import { Stream } from 'stream';
-import { isAbsolute, join } from 'path';
+import { Readable } from 'stream';
+import { isAbsolute, join, resolve } from 'path';
 import fs from 'fs-extra';
 import createOutputStream from 'create-output-stream';
 import Storage from '../Storage';
-import { FileNotFound } from '../Exceptions';
+import { FileNotFound, UnknownException, PermissionMissing } from '../Exceptions';
 import { isReadableStream, pipeline } from '../utils';
+import { Response, ExistsResponse, ContentResponse, SizeResponse } from '../types';
+
+function handleError(err: Error & { code: string; path?: string }, fullPath: string): never {
+	switch (err.code) {
+		case 'ENOENT':
+			throw new FileNotFound(err, err.path || fullPath);
+		case 'EPERM':
+			throw new PermissionMissing(err, err.path || fullPath);
+		default:
+			throw new UnknownException(err, err.path || fullPath);
+	}
+}
 
 export class LocalFileSystem extends Storage {
-	constructor(protected $config: LocalFileSystemConfig) {
+	private $root: string;
+
+	constructor(config: LocalFileSystemConfig) {
 		super();
+		this.$root = resolve(config.root);
 	}
 
 	/**
 	 * Returns full path to the storage root directory.
 	 */
 	private _fullPath(relativePath: string): string {
-		return isAbsolute(relativePath) ? relativePath : join(this.$config.root, relativePath);
+		return isAbsolute(relativePath) ? relativePath : join(this.$root, relativePath);
 	}
 
 	/**
@@ -30,84 +45,111 @@ export class LocalFileSystem extends Storage {
 	 */
 	public async append(
 		location: string,
-		content: Buffer | Stream | string,
+		content: Buffer | Readable | string,
 		options?: fs.WriteFileOptions
-	): Promise<boolean> {
+	): Promise<Response> {
 		if (isReadableStream(content)) {
 			return this.put(location, content, Object.assign({ flags: 'a' }, options));
+		} else {
+			const fullPath = this._fullPath(location);
+
+			try {
+				const result = await fs.appendFile(fullPath, content, options);
+				return { raw: result };
+			} catch (e) {
+				return handleError(e, fullPath);
+			}
 		}
-
-		await fs.appendFile(this._fullPath(location), content, options);
-
-		return true;
 	}
 
 	/**
 	 * Copy a file to a location.
 	 */
-	public async copy(src: string, dest: string, options?: fs.CopyOptions): Promise<boolean> {
-		await fs.copy(this._fullPath(src), this._fullPath(dest), options);
+	public async copy(src: string, dest: string, options?: fs.CopyOptions): Promise<Response> {
+		const srcPath = this._fullPath(src);
 
-		return true;
+		try {
+			const result = await fs.copy(srcPath, this._fullPath(dest), options);
+			return { raw: result };
+		} catch (e) {
+			return handleError(e, srcPath);
+		}
 	}
 
 	/**
 	 * Delete existing file.
-	 * This method will not throw an exception if file doesn't exists.
 	 */
-	public async delete(location: string): Promise<boolean> {
-		await fs.remove(this._fullPath(location));
+	public async delete(location: string): Promise<Response> {
+		const fullPath = this._fullPath(location);
 
-		return true;
+		try {
+			const result = await fs.unlink(this._fullPath(location));
+			return { raw: result };
+		} catch (e) {
+			return handleError(e, fullPath);
+		}
 	}
 
 	/**
 	 * Returns the driver.
 	 */
-	public driver() {
+	public driver(): typeof fs {
 		return fs;
 	}
 
 	/**
 	 * Determines if a file or folder already exists.
 	 */
-	public exists(location: string) {
-		return fs.pathExists(this._fullPath(location));
-	}
-
-	/**
-	 * Returns the file contents.
-	 */
-	public async get(location: string, encoding = 'utf8'): Promise<Buffer | string> {
+	public async exists(location: string): Promise<ExistsResponse> {
 		const fullPath = this._fullPath(location);
 
 		try {
-			return await fs.readFile(fullPath, encoding);
+			const result = await fs.pathExists(fullPath);
+			return { exists: result, raw: result };
 		} catch (e) {
-			if (e.code === 'ENOENT') {
-				throw new FileNotFound(fullPath);
-			}
+			return handleError(e, fullPath);
+		}
+	}
 
-			throw e;
+	/**
+	 * Returns the file contents as string.
+	 */
+	public async get(location: string, encoding = 'utf8'): Promise<ContentResponse<string>> {
+		const fullPath = this._fullPath(location);
+
+		try {
+			const result = await fs.readFile(fullPath, encoding);
+			return { content: result, raw: result };
+		} catch (e) {
+			return handleError(e, fullPath);
+		}
+	}
+
+	/**
+	 * Returns the file contents as Buffer.
+	 */
+	public async getBuffer(location: string): Promise<ContentResponse<Buffer>> {
+		const fullPath = this._fullPath(location);
+
+		try {
+			const result = await fs.readFile(fullPath);
+			return { content: result, raw: result };
+		} catch (e) {
+			return handleError(e, fullPath);
 		}
 	}
 
 	/**
 	 * Returns file size in bytes.
 	 */
-	public async getSize(location: string): Promise<number> {
+	public async getSize(location: string): Promise<SizeResponse> {
 		const fullPath = this._fullPath(location);
 
 		try {
 			const stat = await fs.stat(fullPath);
-
-			return stat.size;
+			return { size: stat.size, raw: stat };
 		} catch (e) {
-			if (e.code === 'ENOENT') {
-				throw new FileNotFound(fullPath);
-			}
-
-			throw e;
+			return handleError(e, fullPath);
 		}
 	}
 
@@ -121,23 +163,28 @@ export class LocalFileSystem extends Storage {
 	/**
 	 * Move file to a new location.
 	 */
-	public async move(src: string, dest: string): Promise<boolean> {
-		await fs.move(this._fullPath(src), this._fullPath(dest));
+	public async move(src: string, dest: string): Promise<Response> {
+		const srcPath = this._fullPath(src);
 
-		return true;
+		try {
+			const result = await fs.move(src, this._fullPath(dest));
+			return { raw: result };
+		} catch (e) {
+			return handleError(e, srcPath);
+		}
 	}
 
 	/**
 	 * Prepends content to a file.
 	 */
-	public async prepend(location: string, content: Buffer | string, options?: fs.WriteFileOptions): Promise<boolean> {
-		if (await this.exists(location)) {
-			const actualContent = await this.get(location, 'utf-8');
+	public async prepend(location: string, content: Buffer | string, options?: fs.WriteFileOptions): Promise<Response> {
+		try {
+			const { content: actualContent } = await this.get(location, 'utf-8');
 
 			return this.put(location, `${content}${actualContent}`, options);
+		} catch {
+			return this.put(location, content, options);
 		}
-
-		return this.put(location, content, options);
 	}
 
 	/**
@@ -146,21 +193,23 @@ export class LocalFileSystem extends Storage {
 	 */
 	public async put(
 		location: string,
-		content: Buffer | Stream | string,
+		content: Buffer | Readable | string,
 		options?: fs.WriteFileOptions
-	): Promise<boolean> {
+	): Promise<Response> {
 		const fullPath = this._fullPath(location);
 
-		if (isReadableStream(content)) {
-			const ws = createOutputStream(fullPath, options);
-			await pipeline(content, ws);
+		try {
+			if (isReadableStream(content)) {
+				const ws = createOutputStream(fullPath, options);
+				await pipeline(content, ws);
+				return { raw: undefined };
+			}
 
-			return true;
+			const result = await fs.outputFile(fullPath, content, options);
+			return { raw: result };
+		} catch (e) {
+			return handleError(e, fullPath);
 		}
-
-		await fs.outputFile(fullPath, content, options);
-
-		return true;
 	}
 }
 

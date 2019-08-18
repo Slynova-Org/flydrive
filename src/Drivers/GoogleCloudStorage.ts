@@ -9,6 +9,19 @@ import { Readable } from 'stream';
 import { Storage as GCSDriver, StorageOptions, Bucket, File } from '@google-cloud/storage';
 import Storage from '../Storage';
 import { isReadableStream, pipeline } from '../utils';
+import { Response, ExistsResponse, ContentResponse, SignedUrlResponse, SizeResponse } from '../types';
+import { FileNotFound, PermissionMissing, UnknownException } from '../Exceptions';
+
+function handleError(err: Error & { code?: number }, path: string): never {
+	switch (err.code) {
+		case 403:
+			throw new PermissionMissing(err, path);
+		case 404:
+			throw new FileNotFound(err, path);
+		default:
+			throw new UnknownException(err, path);
+	}
+}
 
 export class GoogleCloudStorage extends Storage {
 	protected $config: GoogleCloudStorageConfig;
@@ -40,22 +53,28 @@ export class GoogleCloudStorage extends Storage {
 	/**
 	 * Copy a file to a location.
 	 */
-	public async copy(src: string, dest: string): Promise<boolean> {
+	public async copy(src: string, dest: string): Promise<Response> {
 		const srcFile = this._file(src);
 		const destFile = this._file(dest);
 
-		await srcFile.copy(destFile);
-
-		return true;
+		try {
+			const result = await srcFile.copy(destFile);
+			return { raw: result };
+		} catch (e) {
+			return handleError(e, src);
+		}
 	}
 
 	/**
 	 * Delete existing file.
-	 * This method will not throw an exception if file doesn't exists.
 	 */
-	public async delete(location: string): Promise<boolean> {
-		await this._file(location).delete();
-		return true;
+	public async delete(location: string): Promise<Response> {
+		try {
+			const result = await this._file(location).delete();
+			return { raw: result };
+		} catch (e) {
+			return handleError(e, location);
+		}
 	}
 
 	/**
@@ -68,39 +87,64 @@ export class GoogleCloudStorage extends Storage {
 	/**
 	 * Determines if a file or folder already exists.
 	 */
-	public async exists(location: string): Promise<boolean> {
-		const [result] = await this._file(location).exists();
-		return result;
+	public async exists(location: string): Promise<ExistsResponse> {
+		try {
+			const result = await this._file(location).exists();
+			return { exists: result[0], raw: result };
+		} catch (e) {
+			return handleError(e, location);
+		}
 	}
 
 	/**
 	 * Returns the file contents.
 	 */
-	public async get(location: string, encoding?: string): Promise<Buffer | string> {
-		const file = this._file(location);
-		const [content] = await file.download();
-		return encoding ? content.toString(encoding) : content;
+	public async get(location: string, encoding = 'utf8'): Promise<ContentResponse<string>> {
+		try {
+			const result = await this._file(location).download();
+			return { content: result[0].toString(encoding), raw: result };
+		} catch (e) {
+			return handleError(e, location);
+		}
+	}
+
+	/**
+	 * Returns the file contents as Buffer.
+	 */
+	public async getBuffer(location: string): Promise<ContentResponse<Buffer>> {
+		try {
+			const result = await this._file(location).download();
+			return { content: result[0], raw: result };
+		} catch (e) {
+			return handleError(e, location);
+		}
 	}
 
 	/**
 	 * Returns signed url for an existing file.
 	 */
-	public async getSignedUrl(location: string, expiry = 900): Promise<string> {
-		const file = this._file(location);
-		const [result] = await file.getSignedUrl({
-			action: 'read',
-			expires: Date.now() + expiry * 1000,
-		});
-		return result;
+	public async getSignedUrl(location: string, expiry = 900): Promise<SignedUrlResponse> {
+		try {
+			const result = await this._file(location).getSignedUrl({
+				action: 'read',
+				expires: Date.now() + expiry * 1000,
+			});
+			return { signedUrl: result[0], raw: result };
+		} catch (e) {
+			return handleError(e, location);
+		}
 	}
 
 	/**
 	 * Returns file size in bytes.
 	 */
-	public async getSize(location: string): Promise<number> {
-		const file = this._file(location);
-		const [metadata] = await file.getMetadata();
-		return Number(metadata.size);
+	public async getSize(location: string): Promise<SizeResponse> {
+		try {
+			const result = await this._file(location).getMetadata();
+			return { size: Number(result[0].size), raw: result };
+		} catch (e) {
+			return handleError(e, location);
+		}
 	}
 
 	/**
@@ -111,7 +155,7 @@ export class GoogleCloudStorage extends Storage {
 	}
 
 	/**
-	 * Returns url for a given key. Note this method doesn't
+	 * Returns URL for a given location. Note this method doesn't
 	 * validates the existence of file or it's visibility
 	 * status.
 	 */
@@ -122,29 +166,37 @@ export class GoogleCloudStorage extends Storage {
 	/**
 	 * Move file to a new location.
 	 */
-	public async move(src: string, dest: string): Promise<boolean> {
+	public async move(src: string, dest: string): Promise<Response> {
 		const srcFile = this._file(src);
 		const destFile = this._file(dest);
 
-		await srcFile.move(destFile);
-
-		return true;
+		try {
+			const result = await srcFile.move(destFile);
+			return { raw: result };
+		} catch (e) {
+			return handleError(e, src);
+		}
 	}
 
 	/**
 	 * Creates a new file.
 	 * This method will create missing directories on the fly.
 	 */
-	public async put(location: string, content: Buffer | Readable | string): Promise<boolean> {
+	public async put(location: string, content: Buffer | Readable | string): Promise<Response> {
 		const file = this._file(location);
-		if (isReadableStream(content)) {
-			const destStream = file.createWriteStream();
-			await pipeline(content, destStream);
-			return true;
-		}
 
-		await file.save(content, { resumable: false });
-		return true;
+		try {
+			if (isReadableStream(content)) {
+				const destStream = file.createWriteStream();
+				await pipeline(content, destStream);
+				return { raw: undefined };
+			}
+
+			const result = await file.save(content, { resumable: false });
+			return { raw: result };
+		} catch (e) {
+			return handleError(e, location);
+		}
 	}
 }
 

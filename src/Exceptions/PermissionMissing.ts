@@ -7,10 +7,10 @@
 
 import { RuntimeException } from 'node-exceptions';
 
-export class FileNotFound extends RuntimeException {
+export class PermissionMissing extends RuntimeException {
 	raw: Error;
 	constructor(err: Error, path: string) {
-		super(`The file ${path} doesn't exist`, 500, 'E_FILE_NOT_FOUND');
+		super(`Missing permission for file ${path}`, 500, 'E_PERMISSION_MISSING');
 		this.raw = err;
 	}
 }
