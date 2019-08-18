@@ -67,7 +67,6 @@ export class GoogleCloudStorage extends Storage {
 
 	/**
 	 * Delete existing file.
-	 * This method will not throw an exception if file doesn't exists.
 	 */
 	public async delete(location: string): Promise<Response> {
 		try {
