@@ -98,7 +98,7 @@ await storage.disk('local').append('foo.txt', 'bar');
 </details>
 
 <details>
-<summary markdown="span"><code>bucket(name: string): void</code></summary>
+<summary markdown="span"><code>bucket(name: string): Storage</code></summary>
 
 This method can be used to swap the bucket at runtime.
 It returns a new Storage instance.
@@ -141,7 +141,7 @@ await storage.disk('local').delete('foo.txt');
 </details>
 
 <details>
-<summary markdown="span"><code>driver(): any</code></summary>
+<summary markdown="span"><code>driver()</code></summary>
 
 This method returns the driver used if you need to do anything specific not supported by default.
 
@@ -195,7 +195,7 @@ const { content } = await storage.disk('local').exists('foo.txt');
 </details>
 
 <details>
-<summary markdown="span"><code>getSignedUrl(location: string, expiry: number = 900): Promise&lt;SignedUrlResponse&gt;</code></summary>
+<summary markdown="span"><code>getSignedUrl(location: string, options: SignedUrlOptions = { expiry: 900 }): Promise&lt;SignedUrlResponse&gt;</code></summary>
 
 This methods will return the signed url for an existing file.
 

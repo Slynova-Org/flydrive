@@ -7,7 +7,7 @@
 
 import { Readable } from 'stream';
 import { MethodNotSupported } from './Exceptions';
-import { Response, SizeResponse, SignedUrlResponse, ContentResponse, ExistsResponse } from './types';
+import { Response, SizeResponse, SignedUrlResponse, ContentResponse, ExistsResponse, SignedUrlOptions } from './types';
 
 export default abstract class Storage {
 	/**
@@ -88,7 +88,7 @@ export default abstract class Storage {
 	 *
 	 * Supported drivers: "s3", "gcs"
 	 */
-	getSignedUrl(location: string, expiry: number): Promise<SignedUrlResponse> {
+	getSignedUrl(location: string, options?: SignedUrlOptions): Promise<SignedUrlResponse> {
 		throw new MethodNotSupported('getSignedUrl', this.constructor.name);
 	}
 
