@@ -114,7 +114,7 @@ export class LocalFileSystem extends Storage {
 	/**
 	 * Returns the file contents as string.
 	 */
-	public async get(location: string, encoding = 'utf8'): Promise<ContentResponse<string>> {
+	public async get(location: string, encoding = 'utf-8'): Promise<ContentResponse<string>> {
 		const fullPath = this._fullPath(location);
 
 		try {

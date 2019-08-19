@@ -99,7 +99,7 @@ export class GoogleCloudStorage extends Storage {
 	/**
 	 * Returns the file contents.
 	 */
-	public async get(location: string, encoding = 'utf8'): Promise<ContentResponse<string>> {
+	public async get(location: string, encoding = 'utf-8'): Promise<ContentResponse<string>> {
 		try {
 			const result = await this._file(location).download();
 			return { content: result[0].toString(encoding), raw: result };
