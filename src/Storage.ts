@@ -52,7 +52,7 @@ export default abstract class Storage {
 	 *
 	 * Supported drivers: "local", "s3", "gcs"
 	 */
-	public driver(): any {
+	public driver(): unknown {
 		throw new MethodNotSupported('driver', this.constructor.name);
 	}
 

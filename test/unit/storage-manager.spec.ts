@@ -31,6 +31,7 @@ test.group('Storage Manager', (group) => {
 		const storageManager = new StorageManager({
 			default: 'local',
 			disks: {
+				// @ts-ignore
 				local: {
 					root: '',
 				},

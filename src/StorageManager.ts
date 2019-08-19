@@ -8,32 +8,30 @@
 import Drivers from './Drivers';
 import Storage from './Storage';
 import { InvalidConfig, DriverNotSupported } from './Exceptions';
+import { StorageManagerConfig, StorageManagerDiskConfig } from './types';
 
 export default class StorageManager {
 	/**
 	 * Configuration of the storage manager.
 	 */
-	private _config: any;
+	private _config: StorageManagerConfig;
+
+	private _disks: StorageManagerDiskConfig;
 
 	/**
 	 * List of drivers extended
 	 */
 	private _extendedDrivers: Map<string, () => Storage> = new Map();
 
-	constructor(config) {
+	constructor(config: StorageManagerConfig) {
 		this._config = config;
-
-		/**
-		 * Adding empty disk property to make future checks
-		 * simpler
-		 */
-		this._config.disks = this._config.disks || {};
+		this._disks = config.disks || {};
 	}
 
 	/**
 	 * Get a disk instance.
 	 */
-	disk<T extends Storage>(name?: string, config?: any): T {
+	disk<T extends Storage>(name?: string, config?: unknown): T {
 		name = name || this._config.default;
 
 		/**
@@ -44,7 +42,7 @@ export default class StorageManager {
 			throw InvalidConfig.missingDiskName();
 		}
 
-		const diskConfig = this._config.disks[name];
+		const diskConfig = this._disks[name];
 
 		/**
 		 * Configuration for the defined disk is missing
@@ -85,7 +83,7 @@ export default class StorageManager {
 	/**
 	 * Register a custom driver.
 	 */
-	public extend<T extends Storage>(name: string, handler: () => T) {
+	public extend<T extends Storage>(name: string, handler: () => T): void {
 		this._extendedDrivers.set(name, handler);
 	}
 }
