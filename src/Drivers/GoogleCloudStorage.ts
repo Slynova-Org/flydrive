@@ -9,7 +9,7 @@ import { Readable } from 'stream';
 import { Storage as GCSDriver, StorageOptions, Bucket, File } from '@google-cloud/storage';
 import Storage from '../Storage';
 import { isReadableStream, pipeline } from '../utils';
-import { Response, ExistsResponse, ContentResponse, SignedUrlResponse, SizeResponse } from '../types';
+import { Response, ExistsResponse, ContentResponse, SignedUrlResponse, SizeResponse, SignedUrlOptions } from '../types';
 import { FileNotFound, PermissionMissing, UnknownException } from '../Exceptions';
 
 function handleError(err: Error & { code?: number }, path: string): never {
@@ -123,7 +123,8 @@ export class GoogleCloudStorage extends Storage {
 	/**
 	 * Returns signed url for an existing file.
 	 */
-	public async getSignedUrl(location: string, expiry = 900): Promise<SignedUrlResponse> {
+	public async getSignedUrl(location: string, options: SignedUrlOptions = {}): Promise<SignedUrlResponse> {
+		const { expiry = 900 } = options;
 		try {
 			const result = await this._file(location).getSignedUrl({
 				action: 'read',

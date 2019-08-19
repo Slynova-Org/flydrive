@@ -10,6 +10,7 @@ import S3, { ClientConfiguration, GetObjectOutput } from 'aws-sdk/clients/s3';
 import { Storage } from '..';
 import { FileNotFound } from '../Exceptions';
 import { isReadableStream } from '../utils';
+import { SignedUrlOptions } from '../types';
 
 export class AWSS3 extends Storage {
 	protected $driver: S3;
@@ -158,7 +159,8 @@ export class AWSS3 extends Storage {
 	/**
 	 * Returns signed url for an existing file
 	 */
-	public getSignedUrl(location: string, expiry = 900): Promise<string> {
+	public getSignedUrl(location: string, options: SignedUrlOptions = {}): Promise<string> {
+		const { expiry = 900 } = options;
 		return new Promise((resolve, reject) => {
 			const params = {
 				Key: location,

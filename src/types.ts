@@ -17,6 +17,15 @@ export interface ContentResponse<ContentType> extends Response {
 	content: ContentType;
 }
 
+export interface SignedUrlOptions {
+	/**
+	 * Expiration time of the URL.
+	 * It should be a number of seconds from now.
+	 * @default `900` (15 minutes)
+	 */
+	expiry?: number;
+}
+
 export interface SignedUrlResponse extends Response {
 	signedUrl: string;
 }
