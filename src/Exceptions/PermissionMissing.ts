@@ -1,0 +1,16 @@
+/**
+ * @slynova/flydrive
+ *
+ * @license MIT
+ * @copyright Slynova - Romain Lanz <romain.lanz@slynova.ch>
+ */
+
+import { RuntimeException } from 'node-exceptions';
+
+export class PermissionMissing extends RuntimeException {
+	raw: Error;
+	constructor(err: Error, path: string) {
+		super(`Missing permission for file ${path}`, 500, 'E_PERMISSION_MISSING');
+		this.raw = err;
+	}
+}
