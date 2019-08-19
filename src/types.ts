@@ -5,8 +5,23 @@
  * @copyright Slynova - Romain Lanz <romain.lanz@slynova.ch>
  */
 
+export interface StorageManagerDiskConfig {
+	[key: string]: {
+		driver: string;
+		[key: string]: unknown;
+	};
+}
+
+export interface StorageManagerConfig {
+	/**
+	 * The default disk returned by `disk()`.
+	 */
+	default?: string;
+	disks?: StorageManagerDiskConfig;
+}
+
 export interface Response {
-	raw: any;
+	raw: unknown;
 }
 
 export interface ExistsResponse extends Response {
