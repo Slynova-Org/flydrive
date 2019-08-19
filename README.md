@@ -34,49 +34,65 @@ When you require the package in your file, it will give you access to the `Stora
 This class is a facade for the package and should be instantiated with a [configuration object](https://github.com/Slynova-Org/flydrive/blob/master/tests/stubs/config.ts).
 
 ```javascript
-const { StorageManager } = require('@slynova/flydrive')
-const storage = new StorageManager(config)
+const { StorageManager } = require('@slynova/flydrive');
+const storage = new StorageManager(config);
 ```
 
 Once you instantiated the manager, you can use the `StorageManager#disk()` method to retrieve a disk an use it.
 
 ```javascript
-storage.disk() // Returns the default disk (specified in the config)
-storage.disk('awsCloud') // Returns the driver for the disk "s3"
-storage.disk('awsCloud', customConfig) // Overwrite the default configuration of the disk
+storage.disk(); // Returns the default disk (specified in the config)
+storage.disk('awsCloud'); // Returns the driver for the disk "s3"
+storage.disk('awsCloud', customConfig); // Overwrite the default configuration of the disk
 ```
 
 ## Driver's API
 
-Each driver extends the abstract class [`Storage`](https://github.com/Slynova-Org/flydrive/blob/master/src/Storage.ts). This class will throw an exception for each methods by default. The driver needs to overwrite those methods when he supports them.
+Each driver extends the abstract class [`Storage`](https://github.com/Slynova-Org/flydrive/blob/master/src/Storage.ts). This class will throw an exception for each methods by default. The driver needs to overwrite the methods it supports.
 
 The following method doesn't exists on the `LocalFileSystem` driver, therefore, it will throw an exception.
 
 ```javascript
 // throws "E_METHOD_NOT_SUPPORTED: Method getSignedUrl is not supported for the driver LocalFileSystem"
-storage.disk('local').getSignedUrl()
+storage.disk('local').getSignedUrl();
 ```
 
 Since we are using TypeScript, you can make use of casting to get the real interface:
 
 ```typescript
-import { LocalFileSystem } from '@slynova/flydrive'
+import { LocalFileSystem } from '@slynova/flydrive';
 
-storage.disk<LocalFileSystem>('local')
+storage.disk<LocalFileSystem>('local');
 ```
+
+### Response interface
+
+Asynchronous methods will always return a Promise which resolves with a `Response`
+object. The response object may contain relevant data in its properties (for
+example, the `ExistsResponse` object for the `exists` method contains a boolean
+`exists` property).
+
+All responses additionally have a `raw` property which is driver-specific and
+contains the result from the original call made by the driver.
+
+### Exceptions
+
+In case of runtime errors, `flydrive` will try to throw driver-agnostic exceptions.  
+Exceptions also have a `raw` property which contains the original error.
 
 ### Methods
 
 <details>
-<summary markdown="span"><code>append(location: string, content: Buffer | Stream | string, options: object): Promise&lt;boolean&gt;</code></summary>
+<summary markdown="span"><code>append(location: string, content: Buffer | Stream | string, options: object): Promise&lt;Response&gt;</code></summary>
 
 This method will append the content to the file at the location.
+If the file doesn't exist yet, it will be created.
 
 ```javascript
 // Supported drivers: "local"
 
-await storage.disk('local').append('./foo.txt', 'bar')
-// foo.txt now has the content `{initialContent}bar`
+await storage.disk('local').append('foo.txt', 'bar');
+// foo.txt now has the content `${initialContent}bar`
 ```
 
 </details>
@@ -84,26 +100,41 @@ await storage.disk('local').append('./foo.txt', 'bar')
 <details>
 <summary markdown="span"><code>bucket(name: string): void</code></summary>
 
-This method let us swap the used bucker at the runtime.
+This method can be used to swap the bucket at runtime.
+It returns a new Storage instance.
 
 ```javascript
 // Supported drivers: "s3", "gcs"
 
-storage.disk('cloud').bucket('anotherOne')
-// The following chained action will use the "anotherOne" bucket instead of the default one
+storage.disk('cloud').bucket('anotherOne');
+// The following chained action will use the "anotherOne" bucket instead of the original one
 ```
 
 </details>
 
 <details>
-<summary markdown="span"><code>delete(location: string): Promise&lt;boolean&gt;</code></summary>
+<summary markdown="span"><code>copy(src: string, dest: string, options: object): Promise&lt;Response&gt;</code></summary>
 
-This method will delete the file at the given location
+This method will copy a file to another location.
 
 ```javascript
 // Supported drivers: "local", "s3", "gcs"
 
-await storage.disk('local').delete('./foo.txt')
+await storage.disk('local').copy('foo.txt', 'bar.txt');
+// foo.txt was copied to bar.txt
+```
+
+</details>
+
+<details>
+<summary markdown="span"><code>delete(location: string): Promise&lt;Response&gt;</code></summary>
+
+This method will delete the file at the given location.
+
+```javascript
+// Supported drivers: "local", "s3", "gcs"
+
+await storage.disk('local').delete('foo.txt');
 // foo.txt has been deleted
 ```
 
@@ -115,62 +146,76 @@ await storage.disk('local').delete('./foo.txt')
 This method returns the driver used if you need to do anything specific not supported by default.
 
 ```javascript
-storage.disk('local').driver() // Returns "fs-extra"
-storage.disk('awsCloud').driver() // Returns "aws-sdk"
-storage.disk('googleCloud').driver() // Returns "@google-cloud/storage"
+storage.disk('local').driver(); // Returns "fs-extra"
+storage.disk('awsCloud').driver(); // Returns "aws-sdk"
+storage.disk('googleCloud').driver(); // Returns "@google-cloud/storage"
 // ....
 ```
 
 </details>
 
 <details>
-<summary markdown="span"><code>exists(location: string): Promise&lt;boolean&gt;</code></summary>
+<summary markdown="span"><code>exists(location: string): Promise&lt;ExistsResponse&gt;</code></summary>
 
-This method will determine if a file or folder exists for the given location.
+This method will determine if a file exists at the given location.
 
 ```javascript
 // Supported drivers: "local", "s3", "gcs"
 
-await storage.disk('local').exists('./foo.txt')
+const { exists } = await storage.disk('local').exists('foo.txt');
+// exists is true or false
 ```
 
 </details>
 
 <details>
-<summary markdown="span"><code>get(location: string, encoding?: object | string): Promise&lt;Buffer | string&gt;</code></summary>
+<summary markdown="span"><code>get(location: string, encoding: string = 'utf-8'): Promise&lt;ContentResponse&lt;string&gt;&gt;</code></summary>
 
-This methods will return the file's content for the given location.
+This methods will return the file's content as a string for the given location.
 
 ```javascript
 // Supported drivers: "local", "s3", "gcs"
 
-const content = await storage.disk('local').exists('./foo.txt')
+const { content } = await storage.disk('local').exists('foo.txt');
 ```
 
 </details>
 
 <details>
-<summary markdown="span"><code>getSignedUrl(location: string, expiry: number = 900): Promise&lt;string&gt;</code></summary>
+<summary markdown="span"><code>getBuffer(location: string): Promise&lt;ContentResponse&lt;Buffer&gt;&gt;</code></summary>
+
+This methods will return the file's content as a Buffer for the given location.
+
+```javascript
+// Supported drivers: "local", "s3", "gcs"
+
+const { content } = await storage.disk('local').exists('foo.txt');
+```
+
+</details>
+
+<details>
+<summary markdown="span"><code>getSignedUrl(location: string, expiry: number = 900): Promise&lt;SignedUrlResponse&gt;</code></summary>
 
 This methods will return the signed url for an existing file.
 
 ```javascript
 // Supported drivers: "s3", "gcs"
 
-const uri = await storage.disk('awsCloud').getSignedUrl('./foo.txt')
+const { signedUrl } = await storage.disk('awsCloud').getSignedUrl('foo.txt');
 ```
 
 </details>
 
 <details>
-<summary markdown="span"><code>getSize(location: string): Promise&lt;number&gt;</code></summary>
+<summary markdown="span"><code>getSize(location: string): Promise&lt;SizeResponse&gt;</code></summary>
 
 This methods will return the file size in bytes.
 
 ```javascript
 // Supported drivers: "local", "gcs"
 
-const bytes = await storage.disk('local').getSize('./foo.txt.)
+const { size } = await storage.disk('local').getSize('foo.txt');
 ```
 
 </details>
@@ -178,12 +223,12 @@ const bytes = await storage.disk('local').getSize('./foo.txt.)
 <details>
 <summary markdown="span"><code>getStream(location: string, options: object | string): Stream</code></summary>
 
-This methods will return a stream for the given file.
+This methods will return a Node.js readable stream for the given file.
 
 ```javascript
 // Supported drivers: "local", "s3", "gcs"
 
-const stream = storage.disk('local').getStream('./foo.txt')
+const stream = storage.disk('local').getStream('foo.txt');
 ```
 
 </details>
@@ -191,52 +236,52 @@ const stream = storage.disk('local').getStream('./foo.txt')
 <details>
 <summary markdown="span"><code>getUrl(location: string): string</code></summary>
 
-This methods will return an url for a given file.
+This methods will return a public URL for a given file.
 
 ```javascript
 // Supported drivers: "s3", "gcs"
 
-const uri = storage.disk('awsCloud').getUrl('./foo.txt')
+const uri = storage.disk('awsCloud').getUrl('foo.txt');
 ```
 
 </details>
 
 <details>
-<summary markdown="span"><code>move(src: string, dest: string): Promise&lt;boolean&gt;</code></summary>
+<summary markdown="span"><code>move(src: string, dest: string): Promise&lt;Response&gt;</code></summary>
 
-This methods will move file to a new location.
+This methods will move the file to a new location.
 
 ```javascript
 // Supported drivers: "local", "s3", "gcs"
 
-await storage.disk('local').move('./foo.txt', './newFolder/foo.txt')
+await storage.disk('local').move('foo.txt', 'newFolder/foo.txt');
 ```
 
 </details>
 
 <details>
-<summary markdown="span"><code>put(location: string, content: Buffer | Stream | string, options: object): Promise&lt;boolean&gt;</code></summary>
+<summary markdown="span"><code>put(location: string, content: Buffer | Stream | string, options: object): Promise&lt;Response&gt;</code></summary>
 
-This methods will create a new file.
+This methods will create a new file with the provided content.
 
 ```javascript
 // Supported drivers: "local", "s3", "gcs"
 
-await storage.disk('local').put('./bar.txt', 'Foobar')
+await storage.disk('local').put('bar.txt', 'Foobar');
 ```
 
 </details>
 
 <details>
-<summary markdown="span"><code>prepend(location: string, content: Buffer | string, options: object): Promise&lt;boolean&gt;</code></summary>
+<summary markdown="span"><code>prepend(location: string, content: Buffer | string, options: object): Promise&lt;Response&gt;</code></summary>
 
 This methods will preprend content to a file.
 
 ```javascript
 // Supported drivers: "local"
 
-await storage.disk('local').prepend('./foo.txt', 'bar')
-// foo.txt now has the content `bar{initialContent}`
+await storage.disk('local').prepend('foo.txt', 'bar');
+// foo.txt now has the content `bar${initialContent}`
 ```
 
 </details>
