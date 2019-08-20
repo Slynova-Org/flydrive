@@ -21,7 +21,7 @@ function handleError(err: Error & { code: string; path?: string }, fullPath: str
 		case 'EPERM':
 			throw new PermissionMissing(err, err.path || fullPath);
 		default:
-			throw new UnknownException(err, err.path || fullPath);
+			throw new UnknownException(err, err.code, err.path || fullPath);
 	}
 }
 
