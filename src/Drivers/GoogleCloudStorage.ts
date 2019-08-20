@@ -19,7 +19,7 @@ function handleError(err: Error & { code?: number }, path: string): never {
 		case 404:
 			throw new FileNotFound(err, path);
 		default:
-			throw new UnknownException(err, path);
+			throw new UnknownException(err, String(err.code), path);
 	}
 }
 

@@ -18,7 +18,7 @@ function handleError(err: Error, path: string, bucket: string): never {
 		case 'NoSuchKey':
 			throw new FileNotFound(err, path);
 		default:
-			throw new UnknownException(err, path);
+			throw new UnknownException(err, err.name, path);
 	}
 }
 
