@@ -5,7 +5,7 @@ import uuid from 'uuid/v4';
 import { Storage } from '@google-cloud/storage';
 
 import { GoogleCloudStorage } from '../../src/Drivers/GoogleCloudStorage';
-import { PermissionMissing } from '../../src/Exceptions';
+import { PermissionMissing, FileNotFound } from '../../src/Exceptions';
 
 function streamToString(stream: Readable): Promise<string> {
 	return new Promise((resolve, reject) => {
@@ -59,7 +59,7 @@ test.group('GCS Driver', (group) => {
 	test('copy a file', async (assert) => {
 		await storage.copy(testFile, otherFile);
 
-		const { content } = await storage.get(otherFile, 'utf8');
+		const { content } = await storage.get(otherFile, 'utf-8');
 		assert.strictEqual(content, testString);
 
 		const { exists } = await storage.exists(testFile);
@@ -85,8 +85,17 @@ test.group('GCS Driver', (group) => {
 	});
 
 	test('get file content as a string', async (assert) => {
-		const { content } = await storage.get(testFile, 'utf8');
+		const { content } = await storage.get(testFile, 'utf-8');
 		assert.strictEqual(content, testString);
+	});
+
+	test('get file that does not exist', async (assert) => {
+		assert.plan(1);
+		try {
+			await storage.get('bad.txt');
+		} catch (e) {
+			assert.instanceOf(e, FileNotFound);
+		}
 	});
 
 	test('get a signed URL', async (assert) => {
@@ -113,7 +122,7 @@ test.group('GCS Driver', (group) => {
 	test('move a file', async (assert) => {
 		await storage.move(testFile, otherFile);
 
-		const { content } = await storage.get(otherFile, 'utf8');
+		const { content } = await storage.get(otherFile, 'utf-8');
 		assert.strictEqual(content, testString);
 
 		const { exists } = await storage.exists(testFile);
@@ -124,7 +133,7 @@ test.group('GCS Driver', (group) => {
 		const str = 'this-is-a-test';
 
 		await storage.put(testFile, str);
-		const { content } = await storage.get(testFile, 'utf8');
+		const { content } = await storage.get(testFile, 'utf-8');
 		assert.strictEqual(content, str);
 	});
 
@@ -133,7 +142,7 @@ test.group('GCS Driver', (group) => {
 		const buffer = Buffer.from(str);
 
 		await storage.put(testFile, buffer);
-		const { content } = await storage.get(testFile, 'utf8');
+		const { content } = await storage.get(testFile, 'utf-8');
 		assert.strictEqual(content, str);
 	});
 
@@ -141,7 +150,7 @@ test.group('GCS Driver', (group) => {
 		const stream = storage.getStream(testFile);
 
 		await storage.put(otherFile, stream);
-		const { content } = await storage.get(otherFile, 'utf8');
+		const { content } = await storage.get(otherFile, 'utf-8');
 		assert.strictEqual(content, testString);
-	});
+	}).timeout(5000);
 });

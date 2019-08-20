@@ -6,11 +6,21 @@
  */
 
 import { Readable } from 'stream';
-import S3, { ClientConfiguration, GetObjectOutput } from 'aws-sdk/clients/s3';
+import S3, { ClientConfiguration } from 'aws-sdk/clients/s3';
 import { Storage } from '..';
-import { FileNotFound } from '../Exceptions';
-import { isReadableStream } from '../utils';
-import { SignedUrlOptions } from '../types';
+import { UnknownException, NoSuchBucket, FileNotFound } from '../Exceptions';
+import { SignedUrlOptions, Response, ExistsResponse, ContentResponse, SignedUrlResponse } from '../types';
+
+function handleError(err: Error, path: string, bucket: string): never {
+	switch (err.name) {
+		case 'NoSuchBucket':
+			throw new NoSuchBucket(err, bucket);
+		case 'NoSuchKey':
+			throw new FileNotFound(err, path);
+		default:
+			throw new UnknownException(err, path);
+	}
+}
 
 export class AWSS3 extends Storage {
 	protected $driver: S3;
@@ -46,40 +56,34 @@ export class AWSS3 extends Storage {
 	/**
 	 * Copy a file to a location.
 	 */
-	public copy(src: string, dest: string, options: object = {}): Promise<boolean> {
-		return new Promise((resolve, reject) => {
-			const params = {
-				Key: dest,
-				Bucket: this.$bucket,
-				CopySource: `/${this.$bucket}/${src}`,
-				...options,
-			};
+	public async copy(src: string, dest: string, options: object): Promise<Response> {
+		const params = {
+			Key: dest,
+			Bucket: this.$bucket,
+			CopySource: `/${this.$bucket}/${src}`,
+			...options,
+		};
 
-			this.$driver.copyObject(params, (error) => {
-				if (error) {
-					return reject(error);
-				}
-
-				return resolve(true);
-			});
-		});
+		try {
+			const result = await this.$driver.copyObject(params).promise();
+			return { raw: result };
+		} catch (e) {
+			return handleError(e, src, this.$bucket);
+		}
 	}
 
 	/**
 	 * Delete existing file.
 	 */
-	public delete(location: string): Promise<boolean> {
-		return new Promise((resolve, reject) => {
-			const params = { Key: location, Bucket: this.$bucket };
+	public async delete(location: string): Promise<Response> {
+		const params = { Key: location, Bucket: this.$bucket };
 
-			this.$driver.deleteObject(params, (error) => {
-				if (error) {
-					return reject(error);
-				}
-
-				return resolve(true);
-			});
-		});
+		try {
+			const result = await this.$driver.deleteObject(params).promise();
+			return { raw: result };
+		} catch (e) {
+			return handleError(e, location, this.$bucket);
+		}
 	}
 
 	/**
@@ -92,46 +96,76 @@ export class AWSS3 extends Storage {
 	/**
 	 * Determines if a file or folder already exists.
 	 */
-	public exists(location: string): Promise<boolean> {
-		return new Promise((resolve, reject) => {
-			const params = { Key: location, Bucket: this.$bucket };
+	public async exists(location: string): Promise<ExistsResponse> {
+		const params = { Key: location, Bucket: this.$bucket };
 
-			this.$driver.headObject(params, (error) => {
-				if (error && error.statusCode === 404) {
-					return resolve(false);
-				}
-
-				if (error) {
-					return reject(error);
-				}
-
-				resolve(true);
-			});
-		});
+		try {
+			const result = await this.$driver.headObject(params).promise();
+			return { exists: true, raw: result };
+		} catch (e) {
+			if (e.statusCode === 404) {
+				return { exists: false, raw: e };
+			} else {
+				return handleError(e, location, this.$bucket);
+			}
+		}
 	}
 
 	/**
 	 * Returns the file contents.
 	 */
-	public async get(location: string, encoding?: string): Promise<Buffer | string> {
-		const { Body } = await this.$getObject(location);
+	public async get(location: string, encoding = 'utf-8'): Promise<ContentResponse<string>> {
+		const bufferResult = await this.getBuffer(location);
+		return {
+			content: bufferResult.content.toString(encoding),
+			raw: bufferResult.raw,
+		};
+	}
 
-		if (!Body) {
-			throw new FileNotFound(location);
+	/**
+	 * Returns the file contents as Buffer.
+	 */
+	public async getBuffer(location: string): Promise<ContentResponse<Buffer>> {
+		const params = { Key: location, Bucket: this.$bucket };
+
+		try {
+			const result = await this.$driver.getObject(params).promise();
+
+			// S3.getObject returns a Buffer in Node.js
+			const body = result.Body as Buffer;
+
+			return { content: body, raw: result };
+		} catch (e) {
+			return handleError(e, location, this.$bucket);
 		}
+	}
 
-		//* Removing the Blob type since Node doesn't support Blob...
-		const content = Body as Buffer | Uint8Array | Readable | string;
+	/**
+	 * Returns signed url for an existing file
+	 */
+	public async getSignedUrl(location: string, options: SignedUrlOptions = {}): Promise<SignedUrlResponse> {
+		const { expiry = 900 } = options;
 
-		if (isReadableStream(content)) {
-			return this.$streamToBuffer(content);
+		try {
+			const result = await new Promise((resolve: (value: string) => void, reject): void => {
+				const params = {
+					Key: location,
+					Bucket: this.$bucket,
+					Expiry: expiry,
+				};
+
+				this.$driver.getSignedUrl('getObject', params, (error, url) => {
+					if (error) {
+						return reject(error);
+					}
+
+					return resolve(url);
+				});
+			});
+			return { signedUrl: result, raw: result };
+		} catch (e) {
+			return handleError(e, location, this.$bucket);
 		}
-
-		if (content instanceof Uint8Array) {
-			return Buffer.from(content.buffer);
-		}
-
-		return content;
 	}
 
 	/**
@@ -157,85 +191,28 @@ export class AWSS3 extends Storage {
 	}
 
 	/**
-	 * Returns signed url for an existing file
-	 */
-	public getSignedUrl(location: string, options: SignedUrlOptions = {}): Promise<string> {
-		const { expiry = 900 } = options;
-		return new Promise((resolve, reject) => {
-			const params = {
-				Key: location,
-				Bucket: this.$bucket,
-				Expiry: expiry,
-			};
-
-			this.$driver.getSignedUrl('getObject', params, (error, url) => {
-				if (error) {
-					return reject(error);
-				}
-
-				return resolve(url);
-			});
-		});
-	}
-
-	/**
 	 * Moves file from one location to another. This
 	 * method will call `copy` and `delete` under
 	 * the hood.
 	 */
-	public async move(src: string, dest: string): Promise<boolean> {
-		await this.copy(src, dest);
+	public async move(src: string, dest: string): Promise<Response> {
+		await this.copy(src, dest, {});
 		await this.delete(src);
-
-		return true;
+		return { raw: undefined };
 	}
 
 	/**
 	 * Creates a new file.
 	 * This method will create missing directories on the fly.
 	 */
-	public put(location: string, content: Buffer | Readable | string, options?: object): Promise<boolean> {
-		return new Promise((resolve, reject) => {
-			const params = { Key: location, Body: content, Bucket: this.$bucket };
-
-			this.$driver.upload(params, (error) => {
-				if (error) {
-					return reject(error);
-				}
-
-				return resolve(true);
-			});
-		});
-	}
-
-	/**
-	 * Returns S3 Object for a given file.
-	 */
-	protected $getObject(location: string): Promise<GetObjectOutput> {
-		return new Promise((resolve, reject) => {
-			const params = { Key: location, Bucket: this.$bucket };
-
-			this.$driver.getObject(params, (error, response) => {
-				if (error) {
-					return reject(error);
-				}
-
-				return resolve(response);
-			});
-		});
-	}
-
-	/**
-	 * Transform the given Stream to a Buffer
-	 */
-	protected $streamToBuffer(stream: Readable): Promise<Buffer> {
-		return new Promise((resolve, reject) => {
-			const chunks: any[] = [];
-
-			stream.on('data', (chunk) => chunks.push(chunk));
-			stream.on('error', reject);
-			stream.on('end', () => resolve(Buffer.concat(chunks)));
-		});
+	public async put(location: string, content: Buffer | Readable | string): Promise<Response> {
+		const params = { Key: location, Body: content, Bucket: this.$bucket };
+		try {
+			const result = await this.$driver.upload(params).promise();
+			return { raw: result };
+		} catch (e) {
+			return handleError(e, location, this.$bucket);
+		}
 	}
 }
 

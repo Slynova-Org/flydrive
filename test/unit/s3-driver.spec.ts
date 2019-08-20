@@ -6,11 +6,11 @@
  */
 
 import test from 'japa';
-import path from 'path';
 import fs from 'fs-extra';
 import { Readable } from 'stream';
 
 import { AWSS3, AWSS3Config } from '../../src/Drivers/AWSS3';
+import { NoSuchBucket, FileNotFound } from '../../src/Exceptions';
 
 function streamToString(stream: Readable): Promise<string> {
 	return new Promise((resolve, reject) => {
@@ -41,75 +41,85 @@ test.group('S3 Driver', (group) => {
 
 	group.before(async () => {
 		// Create test bucket
-		await s3Driver.driver().createBucket(
-			{
+		await s3Driver
+			.driver()
+			.createBucket({
 				ACL: 'public-read',
 				Bucket: process.env.S3_BUCKET || '',
 				CreateBucketConfiguration: {
 					LocationConstraint: process.env.S3_REGION || '',
 				},
-			},
-			(err) => {
-				if (err) console.log(err, err.stack);
-			}
-		);
+			})
+			.promise();
 	});
 
 	test("return false when file doesn't exists", async (assert) => {
-		const exists = await s3Driver.exists('some-file.jpg');
+		const { exists } = await s3Driver.exists('some-file.jpg');
 		assert.isFalse(exists);
 	});
 
 	test('create a new file', async (assert) => {
-		const success = await s3Driver.put('some-file.txt', 'This is the text file');
-		const exists = await s3Driver.exists('some-file.txt');
+		await s3Driver.put('some-file.txt', 'This is the text file');
+		const { content } = await s3Driver.get('some-file.txt');
 
-		assert.equal(success, true);
-		assert.isTrue(exists);
+		assert.strictEqual(content, 'This is the text file');
 	});
 
 	test('create a new file from buffer', async (assert) => {
-		const success = await s3Driver.put('buffer-file.txt', Buffer.from('This is the text file', 'utf-8'));
-		const exists = await s3Driver.exists('buffer-file.txt');
+		await s3Driver.put('buffer-file.txt', Buffer.from('This is the text file', 'utf-8'));
+		const { content } = await s3Driver.get('some-file.txt');
 
-		assert.equal(success, true);
-		assert.isTrue(exists);
+		assert.strictEqual(content, 'This is the text file');
 	});
 
 	test('create a new file from stream', async (assert) => {
-		const dummyFile = path.join(__dirname, 'stream-file.txt');
-		await fs.outputFile(dummyFile, 'Some dummy content');
+		const readStream = fs.createReadStream(__filename);
 
-		const readStream = fs.createReadStream(dummyFile);
+		await s3Driver.put('stream-file.txt', readStream);
+		const { exists } = await s3Driver.exists('stream-file.txt');
 
-		const success = await s3Driver.put('stream-file.txt', readStream);
-		const exists = await s3Driver.exists('stream-file.txt');
-		await fs.remove(dummyFile);
-
-		assert.equal(success, true);
 		assert.isTrue(exists);
 	});
 
 	test('throw exception when unable to put file', async (assert) => {
-		assert.plan(2);
+		assert.plan(1);
 		try {
 			const s3Driver = new AWSS3({ ...config, bucket: 'wrong' });
 			await s3Driver.put('dummy-file.txt', 'Hello');
 		} catch (error) {
-			assert.equal(error.code, 'NoSuchBucket');
-			assert.equal(error.message, 'The specified bucket does not exist');
+			assert.instanceOf(error, NoSuchBucket);
 		}
 	});
 
-	test('delete existing file', async () => {
+	test('delete existing file', async (assert) => {
 		await s3Driver.put('dummy-file.txt', 'Hello');
 		await s3Driver.delete('dummy-file.txt');
+
+		const { exists } = await s3Driver.exists('dummy-file.txt');
+
+		assert.isFalse(exists);
 	});
 
-	test('get file contents', async (assert) => {
+	test('get file contents as string', async (assert) => {
 		await s3Driver.put('dummy-file.txt', 'Hello');
-		const content = await s3Driver.get('dummy-file.txt');
+		const { content } = await s3Driver.get('dummy-file.txt');
 		assert.equal(content, 'Hello');
+	});
+
+	test('get file contents as Buffer', async (assert) => {
+		await s3Driver.put('dummy-file.txt', 'Hello');
+		const { content } = await s3Driver.getBuffer('dummy-file.txt');
+		assert.instanceOf(content, Buffer);
+		assert.equal(content.toString(), 'Hello');
+	});
+
+	test('get file that does not exist', async (assert) => {
+		assert.plan(1);
+		try {
+			await s3Driver.get('bad.txt');
+		} catch (e) {
+			assert.instanceOf(e, FileNotFound);
+		}
 	});
 
 	test('get file as stream', async (assert) => {

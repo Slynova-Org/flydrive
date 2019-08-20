@@ -30,6 +30,7 @@ test.group('Storage Manager', (group) => {
 	test('throw exception when disk config doesnt have driver', (assert) => {
 		const storageManager = new StorageManager({
 			default: 'local',
+			// @ts-ignore
 			disks: {
 				// @ts-ignore
 				local: {
