@@ -213,7 +213,7 @@ const { signedUrl } = await storage.disk('awsCloud').getSignedUrl('foo.txt');
 This methods will return the file size in bytes.
 
 ```javascript
-// Supported drivers: "local", "gcs"
+// Supported drivers: "local", "s3", "gcs"
 
 const { size } = await storage.disk('local').getSize('foo.txt');
 ```
