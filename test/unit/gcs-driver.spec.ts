@@ -64,14 +64,14 @@ test.group('GCS Driver', (group) => {
 
 		const { exists } = await storage.exists(testFile);
 		assert.isTrue(exists);
-	});
+	}).timeout(5000);
 
 	test('delete a file', async (assert) => {
 		await storage.delete(testFile);
 
 		const { exists } = await storage.exists(testFile);
 		assert.isFalse(exists);
-	});
+	}).timeout(5000);
 
 	test('get driver instance', (assert) => {
 		const driver = storage.driver();
@@ -82,12 +82,12 @@ test.group('GCS Driver', (group) => {
 		const { content } = await storage.getBuffer(testFile);
 		assert.instanceOf(content, Buffer);
 		assert.strictEqual(content.toString(), testString);
-	});
+	}).timeout(5000);
 
 	test('get file content as a string', async (assert) => {
 		const { content } = await storage.get(testFile, 'utf-8');
 		assert.strictEqual(content, testString);
-	});
+	}).timeout(5000);
 
 	test('get file that does not exist', async (assert) => {
 		assert.plan(1);
@@ -96,29 +96,29 @@ test.group('GCS Driver', (group) => {
 		} catch (e) {
 			assert.instanceOf(e, FileNotFound);
 		}
-	});
+	}).timeout(5000);
 
 	test('get a signed URL', async (assert) => {
 		const { signedUrl } = await storage.getSignedUrl(testFile);
 		assert.isTrue(signedUrl.startsWith(`https://storage.googleapis.com/${testBucket}/${folder}`));
-	});
+	}).timeout(5000);
 
 	test('get the stat of a file', async (assert) => {
 		const { size, modified } = await storage.getStat(testFile);
 		assert.strictEqual(size, testString.length);
 		assert.instanceOf(modified, Date);
-	});
+	}).timeout(5000);
 
 	test('get a readable stream', async (assert) => {
 		const stream = await storage.getStream(testFile);
 		const result = await streamToString(stream);
 		assert.strictEqual(result, testString);
-	});
+	}).timeout(5000);
 
 	test('get a public URL', (assert) => {
 		const url = storage.getUrl(testFile);
 		assert.strictEqual(url, `https://storage.cloud.google.com/${testBucket}/${testFile}`);
-	});
+	}).timeout(5000);
 
 	test('move a file', async (assert) => {
 		await storage.move(testFile, otherFile);
@@ -128,7 +128,7 @@ test.group('GCS Driver', (group) => {
 
 		const { exists } = await storage.exists(testFile);
 		assert.isFalse(exists);
-	});
+	}).timeout(5000);
 
 	test('put a file from a string', async (assert) => {
 		const str = 'this-is-a-test';
@@ -136,7 +136,7 @@ test.group('GCS Driver', (group) => {
 		await storage.put(testFile, str);
 		const { content } = await storage.get(testFile, 'utf-8');
 		assert.strictEqual(content, str);
-	});
+	}).timeout(5000);
 
 	test('put a file from a Buffer', async (assert) => {
 		const str = 'this-is-a-test';
@@ -145,7 +145,7 @@ test.group('GCS Driver', (group) => {
 		await storage.put(testFile, buffer);
 		const { content } = await storage.get(testFile, 'utf-8');
 		assert.strictEqual(content, str);
-	});
+	}).timeout(5000);
 
 	test('put a file from a stream', async (assert) => {
 		const stream = storage.getStream(testFile);
