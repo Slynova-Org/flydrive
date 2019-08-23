@@ -198,9 +198,10 @@ test.group('Local Driver', (group) => {
 		assert.equal(content, 'Foo');
 	});
 
-	test('get size of a given file', async (assert) => {
+	test('get the stat of a given file', async (assert) => {
 		await storage.put('./test/unit/storage/foo', 'Foo content');
-		const { size } = await storage.getSize('./test/unit/storage/foo');
+		const { size, modified } = await storage.getStat('./test/unit/storage/foo');
 		assert.equal(size, 11);
+		assert.instanceOf(modified, Date);
 	});
 });

@@ -122,10 +122,11 @@ test.group('S3 Driver', (group) => {
 		}
 	});
 
-	test('get the size of a file', async (assert) => {
+	test('get the stat of a file', async (assert) => {
 		await s3Driver.put('dummy-file.txt', 'Hello');
-		const { size } = await s3Driver.getSize('dummy-file.txt');
+		const { size, modified } = await s3Driver.getStat('dummy-file.txt');
 		assert.strictEqual(size, 5);
+		assert.instanceOf(modified, Date);
 	});
 
 	test('get file as stream', async (assert) => {
