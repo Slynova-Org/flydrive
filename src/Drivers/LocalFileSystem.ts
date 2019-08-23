@@ -12,7 +12,7 @@ import createOutputStream from 'create-output-stream';
 import Storage from '../Storage';
 import { FileNotFound, UnknownException, PermissionMissing } from '../Exceptions';
 import { isReadableStream, pipeline } from '../utils';
-import { Response, ExistsResponse, ContentResponse, SizeResponse } from '../types';
+import { Response, ExistsResponse, ContentResponse, StatResponse } from '../types';
 
 function handleError(err: Error & { code: string; path?: string }, fullPath: string): never {
 	switch (err.code) {
@@ -142,12 +142,16 @@ export class LocalFileSystem extends Storage {
 	/**
 	 * Returns file size in bytes.
 	 */
-	public async getSize(location: string): Promise<SizeResponse> {
+	public async getStat(location: string): Promise<StatResponse> {
 		const fullPath = this._fullPath(location);
 
 		try {
 			const stat = await fs.stat(fullPath);
-			return { size: stat.size, raw: stat };
+			return {
+				size: stat.size,
+				modified: stat.mtime,
+				raw: stat,
+			};
 		} catch (e) {
 			return handleError(e, fullPath);
 		}

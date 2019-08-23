@@ -103,9 +103,10 @@ test.group('GCS Driver', (group) => {
 		assert.isTrue(signedUrl.startsWith(`https://storage.googleapis.com/${testBucket}/${folder}`));
 	});
 
-	test('get the size of a file', async (assert) => {
-		const { size } = await storage.getSize(testFile);
+	test('get the stat of a file', async (assert) => {
+		const { size, modified } = await storage.getStat(testFile);
 		assert.strictEqual(size, testString.length);
+		assert.instanceOf(modified, Date);
 	});
 
 	test('get a readable stream', async (assert) => {

@@ -7,7 +7,7 @@
 
 import { Readable } from 'stream';
 import { MethodNotSupported } from './Exceptions';
-import { Response, SizeResponse, SignedUrlResponse, ContentResponse, ExistsResponse, SignedUrlOptions } from './types';
+import { Response, SignedUrlResponse, ContentResponse, ExistsResponse, SignedUrlOptions, StatResponse } from './types';
 
 export default abstract class Storage {
 	/**
@@ -93,12 +93,12 @@ export default abstract class Storage {
 	}
 
 	/**
-	 * Returns file size in bytes.
+	 * Returns file's size and modification date.
 	 *
-	 * Supported drivers: "local", "gcs"
+	 * Supported drivers: "local", "s3", "gcs"
 	 */
-	getSize(location: string): Promise<SizeResponse> {
-		throw new MethodNotSupported('getSize', this.constructor.name);
+	getStat(location: string): Promise<StatResponse> {
+		throw new MethodNotSupported('getStat', this.constructor.name);
 	}
 
 	/**

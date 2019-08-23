@@ -208,14 +208,14 @@ const { signedUrl } = await storage.disk('awsCloud').getSignedUrl('foo.txt');
 </details>
 
 <details>
-<summary markdown="span"><code>getSize(location: string): Promise&lt;SizeResponse&gt;</code></summary>
+<summary markdown="span"><code>getStat(location: string): Promise&lt;StatResponse&gt;</code></summary>
 
-This methods will return the file size in bytes.
+This methods will return the file's size (in bytes) and last modification date.
 
 ```javascript
 // Supported drivers: "local", "s3", "gcs"
 
-const { size } = await storage.disk('local').getSize('foo.txt');
+const { size, modified } = await storage.disk('local').getStat('foo.txt');
 ```
 
 </details>

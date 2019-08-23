@@ -9,7 +9,7 @@ import { Readable } from 'stream';
 import { Storage as GCSDriver, StorageOptions, Bucket, File } from '@google-cloud/storage';
 import Storage from '../Storage';
 import { isReadableStream, pipeline } from '../utils';
-import { Response, ExistsResponse, ContentResponse, SignedUrlResponse, SizeResponse, SignedUrlOptions } from '../types';
+import { Response, ExistsResponse, ContentResponse, SignedUrlResponse, SignedUrlOptions, StatResponse } from '../types';
 import { FileNotFound, PermissionMissing, UnknownException, AuthorizationRequired, WrongKeyPath } from '../Exceptions';
 
 function handleError(err: Error & { code?: number | string }, path: string): never {
@@ -141,12 +141,16 @@ export class GoogleCloudStorage extends Storage {
 	}
 
 	/**
-	 * Returns file size in bytes.
+	 * Returns file's size and modification date.
 	 */
-	public async getSize(location: string): Promise<SizeResponse> {
+	public async getStat(location: string): Promise<StatResponse> {
 		try {
 			const result = await this._file(location).getMetadata();
-			return { size: Number(result[0].size), raw: result };
+			return {
+				size: Number(result[0].size),
+				modified: new Date(result[0].updated),
+				raw: result,
+			};
 		} catch (e) {
 			return handleError(e, location);
 		}

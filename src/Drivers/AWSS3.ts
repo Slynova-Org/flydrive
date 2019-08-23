@@ -9,7 +9,7 @@ import { Readable } from 'stream';
 import S3, { ClientConfiguration } from 'aws-sdk/clients/s3';
 import { Storage } from '..';
 import { UnknownException, NoSuchBucket, FileNotFound } from '../Exceptions';
-import { SignedUrlOptions, Response, ExistsResponse, ContentResponse, SignedUrlResponse, SizeResponse } from '../types';
+import { SignedUrlOptions, Response, ExistsResponse, ContentResponse, SignedUrlResponse, StatResponse } from '../types';
 
 function handleError(err: Error, path: string, bucket: string): never {
 	switch (err.name) {
@@ -169,14 +169,18 @@ export class AWSS3 extends Storage {
 	}
 
 	/**
-	 * Returns file size in bytes.
+	 * Returns file's size and modification date.
 	 */
-	public async getSize(location: string): Promise<SizeResponse> {
+	public async getStat(location: string): Promise<StatResponse> {
 		const params = { Key: location, Bucket: this.$bucket };
 
 		try {
 			const result = await this.$driver.headObject(params).promise();
-			return { size: result.ContentLength as number, raw: result };
+			return {
+				size: result.ContentLength as number,
+				modified: result.LastModified as Date,
+				raw: result,
+			};
 		} catch (e) {
 			return handleError(e, location, this.$bucket);
 		}

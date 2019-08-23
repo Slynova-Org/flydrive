@@ -45,6 +45,7 @@ export interface SignedUrlResponse extends Response {
 	signedUrl: string;
 }
 
-export interface SizeResponse extends Response {
+export interface StatResponse extends Response {
 	size: number;
+	modified: Date;
 }
