@@ -1,6 +1,6 @@
 {
   "name": "@slynova/flydrive",
-  "version": "0.3.1",
+  "version": "1.0.0-0",
   "description": "Flexible and Fluent way to manage storage in Node.js.",
   "main": "./build/index.js",
   "license": "MIT",
