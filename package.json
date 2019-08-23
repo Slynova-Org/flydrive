@@ -50,6 +50,7 @@
     "eslint": "^6.2.1",
     "eslint-config-prettier": "^6.1.0",
     "japa": "^2.0.10",
+    "np": "^5.0.3",
     "prettier": "1.18.2",
     "rimraf": "^3.0.0",
     "ts-node": "^8.3.0",
