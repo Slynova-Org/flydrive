@@ -10,14 +10,18 @@ import { Storage as GCSDriver, StorageOptions, Bucket, File } from '@google-clou
 import Storage from '../Storage';
 import { isReadableStream, pipeline } from '../utils';
 import { Response, ExistsResponse, ContentResponse, SignedUrlResponse, SizeResponse, SignedUrlOptions } from '../types';
-import { FileNotFound, PermissionMissing, UnknownException } from '../Exceptions';
+import { FileNotFound, PermissionMissing, UnknownException, AuthorizationRequired, WrongKeyPath } from '../Exceptions';
 
-function handleError(err: Error & { code?: number }, path: string): never {
+function handleError(err: Error & { code?: number | string }, path: string): never {
 	switch (err.code) {
+		case 401:
+			throw new AuthorizationRequired(err, path);
 		case 403:
 			throw new PermissionMissing(err, path);
 		case 404:
 			throw new FileNotFound(err, path);
+		case 'ENOENT':
+			throw new WrongKeyPath(err, path);
 		default:
 			throw new UnknownException(err, String(err.code), path);
 	}
