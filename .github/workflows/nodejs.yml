@@ -1,0 +1,43 @@
+name: Node.js tests
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      flydrive:
+        container_name: flydrive
+        build:
+          context: .
+          dockerfile: ./Dockerfile
+        depends_on:
+          - localstack-s3
+        env_file:
+          - ./.env.docker
+        volumes:
+          - .:/app
+          - /app/node_modules
+        command: tail -f /dev/null
+      localstack-s3:
+        container_name: localstack-s3
+        image: localstack/localstack
+        env_file:
+          - ./.env.docker
+        ports:
+          - '5000:5000'
+          - '8080:8080'
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [10.x, 12.x]
+    steps:
+      - uses: actions/checkout@v1
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install dependencies
+        run: yarn
