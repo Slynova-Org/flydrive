@@ -29,3 +29,13 @@ jobs:
           node-version: ${{ matrix.node-version }}
       - name: Install dependencies
         run: yarn
+      - name: Run tests
+        run: yarn test
+        env:
+          GITHUB_ACTION: true
+          GCS_KEY: ${{secrets.GCS_KEY}}
+          S3_KEY: no_need
+          S3_SECRET: no_need
+          S3_ENDPOINT: http://localhost:5000
+          S3_BUCKET: testbucket
+          S3_REGION: eu-west-1
