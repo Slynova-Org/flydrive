@@ -8,22 +8,12 @@ jobs:
   test:
     runs-on: ubuntu-latest
     services:
-      flydrive:
-        build:
-          context: .
-          dockerfile: ./Dockerfile
-        depends_on:
-          - localstack-s3
-        env_file:
-          - ./.env.docker
-        volumes:
-          - .:/app
-          - /app/node_modules
-        command: tail -f /dev/null
       localstack-s3:
         image: localstack/localstack
-        env_file:
-          - ./.env.docker
+        env:
+          HOSTNAME: localstack-s3
+          SERVICES: s3:5000
+          DEFAULT_REGION: eu-west-1
         ports:
           - '5000:5000'
           - '8080:8080'
