@@ -11,7 +11,7 @@ jobs:
       localstack-s3:
         image: localstack/localstack
         env:
-          HOSTNAME: localstack-s3
+          HOSTNAME: localhost
           SERVICES: s3:5000
           DEFAULT_REGION: eu-west-1
         ports:
