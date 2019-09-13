@@ -9,7 +9,6 @@ jobs:
     runs-on: ubuntu-latest
     services:
       flydrive:
-        container_name: flydrive
         build:
           context: .
           dockerfile: ./Dockerfile
@@ -22,7 +21,6 @@ jobs:
           - /app/node_modules
         command: tail -f /dev/null
       localstack-s3:
-        container_name: localstack-s3
         image: localstack/localstack
         env_file:
           - ./.env.docker
