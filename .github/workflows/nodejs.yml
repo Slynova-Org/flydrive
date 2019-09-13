@@ -30,7 +30,9 @@ jobs:
       - name: Install dependencies
         run: yarn
       - name: Run tests
-        run: yarn test
+        run: |
+          yarn test:local
+          yarn lint
         env:
           GITHUB_ACTION: true
           GCS_KEY: ${{secrets.GCS_KEY}}
