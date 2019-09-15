@@ -20,7 +20,7 @@ function streamToString(stream: Readable): Promise<string> {
 const testBucket = 'flydrive-test';
 const storage = new GoogleCloudStorage({
 	...(process.env.GCS_KEYFILENAME && { keyFilename: process.env.GCS_KEYFILENAME }),
-	...(process.env.GCS_KEY && { key: process.env.GCS_KEY }),
+	...(process.env.GCS_KEY && { credentials: JSON.parse(process.env.GCS_KEY) }),
 	bucket: testBucket,
 });
 
