@@ -31,7 +31,7 @@ $ yarn add @slynova/flydrive
 ```
 
 When you require the package in your file, it will give you access to the `StorageManager` class.
-This class is a facade for the package and should be instantiated with a [configuration object](https://github.com/Slynova-Org/flydrive/blob/master/tests/stubs/config.ts).
+This class is a facade for the package and should be instantiated with a [configuration object](https://github.com/Slynova-Org/flydrive/blob/master/tests/stubs/config.js).
 
 ```javascript
 const { StorageManager } = require('@slynova/flydrive');
