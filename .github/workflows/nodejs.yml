@@ -1,0 +1,28 @@
+name: Node.js tests
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        node-version: [10.x, 12.x]
+    steps:
+      - uses: actions/checkout@v1
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
+        with:
+          node-version: ${{ matrix.node-version }}
+      - name: Install dependencies
+        run: yarn
+      - name: Run tests
+        run: |
+          yarn test:local
+          yarn lint
+        env:
+          GITHUB_ACTION: true
+          GCS_KEY: ${{secrets.GCS_KEY}}
