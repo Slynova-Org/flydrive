@@ -6,7 +6,7 @@ configure({
 	files: ['test/**/*.spec.ts'],
 	filter: (file) => {
 		if (process.env.GITHUB_ACTION) {
-			return !file.includes('s3');
+			return true;
 		}
 		if ((process.env.DOCKER && file.includes('gcs')) || (!process.env.DOCKER && file.includes('s3'))) {
 			return false;

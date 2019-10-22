@@ -8,6 +8,16 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    services:
+      localstack-s3:
+        image: localstack/localstack
+        env:
+          HOSTNAME: localhost
+          SERVICES: s3:5000
+          DEFAULT_REGION: eu-west-1
+        ports:
+          - '5000:5000'
+          - '8080:8080'
     strategy:
       fail-fast: false
       matrix:
@@ -26,3 +36,8 @@ jobs:
           yarn lint
         env:
           GCS_KEY: ${{secrets.GCS_KEY}}
+          S3_KEY: no_need
+          S3_SECRET: no_need
+          S3_ENDPOINT: http://localhost:5000
+          S3_BUCKET: testbucket
+          S3_REGION: eu-west-1
