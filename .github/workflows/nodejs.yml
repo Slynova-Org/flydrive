@@ -25,5 +25,4 @@ jobs:
           yarn test:local
           yarn lint
         env:
-          GITHUB_ACTION: true
           GCS_KEY: ${{secrets.GCS_KEY}}
