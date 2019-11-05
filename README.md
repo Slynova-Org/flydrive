@@ -16,6 +16,7 @@ There are currently 4 drivers available:
 - Amazon S3 (You need to install `aws-sdk` package to be able to use this driver)
 - Digital Ocean Spaces (You need to install `aws-sdk` package to be able to use this driver)
 - Google Cloud Storage (You need to install `@google-cloud/storage` package to be able to use this driver)
+- Scaleway Object Storage (You need to install `aws-sdk` package to be able to use this driver)
 
 ---
 
