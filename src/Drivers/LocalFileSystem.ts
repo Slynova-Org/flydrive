@@ -6,9 +6,8 @@
  */
 
 import { Readable } from 'stream';
-import { isAbsolute, join, resolve } from 'path';
+import { dirname, isAbsolute, join, resolve } from 'path';
 import fs from 'fs-extra';
-import createOutputStream from 'create-output-stream';
 import Storage from '../Storage';
 import { FileNotFound, UnknownException, PermissionMissing } from '../Exceptions';
 import { isReadableStream, pipeline } from '../utils';
@@ -204,7 +203,9 @@ export class LocalFileSystem extends Storage {
 
 		try {
 			if (isReadableStream(content)) {
-				const ws = createOutputStream(fullPath, options);
+				const dir = dirname(fullPath);
+				await fs.ensureDir(dir);
+				const ws = fs.createWriteStream(fullPath, options);
 				await pipeline(content, ws);
 				return { raw: undefined };
 			}
