@@ -8,14 +8,16 @@
   <a href="https://opensource.org/licenses/MIT"><img src="https://img.shields.io/npm/l/@slynova/flydrive.svg?style=flat-square" alt="License"></a>
 </p>
 
-`flydrive` is a framework-agnostic package which provides a powerful wrapper to manage Storage in [Node.js](https://nodejs.org).
+`flydrive` is a framework-agnostic package which provides a powerful wrapper to manage file Storage in [Node.js](https://nodejs.org).
 
-There are currently 4 drivers available:
+There are currently 3 drivers available:
 
-- Local
-- Amazon S3 (You need to install `aws-sdk` package to be able to use this driver)
-- Digital Ocean Spaces (You need to install `aws-sdk` package to be able to use this driver)
-- Google Cloud Storage (You need to install `@google-cloud/storage` package to be able to use this driver)
+- `'local'`: Stores files on the local file system.
+- `'s3'`: Amazon S3 and other compatible services
+  - You need to install the `aws-sdk` package to be able to use this driver.
+  - This driver is compatible with DigitalOcean Spaces and Scaleway Object Storage.
+- `'gcs'`: Google Cloud Storage
+  - You need to install the `@google-cloud/storage` package to be able to use this driver.
 
 ---
 
@@ -31,7 +33,7 @@ $ yarn add @slynova/flydrive
 ```
 
 When you require the package in your file, it will give you access to the `StorageManager` class.
-This class is a facade for the package and should be instantiated with a [configuration object](https://github.com/Slynova-Org/flydrive/blob/master/tests/stubs/config.ts).
+This class is a facade for the package and should be instantiated with a [configuration object](https://github.com/Slynova-Org/flydrive/blob/master/test/stubs/config.ts).
 
 ```javascript
 const { StorageManager } = require('@slynova/flydrive');
@@ -50,7 +52,7 @@ storage.disk('awsCloud', customConfig); // Overwrite the default configuration o
 
 Each driver extends the abstract class [`Storage`](https://github.com/Slynova-Org/flydrive/blob/master/src/Storage.ts). This class will throw an exception for each methods by default. The driver needs to overwrite the methods it supports.
 
-The following method doesn't exists on the `LocalFileSystem` driver, therefore, it will throw an exception.
+The following method doesn't exist on the `LocalFileSystem` driver, therefore, it will throw an exception.
 
 ```javascript
 // throws "E_METHOD_NOT_SUPPORTED: Method getSignedUrl is not supported for the driver LocalFileSystem"
