@@ -170,7 +170,7 @@ export class LocalFileSystem extends Storage {
 		const srcPath = this._fullPath(src);
 
 		try {
-			const result = await fs.move(src, this._fullPath(dest));
+			const result = await fs.move(srcPath, this._fullPath(dest));
 			return { raw: result };
 		} catch (e) {
 			return handleError(e, srcPath);
