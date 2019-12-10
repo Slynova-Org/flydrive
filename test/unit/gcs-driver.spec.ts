@@ -1,21 +1,10 @@
-import { Readable } from 'stream';
-
 import test from 'japa';
 import uuid from 'uuid/v4';
 import { Storage } from '@google-cloud/storage';
 
 import { GoogleCloudStorage } from '../../src/Drivers/GoogleCloudStorage';
 import { PermissionMissing, FileNotFound } from '../../src/Exceptions';
-
-function streamToString(stream: Readable): Promise<string> {
-	return new Promise((resolve, reject) => {
-		const chunks: any[] = [];
-
-		stream.on('data', (chunk) => chunks.push(chunk));
-		stream.on('error', reject);
-		stream.on('end', () => resolve(chunks.join('')));
-	});
-}
+import {streamToString} from "../../src/utils/streamToString";
 
 const testBucket = 'flydrive-test';
 const storage = new GoogleCloudStorage({

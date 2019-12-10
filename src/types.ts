@@ -24,6 +24,11 @@ export interface Response {
 	raw: unknown;
 }
 
+export interface DeleteResponse {
+	raw: unknown;
+	wasDeleted?: boolean,
+}
+
 export interface ExistsResponse extends Response {
 	exists: boolean;
 }

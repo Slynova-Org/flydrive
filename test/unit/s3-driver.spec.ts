@@ -7,20 +7,10 @@
 
 import test from 'japa';
 import fs from 'fs-extra';
-import { Readable } from 'stream';
 
 import { AWSS3, AWSS3Config } from '../../src/Drivers/AWSS3';
 import { NoSuchBucket, FileNotFound } from '../../src/Exceptions';
-
-function streamToString(stream: Readable): Promise<string> {
-	return new Promise((resolve, reject) => {
-		const chunks: any[] = [];
-
-		stream.on('data', (chunk) => chunks.push(chunk));
-		stream.on('error', reject);
-		stream.on('end', () => resolve(chunks.join('')));
-	});
-}
+import {streamToString} from "../../src/utils/streamToString";
 
 const config: AWSS3Config = {
 	key: process.env.S3_KEY || '',
