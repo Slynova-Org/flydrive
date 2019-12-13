@@ -4,12 +4,11 @@
  * @license MIT
  * @copyright Slynova - Romain Lanz <romain.lanz@slynova.ch>
  */
+import {StorageConstructor} from "./Storage/Storage";
 
 export interface StorageManagerDiskConfig {
-	[key: string]: {
-		driver: string;
-		[key: string]: unknown;
-	};
+	driver: string | StorageConstructor;
+	[key: string]: unknown;
 }
 
 export interface StorageManagerConfig {
@@ -17,24 +16,14 @@ export interface StorageManagerConfig {
 	 * The default disk returned by `disk()`.
 	 */
 	default?: string;
-	disks?: StorageManagerDiskConfig;
+	disks: {[key: string]: StorageManagerDiskConfig};
 }
 
-export interface Response {
-	raw: unknown;
-}
-
-export interface DeleteResponse {
-	raw: unknown;
-	wasDeleted?: boolean,
-}
-
-export interface ExistsResponse extends Response {
-	exists: boolean;
-}
-
-export interface ContentResponse<ContentType> extends Response {
-	content: ContentType;
+export interface PutOptions {
+	contentType?: string,
+	contentLanguage?: string;
+	// key should match /^[a-zA-Z]+$/ for interoperability
+	metadata?: {[key: string]: string},
 }
 
 export interface SignedUrlOptions {
@@ -46,11 +35,38 @@ export interface SignedUrlOptions {
 	expiry?: number;
 }
 
+export interface Response {
+	raw: unknown;
+}
+
+export interface DeleteResponse extends Response{
+	wasDeleted: boolean,
+}
+
+export interface ExistsResponse extends Response {
+	exists: boolean;
+}
+
+export interface ContentResponse<T> extends Response {
+	content: T;
+	properties: PropertiesResponse;
+}
+
 export interface SignedUrlResponse extends Response {
 	signedUrl: string;
 }
 
-export interface StatResponse extends Response {
-	size: number;
-	modified: Date;
+export interface PropertiesResponse extends Response{
+	contentType: string;
+	contentLanguage?: string,
+	contentLength?: number;
+	lastModified?: Date;
+	eTag?: string,
+	// key should match /^[a-z]+([A-Z][a-z]+)*$/ for interoperability
+	metadata?: {[key: string]: string},
+}
+
+export interface FileListResponse {
+	path: string,
+	properties: PropertiesResponse,
 }

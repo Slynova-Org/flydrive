@@ -28,15 +28,13 @@
   "scripts": {
     "build": "npm run clean && npm run tsc",
     "clean": "rimraf build",
-    "lint": "eslint --ext js,ts src test japaFile.js",
+    "lint": "eslint --ext js,ts src test jest.config.js",
     "prepublishOnly": "npm run build",
-    "test": "npm run test:local && npm run test:docker",
-    "test:local": "node japaFile",
-    "test:docker": "./docker-test.sh",
+    "test": "npm run jest",
     "tsc": "tsc"
   },
   "engines": {
-    "node": ">10.0.0"
+    "node": ">10.10.0"
   },
   "dependencies": {
     "fs-extra": "^8.1.0",
@@ -46,18 +44,21 @@
     "@azure/storage-blob": "^12.0.1",
     "@google-cloud/storage": "^4.0.0",
     "@types/fs-extra": "^8.0.1",
-    "@types/node": "10.0.0",
+    "@types/jest": "^24.0.23",
+    "@types/node": "^10.10.0",
     "@typescript-eslint/eslint-plugin": "^2.5.0",
     "@typescript-eslint/parser": "^2.5.0",
     "aws-sdk": "^2.553.0",
     "dotenv": "^8.2.0",
     "eslint": "^6.5.1",
     "eslint-config-prettier": "^6.4.0",
-    "japa": "^3.0.1",
+    "jest": "^24.9.0",
     "node-fetch": "^2.6.0",
     "np": "^5.1.1",
     "prettier": "1.18.2",
+    "random-bytes-readable-stream": "^2.1.0",
     "rimraf": "^3.0.0",
+    "ts-jest": "^24.2.0",
     "ts-node": "^8.4.1",
     "typescript": "^3.6.4",
     "uuid": "^3.3.3",

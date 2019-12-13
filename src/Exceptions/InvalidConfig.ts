@@ -19,4 +19,8 @@ export class InvalidConfig extends RuntimeException {
 	public static missingDiskDriver(name: string) {
 		return new this(`Make sure to define driver for ${name} disk`, 500, 'E_INVALID_CONFIG');
 	}
+
+	public static duplicateDiskName(name: string) {
+		return new this(`Disk with name ${name} is already defined`, 500, 'E_INVALID_CONFIG');
+	}
 }

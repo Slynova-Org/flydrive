@@ -1,4 +1,9 @@
-/node_modules
 /build
+/coverage
+/node_modules
+/var
+!/var/.gittrack
 
 .env
+
+
