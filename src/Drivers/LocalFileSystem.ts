@@ -6,7 +6,7 @@
  */
 
 import { Readable } from 'stream';
-import { dirname, isAbsolute, join, resolve } from 'path';
+import { dirname, join, resolve } from 'path';
 import fs from 'fs-extra';
 import Storage from '../Storage';
 import { FileNotFound, UnknownException, PermissionMissing } from '../Exceptions';
@@ -36,7 +36,7 @@ export class LocalFileSystem extends Storage {
 	 * Returns full path to the storage root directory.
 	 */
 	private _fullPath(relativePath: string): string {
-		return isAbsolute(relativePath) ? relativePath : join(this.$root, relativePath);
+		return join(this.$root, join('/', relativePath));
 	}
 
 	/**
