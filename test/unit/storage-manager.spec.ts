@@ -37,7 +37,7 @@ test.group('Storage Manager', (group) => {
 					root: '',
 				},
 			},
-		});
+		} as any);
 		const fn = () => storageManager.disk();
 		assert.throw(fn, 'E_INVALID_CONFIG: Make sure to define driver for local disk');
 	});

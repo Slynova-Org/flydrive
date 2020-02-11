@@ -40,17 +40,28 @@ test.group('S3 Driver', (group) => {
 	const fileURL = (KEY) => `http://${s3Driver.driver().endpoint.host}/${process.env.S3_BUCKET}/${KEY}`;
 
 	group.before(async () => {
-		// Create test bucket
-		await s3Driver
-			.driver()
-			.createBucket({
-				ACL: 'public-read',
-				Bucket: process.env.S3_BUCKET || '',
-				CreateBucketConfiguration: {
-					LocationConstraint: process.env.S3_REGION || '',
-				},
-			})
-			.promise();
+		let attempts = 5;
+
+		// trivial delay in case the localstack container hasn't fully initialized
+		while (attempts--) {
+			try {
+				// Create test bucket
+				await s3Driver
+					.driver()
+					.createBucket({
+						ACL: 'public-read',
+						Bucket: process.env.S3_BUCKET || '',
+						CreateBucketConfiguration: {
+							LocationConstraint: process.env.S3_REGION || '',
+						},
+					})
+					.promise();
+				break;
+			} catch (error) {
+				await new Promise((res) => setTimeout(res, 500));
+			}
+		}
+
 	});
 
 	test("return false when file doesn't exists", async (assert) => {

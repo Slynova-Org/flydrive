@@ -23,7 +23,14 @@ export default class StorageManager {
 	 */
 	private _extendedDrivers: Map<string, () => Storage> = new Map();
 
-	constructor(config: StorageManagerConfig) {
+	constructor(config?: StorageManagerConfig) {
+		this.config(config || {});
+	}
+
+	/**
+	 * set the configuration
+	 */
+	config (config: StorageManagerConfig) {
 		this._config = config;
 		this._disks = config.disks || {};
 	}
@@ -31,7 +38,7 @@ export default class StorageManager {
 	/**
 	 * Get a disk instance.
 	 */
-	disk<T extends Storage>(name?: string, config?: unknown): T {
+	disk<T extends Storage>(name?: string, config: object = {}): T {
 		name = name || this._config.default;
 
 		/**

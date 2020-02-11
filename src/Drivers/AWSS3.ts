@@ -7,7 +7,7 @@
 
 import { Readable } from 'stream';
 import S3, { ClientConfiguration } from 'aws-sdk/clients/s3';
-import { Storage } from '..';
+import Storage from '../Storage';
 import { UnknownException, NoSuchBucket, FileNotFound } from '../Exceptions';
 import { SignedUrlOptions, Response, ExistsResponse, ContentResponse, SignedUrlResponse, StatResponse } from '../types';
 
