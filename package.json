@@ -42,7 +42,7 @@
     "@google-cloud/storage": "^4.6.0",
     "@lukeed/uuid": "^1.0.1",
     "@types/fs-extra": "^8.1.0",
-    "@types/node": "10.0.0",
+    "@types/node": "^10.17.17",
     "@typescript-eslint/eslint-plugin": "^2.24.0",
     "@typescript-eslint/parser": "^2.24.0",
     "aws-sdk": "^2.642.0",
