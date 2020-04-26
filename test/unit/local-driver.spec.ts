@@ -8,10 +8,10 @@
 import test from 'japa';
 import path from 'path';
 import fs from 'fs-extra';
-import { Readable } from 'stream';
 
 import * as CE from '../../src/Exceptions';
 import { LocalFileSystemStorage } from '../../src/Drivers/LocalFileSystemStorage';
+import { streamToString } from '../utils';
 
 let storage: LocalFileSystemStorage;
 
@@ -21,16 +21,6 @@ function isWindowsDefenderError(error: { code: string }): boolean {
 
 function realFsPath(relativePath: string): string {
 	return path.join(__dirname, 'storage', relativePath);
-}
-
-function streamToString(stream: Readable): Promise<string> {
-	return new Promise((resolve, reject) => {
-		const chunks: any[] = [];
-
-		stream.on('data', (chunk) => chunks.push(chunk));
-		stream.on('error', reject);
-		stream.on('close', () => resolve(chunks.join('\n')));
-	});
 }
 
 test.group('Local Driver', (group) => {

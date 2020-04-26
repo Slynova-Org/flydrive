@@ -7,20 +7,10 @@
 
 import test from 'japa';
 import fs from 'fs-extra';
-import { Readable } from 'stream';
 
 import { AmazonWebServicesS3Storage, AmazonWebServicesS3Config } from '../../src/Drivers/AmazonWebServicesS3Storage';
 import { NoSuchBucket, FileNotFound } from '../../src/Exceptions';
-
-function streamToString(stream: Readable): Promise<string> {
-	return new Promise((resolve, reject) => {
-		const chunks: any[] = [];
-
-		stream.on('data', (chunk) => chunks.push(chunk));
-		stream.on('error', reject);
-		stream.on('end', () => resolve(chunks.join('')));
-	});
-}
+import { streamToString } from '../utils';
 
 const config: AmazonWebServicesS3Config = {
 	key: process.env.S3_KEY || '',
