@@ -6,10 +6,18 @@
  */
 
 import { Readable } from 'stream';
-import { Storage as GCSDriver, StorageOptions, Bucket, File } from '@google-cloud/storage';
+import { Storage as GCSDriver, StorageOptions, Bucket, File, GetFilesOptions } from '@google-cloud/storage';
 import Storage from '../Storage';
 import { isReadableStream, pipeline } from '../utils';
-import { Response, ExistsResponse, ContentResponse, SignedUrlResponse, SignedUrlOptions, StatResponse } from '../types';
+import {
+	Response,
+	ExistsResponse,
+	ContentResponse,
+	SignedUrlResponse,
+	SignedUrlOptions,
+	StatResponse,
+	FileListResponse,
+} from '../types';
 import { FileNotFound, PermissionMissing, UnknownException, AuthorizationRequired, WrongKeyPath } from '../Exceptions';
 
 function handleError(err: Error & { code?: number | string }, path: string): never {
@@ -206,6 +214,33 @@ export class GoogleCloudStorage extends Storage {
 		} catch (e) {
 			return handleError(e, location);
 		}
+	}
+
+	/**
+	 * Iterate over all files in the bucket.
+	 */
+	public async *flatList(prefix = ''): AsyncIterable<FileListResponse> {
+		let nextQuery: GetFilesOptions | undefined = {
+			prefix,
+			autoPaginate: false,
+			maxResults: 1000,
+		};
+
+		do {
+			try {
+				const result = await this.$bucket.getFiles(nextQuery);
+
+				nextQuery = result[1];
+				for (const file of result[0]) {
+					yield {
+						raw: file.metadata,
+						path: file.name,
+					};
+				}
+			} catch (e) {
+				return handleError(e, prefix);
+			}
+		} while (nextQuery);
 	}
 }
 

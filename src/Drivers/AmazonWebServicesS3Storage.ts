@@ -6,10 +6,18 @@
  */
 
 import { Readable } from 'stream';
-import S3, { ClientConfiguration } from 'aws-sdk/clients/s3';
+import S3, { ClientConfiguration, ObjectList } from 'aws-sdk/clients/s3';
 import { Storage } from '..';
 import { UnknownException, NoSuchBucket, FileNotFound } from '../Exceptions';
-import { SignedUrlOptions, Response, ExistsResponse, ContentResponse, SignedUrlResponse, StatResponse } from '../types';
+import {
+	SignedUrlOptions,
+	Response,
+	ExistsResponse,
+	ContentResponse,
+	SignedUrlResponse,
+	StatResponse,
+	FileListResponse,
+} from '../types';
 
 function handleError(err: Error, path: string, bucket: string): never {
 	switch (err.name) {
@@ -231,6 +239,37 @@ export class AmazonWebServicesS3Storage extends Storage {
 		} catch (e) {
 			return handleError(e, location, this.$bucket);
 		}
+	}
+
+	/**
+	 * Iterate over all files in the bucket.
+	 */
+	public async *flatList(prefix = ''): AsyncIterable<FileListResponse> {
+		let continuationToken: string | undefined;
+
+		do {
+			try {
+				const response = await this.$driver
+					.listObjectsV2({
+						Bucket: this.$bucket,
+						Prefix: prefix,
+						ContinuationToken: continuationToken,
+						MaxKeys: 1000,
+					})
+					.promise();
+
+				continuationToken = response.NextContinuationToken;
+
+				for (const file of response.Contents as ObjectList) {
+					yield {
+						raw: file,
+						path: file.Key as string,
+					};
+				}
+			} catch (e) {
+				return handleError(e, prefix, this.$bucket);
+			}
+		} while (continuationToken);
 	}
 }
 

@@ -173,7 +173,7 @@ const { exists } = await storage.disk('local').exists('foo.txt');
 <details>
 <summary markdown="span"><code>get(location: string, encoding: string = 'utf-8'): Promise&lt;ContentResponse&lt;string&gt;&gt;</code></summary>
 
-This methods will return the file's content as a string for the given location.
+This method will return the file's content as a string for the given location.
 
 ```javascript
 // Supported drivers: "local", "s3", "gcs"
@@ -186,7 +186,7 @@ const { content } = await storage.disk('local').exists('foo.txt');
 <details>
 <summary markdown="span"><code>getBuffer(location: string): Promise&lt;ContentResponse&lt;Buffer&gt;&gt;</code></summary>
 
-This methods will return the file's content as a Buffer for the given location.
+This method will return the file's content as a Buffer for the given location.
 
 ```javascript
 // Supported drivers: "local", "s3", "gcs"
@@ -199,7 +199,7 @@ const { content } = await storage.disk('local').exists('foo.txt');
 <details>
 <summary markdown="span"><code>getSignedUrl(location: string, options: SignedUrlOptions = { expiry: 900 }): Promise&lt;SignedUrlResponse&gt;</code></summary>
 
-This methods will return the signed url for an existing file.
+This method will return the signed url for an existing file.
 
 ```javascript
 // Supported drivers: "s3", "gcs"
@@ -212,7 +212,7 @@ const { signedUrl } = await storage.disk('awsCloud').getSignedUrl('foo.txt');
 <details>
 <summary markdown="span"><code>getStat(location: string): Promise&lt;StatResponse&gt;</code></summary>
 
-This methods will return the file's size (in bytes) and last modification date.
+This method will return the file's size (in bytes) and last modification date.
 
 ```javascript
 // Supported drivers: "local", "s3", "gcs"
@@ -225,7 +225,7 @@ const { size, modified } = await storage.disk('local').getStat('foo.txt');
 <details>
 <summary markdown="span"><code>getStream(location: string, options: object | string): Stream</code></summary>
 
-This methods will return a Node.js readable stream for the given file.
+This method will return a Node.js readable stream for the given file.
 
 ```javascript
 // Supported drivers: "local", "s3", "gcs"
@@ -238,7 +238,7 @@ const stream = storage.disk('local').getStream('foo.txt');
 <details>
 <summary markdown="span"><code>getUrl(location: string): string</code></summary>
 
-This methods will return a public URL for a given file.
+This method will return a public URL for a given file.
 
 ```javascript
 // Supported drivers: "s3", "gcs"
@@ -251,7 +251,7 @@ const uri = storage.disk('awsCloud').getUrl('foo.txt');
 <details>
 <summary markdown="span"><code>move(src: string, dest: string): Promise&lt;Response&gt;</code></summary>
 
-This methods will move the file to a new location.
+This method will move the file to a new location.
 
 ```javascript
 // Supported drivers: "local", "s3", "gcs"
@@ -264,7 +264,7 @@ await storage.disk('local').move('foo.txt', 'newFolder/foo.txt');
 <details>
 <summary markdown="span"><code>put(location: string, content: Buffer | Stream | string, options: object): Promise&lt;Response&gt;</code></summary>
 
-This methods will create a new file with the provided content.
+This method will create a new file with the provided content.
 
 ```javascript
 // Supported drivers: "local", "s3", "gcs"
@@ -277,13 +277,29 @@ await storage.disk('local').put('bar.txt', 'Foobar');
 <details>
 <summary markdown="span"><code>prepend(location: string, content: Buffer | string, options: object): Promise&lt;Response&gt;</code></summary>
 
-This methods will preprend content to a file.
+This method will prepend content to a file.
 
 ```javascript
 // Supported drivers: "local"
 
 await storage.disk('local').prepend('foo.txt', 'bar');
 // foo.txt now has the content `bar${initialContent}`
+```
+
+</details>
+
+<details>
+<summary markdown="span"><code>flatList(prefix?: string): AsyncIterable&lt;FileListResponse&gt;</code></summary>
+
+This method will return an async iterator over all file names that start with `prefix` (recursive).
+
+```javascript
+// Supported drivers: "local", "s3", "gcs"
+
+const disk = storage.disk('local');
+for await (const filename of disk.flatList('a/b')) {
+	console.log(filename);
+}
 ```
 
 </details>

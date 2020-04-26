@@ -49,3 +49,7 @@ export interface StatResponse extends Response {
 	size: number;
 	modified: Date;
 }
+
+export interface FileListResponse extends Response {
+	path: string;
+}

@@ -7,7 +7,15 @@
 
 import { Readable } from 'stream';
 import { MethodNotSupported } from './Exceptions';
-import { Response, SignedUrlResponse, ContentResponse, ExistsResponse, SignedUrlOptions, StatResponse } from './types';
+import {
+	Response,
+	SignedUrlResponse,
+	ContentResponse,
+	ExistsResponse,
+	SignedUrlOptions,
+	StatResponse,
+	FileListResponse,
+} from './types';
 
 export default abstract class Storage {
 	/**
@@ -147,5 +155,14 @@ export default abstract class Storage {
 	 */
 	prepend(location: string, content: Buffer | string): Promise<Response> {
 		throw new MethodNotSupported('prepend', this.constructor.name);
+	}
+
+	/**
+	 * List files with a given prefix.
+	 *
+	 * Supported drivers: "local", "s3", "gcs"
+	 */
+	flatList(prefix?: string): AsyncIterable<FileListResponse> {
+		throw new MethodNotSupported('flatList', this.constructor.name);
 	}
 }
