@@ -1,7 +1,7 @@
 import { Readable } from 'stream';
 
 import test from 'japa';
-import uuid from 'uuid/v4';
+import uuid from '@lukeed/uuid';
 import { Storage } from '@google-cloud/storage';
 
 import { GoogleCloudStorage } from '../../src/Drivers/GoogleCloudStorage';

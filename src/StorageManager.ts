@@ -77,7 +77,7 @@ export default class StorageManager {
 			throw DriverNotSupported.driver(diskConfig.driver);
 		}
 
-		return new Driver({ ...diskConfig, ...config });
+		return new Driver({ ...diskConfig, ...(config as object) });
 	}
 
 	/**

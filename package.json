@@ -35,26 +35,26 @@
     "tsc": "tsc"
   },
   "dependencies": {
-    "fs-extra": "^8.1.0",
+    "fs-extra": "^9.0.0",
     "node-exceptions": "^4.0.1"
   },
   "devDependencies": {
-    "@google-cloud/storage": "^4.0.0",
-    "@types/fs-extra": "^8.0.1",
-    "@types/node": "10.0.0",
-    "@typescript-eslint/eslint-plugin": "^2.5.0",
-    "@typescript-eslint/parser": "^2.5.0",
-    "aws-sdk": "^2.553.0",
+    "@google-cloud/storage": "^4.7.0",
+    "@lukeed/uuid": "^1.0.1",
+    "@types/fs-extra": "^8.1.0",
+    "@types/node": "^10.17.17",
+    "@typescript-eslint/eslint-plugin": "^2.29.0",
+    "@typescript-eslint/parser": "^2.29.0",
+    "aws-sdk": "^2.663.0",
     "dotenv": "^8.2.0",
-    "eslint": "^6.5.1",
-    "eslint-config-prettier": "^6.4.0",
+    "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.11.0",
     "japa": "^3.0.1",
-    "np": "^5.1.1",
-    "prettier": "1.18.2",
-    "rimraf": "^3.0.0",
-    "ts-node": "^8.4.1",
-    "typescript": "^3.6.4",
-    "uuid": "^3.3.3"
+    "np": "^6.2.2",
+    "prettier": "2.0.5",
+    "rimraf": "^3.0.2",
+    "ts-node": "^8.9.1",
+    "typescript": "^3.8.3"
   },
   "repository": "git@github.com:Slynova-Org/flydrive.git",
   "bugs": {
