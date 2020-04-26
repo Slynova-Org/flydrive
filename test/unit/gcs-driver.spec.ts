@@ -4,7 +4,7 @@ import { Storage } from '@google-cloud/storage';
 
 import { GoogleCloudStorage } from '../../src/Drivers/GoogleCloudStorage';
 import { PermissionMissing, FileNotFound } from '../../src/Exceptions';
-import { streamToString } from '../utils';
+import { streamToString, getFlatList } from '../utils';
 
 const testBucket = 'flydrive-test';
 const storage = new GoogleCloudStorage({
@@ -19,6 +19,10 @@ let testFile;
 let otherFile;
 
 const testString = 'test-data';
+
+function filterAndSort(list: string[]): string[] {
+	return list.filter((file) => file.startsWith(folder)).sort();
+}
 
 test.group('GCS Driver', (group) => {
 	group.beforeEach(async () => {
@@ -144,4 +148,39 @@ test.group('GCS Driver', (group) => {
 		const { content } = await storage.get(otherFile, 'utf-8');
 		assert.strictEqual(content, testString);
 	}).timeout(5000);
+
+	test('list files with no prefix and empty bucket', async (assert) => {
+		await storage.delete(testFile);
+		const result = await getFlatList(storage);
+		assert.deepStrictEqual(filterAndSort(result), []);
+	});
+
+	test('list files with prefix that does not exist', async (assert) => {
+		const result = await getFlatList(storage, '/dummy/path');
+		assert.deepStrictEqual(result, []);
+	});
+
+	test('list files with no prefix', async (assert) => {
+		await storage.put(otherFile, testString);
+		const result = await getFlatList(storage);
+		assert.deepStrictEqual(filterAndSort(result), [otherFile, testFile]);
+	});
+
+	test('list files with folder prefix', async (assert) => {
+		await storage.put(otherFile, testString);
+		const result = await getFlatList(storage, folder);
+		assert.deepStrictEqual(filterAndSort(result), [otherFile, testFile]);
+	});
+
+	test('list files with subfolder prefix', async (assert) => {
+		await storage.put(otherFile, testString);
+		const result = await getFlatList(storage, `${folder}/sub/`);
+		assert.deepStrictEqual(filterAndSort(result), [otherFile]);
+	});
+
+	test('list files with filename prefix', async (assert) => {
+		await storage.put(otherFile, testString);
+		const result = await getFlatList(storage, `${folder}/te`);
+		assert.deepStrictEqual(filterAndSort(result), [testFile]);
+	});
 });

@@ -6,7 +6,7 @@
  */
 
 import { Readable } from 'stream';
-import { dirname, join, resolve, relative } from 'path';
+import { dirname, join, resolve, relative, sep } from 'path';
 import { promises as fs } from 'fs';
 import fse from 'fs-extra';
 import Storage from '../Storage';
@@ -37,7 +37,7 @@ export class LocalFileSystemStorage extends Storage {
 	 * Returns full path relative to the storage's root directory.
 	 */
 	private _fullPath(relativePath: string): string {
-		return join(this.$root, join('/', relativePath));
+		return join(this.$root, join(sep, relativePath));
 	}
 
 	/**
@@ -227,7 +227,7 @@ export class LocalFileSystemStorage extends Storage {
 	}
 
 	private async *_flatDirIterator(prefix: string): AsyncIterable<FileListResponse> {
-		const prefixDirectory = prefix[prefix.length - 1] === '/' ? prefix : dirname(prefix);
+		const prefixDirectory = prefix[prefix.length - 1] === sep ? prefix : dirname(prefix);
 
 		try {
 			const dir = await fs.opendir(prefixDirectory);
@@ -236,7 +236,7 @@ export class LocalFileSystemStorage extends Storage {
 				const fileName = join(prefixDirectory, file.name);
 				if (fileName.startsWith(prefix)) {
 					if (file.isDirectory()) {
-						yield* this._flatDirIterator(fileName + '/');
+						yield* this._flatDirIterator(join(fileName, sep));
 					} else if (file.isFile()) {
 						const path = relative(this.$root, fileName);
 						yield {

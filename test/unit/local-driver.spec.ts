@@ -11,7 +11,7 @@ import fs from 'fs-extra';
 
 import * as CE from '../../src/Exceptions';
 import { LocalFileSystemStorage } from '../../src/Drivers/LocalFileSystemStorage';
-import { streamToString } from '../utils';
+import { streamToString, getFlatList } from '../utils';
 
 let storage: LocalFileSystemStorage;
 
@@ -207,5 +207,65 @@ test.group('Local Driver', (group) => {
 		const { size, modified } = await storage.getStat('foo');
 		assert.equal(size, 11);
 		assert.instanceOf(modified, Date);
+	});
+
+	test('list files with no prefix and empty directory', async (assert) => {
+		const result = await getFlatList(storage);
+		assert.deepStrictEqual(result, []);
+	});
+
+	test('list files with prefix that does not exist', async (assert) => {
+		const result = await getFlatList(storage, '/dummy/path');
+		assert.deepStrictEqual(result, []);
+	});
+
+	test('list files with no prefix', async (assert) => {
+		await Promise.all([
+			storage.put('foo.txt', 'bar'),
+			storage.put('foo/bar', 'baz'),
+			storage.put('other/dir/file.txt', 'hello'),
+		]);
+		const result = await getFlatList(storage);
+		assert.deepStrictEqual(result.sort(), ['foo.txt', path.normalize('foo/bar'), path.normalize('other/dir/file.txt')]);
+	});
+
+	test('list files with folder prefix', async (assert) => {
+		await Promise.all([
+			storage.put('foo.txt', 'bar'),
+			storage.put('foo/bar', 'baz'),
+			storage.put('other/dir/file.txt', 'hello'),
+		]);
+		const result = await getFlatList(storage, 'other');
+		assert.deepStrictEqual(result, [path.normalize('other/dir/file.txt')]);
+	});
+
+	test('list files with subfolder prefix', async (assert) => {
+		await Promise.all([
+			storage.put('foo.txt', 'bar'),
+			storage.put('foo/bar', 'baz'),
+			storage.put('other/dir/file.txt', 'hello'),
+		]);
+		const result = await getFlatList(storage, `other/dir/`);
+		assert.deepStrictEqual(result, [path.normalize('other/dir/file.txt')]);
+	});
+
+	test('list files with filename prefix', async (assert) => {
+		await Promise.all([
+			storage.put('foo.txt', 'bar'),
+			storage.put('foo/bar', 'baz'),
+			storage.put('other/dir/file.txt', 'hello'),
+		]);
+		const result = await getFlatList(storage, 'other/dir/fil');
+		assert.deepStrictEqual(result, [path.normalize('other/dir/file.txt')]);
+	});
+
+	test('list files with double dots in prefix', async (assert) => {
+		await Promise.all([
+			storage.put('foo.txt', 'bar'),
+			storage.put('foo/bar', 'baz'),
+			storage.put('other/dir/file.txt', 'hello'),
+		]);
+		const result = await getFlatList(storage, 'other/../');
+		assert.deepStrictEqual(result.sort(), ['foo.txt', path.normalize('foo/bar'), path.normalize('other/dir/file.txt')]);
 	});
 });
