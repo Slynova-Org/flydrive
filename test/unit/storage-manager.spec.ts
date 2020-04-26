@@ -5,14 +5,13 @@
  * @copyright Slynova - Romain Lanz <romain.lanz@slynova.ch>
  */
 
-import { resolve } from 'path';
 import test from 'japa';
 
 import Storage from '../../src/Storage';
 import StorageManager from '../../src/StorageManager';
 import { LocalFileSystemStorage } from '../../src/Drivers/LocalFileSystemStorage';
 
-test.group('Storage Manager', (group) => {
+test.group('Storage Manager', () => {
 	test('throw exception when no disk name is defined', (assert) => {
 		const storageManager = new StorageManager({});
 		const fn = () => storageManager.disk();
@@ -33,9 +32,7 @@ test.group('Storage Manager', (group) => {
 			// @ts-ignore
 			disks: {
 				// @ts-ignore
-				local: {
-					root: '',
-				},
+				local: {},
 			},
 		});
 		const fn = () => storageManager.disk();
@@ -47,8 +44,10 @@ test.group('Storage Manager', (group) => {
 			default: 'local',
 			disks: {
 				local: {
-					root: '',
 					driver: 'foo',
+					config: {
+						root: '',
+					},
 				},
 			},
 		});
@@ -61,8 +60,10 @@ test.group('Storage Manager', (group) => {
 			default: 'local',
 			disks: {
 				local: {
-					root: '',
 					driver: 'local',
+					config: {
+						root: '',
+					},
 				},
 			},
 		});
@@ -76,12 +77,13 @@ test.group('Storage Manager', (group) => {
 			disks: {
 				local: {
 					driver: 'foo',
+					config: {},
 				},
 			},
 		});
 
 		class FooDriver extends Storage {}
-		storageManager.extend('foo', () => new FooDriver());
+		storageManager.registerDriver('foo', FooDriver);
 
 		assert.instanceOf(storageManager.disk('local'), FooDriver);
 	});
@@ -91,20 +93,14 @@ test.group('Storage Manager', (group) => {
 			default: 'local',
 			disks: {
 				local: {
-					root: '',
 					driver: 'local',
+					config: {
+						root: '',
+					},
 				},
 			},
 		});
 		const localWithDefaultConfig = storageManager.disk('local');
-		const localWithCustomConfig = storageManager.disk('local', {
-			root: '/test',
-		});
 		assert.instanceOf(localWithDefaultConfig, LocalFileSystemStorage);
-		assert.instanceOf(localWithCustomConfig, LocalFileSystemStorage);
-		// @ts-ignore
-		assert.notEqual(localWithDefaultConfig.$root, localWithCustomConfig.$root);
-		// @ts-ignore
-		assert.equal(localWithCustomConfig.$root, resolve('/test'));
 	});
 });

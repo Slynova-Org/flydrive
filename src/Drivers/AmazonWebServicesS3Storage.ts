@@ -37,7 +37,7 @@ export class AmazonWebServicesS3Storage extends Storage {
 	protected $driver: S3;
 	protected $bucket: string;
 
-	constructor(config: AmazonWebServicesS3Config) {
+	constructor(config: AmazonWebServicesS3StorageConfig) {
 		super();
 		// eslint-disable-next-line @typescript-eslint/no-var-requires
 		const S3 = require('aws-sdk/clients/s3');
@@ -87,7 +87,7 @@ export class AmazonWebServicesS3Storage extends Storage {
 	/**
 	 * Returns the driver.
 	 */
-	public driver(): unknown {
+	public driver(): S3 {
 		return this.$driver;
 	}
 
@@ -255,7 +255,7 @@ export class AmazonWebServicesS3Storage extends Storage {
 	}
 }
 
-export interface AmazonWebServicesS3Config extends ClientConfiguration {
+export interface AmazonWebServicesS3StorageConfig extends ClientConfiguration {
 	key: string;
 	secret: string;
 	bucket: string;

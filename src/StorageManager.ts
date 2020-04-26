@@ -5,34 +5,51 @@
  * @copyright Slynova - Romain Lanz <romain.lanz@slynova.ch>
  */
 
-import Drivers from './Drivers';
+import { AmazonWebServicesS3Storage } from './Drivers/AmazonWebServicesS3Storage';
+import { GoogleCloudStorage } from './Drivers/GoogleCloudStorage';
+import { LocalFileSystemStorage } from './Drivers/LocalFileSystemStorage';
 import Storage from './Storage';
 import { InvalidConfig, DriverNotSupported } from './Exceptions';
-import { StorageManagerConfig, StorageManagerDiskConfig } from './types';
+import { StorageManagerConfig, StorageManagerDiskConfig, StorageManagerSingleDiskConfig } from './types';
+
+interface StorageConstructor<T extends Storage = Storage> {
+	new (...args: any[]): T;
+}
 
 export default class StorageManager {
 	/**
-	 * Configuration of the storage manager.
+	 * Default disk.
 	 */
-	private _config: StorageManagerConfig;
-
-	private _disks: StorageManagerDiskConfig;
+	private _defaultDisk: string | undefined;
 
 	/**
-	 * List of drivers extended
+	 * Configured disks.
 	 */
-	private _extendedDrivers: Map<string, () => Storage> = new Map();
+	private _disksConfig: StorageManagerDiskConfig;
+
+	/**
+	 * Instantiated disks.
+	 */
+	private _disks: Map<string, Storage> = new Map();
+
+	/**
+	 * List of available drivers.
+	 */
+	private _drivers: Map<string, StorageConstructor<Storage>> = new Map();
 
 	constructor(config: StorageManagerConfig) {
-		this._config = config;
-		this._disks = config.disks || {};
+		this._defaultDisk = config.default;
+		this._disksConfig = config.disks || {};
+		this.registerDriver('s3', AmazonWebServicesS3Storage);
+		this.registerDriver('gcs', GoogleCloudStorage);
+		this.registerDriver('local', LocalFileSystemStorage);
 	}
 
 	/**
 	 * Get a disk instance.
 	 */
-	disk<T extends Storage>(name?: string, config?: unknown): T {
-		name = name || this._config.default;
+	disk<T extends Storage = Storage>(name?: string): T {
+		name = name || this._defaultDisk;
 
 		/**
 		 * No name is defined and neither there
@@ -42,7 +59,11 @@ export default class StorageManager {
 			throw InvalidConfig.missingDiskName();
 		}
 
-		const diskConfig = this._disks[name];
+		if (this._disks.has(name)) {
+			return this._disks.get(name) as T;
+		}
+
+		const diskConfig = this._disksConfig[name];
 
 		/**
 		 * Configuration for the defined disk is missing
@@ -58,32 +79,27 @@ export default class StorageManager {
 			throw InvalidConfig.missingDiskDriver(name);
 		}
 
-		/**
-		 * Call the custom driver constructor.
-		 */
-		const customDriver = this._extendedDrivers.get(diskConfig.driver);
-		if (customDriver) {
-			// eslint-disable-next-line @typescript-eslint/ban-ts-ignore
-			// @ts-ignore
-			return customDriver();
-		}
-
-		const Driver = Drivers[diskConfig.driver];
-
-		/**
-		 * Unable to pull driver from the drivers list
-		 */
+		const Driver = this._drivers.get(diskConfig.driver);
 		if (!Driver) {
 			throw DriverNotSupported.driver(diskConfig.driver);
 		}
 
-		return new Driver({ ...diskConfig, ...(config as object) });
+		const disk = new Driver(diskConfig.config);
+		this._disks.set(name, disk);
+		return disk as T;
+	}
+
+	addDisk(name: string, config: StorageManagerSingleDiskConfig): void {
+		if (this._disksConfig[name]) {
+			throw InvalidConfig.duplicateDiskName(name);
+		}
+		this._disksConfig[name] = config;
 	}
 
 	/**
 	 * Register a custom driver.
 	 */
-	public extend<T extends Storage>(name: string, handler: () => T): void {
-		this._extendedDrivers.set(name, handler);
+	public registerDriver<T extends Storage>(name: string, driver: StorageConstructor<T>): void {
+		this._drivers.set(name, driver);
 	}
 }

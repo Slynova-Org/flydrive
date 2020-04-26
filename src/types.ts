@@ -5,11 +5,39 @@
  * @copyright Slynova - Romain Lanz <romain.lanz@slynova.ch>
  */
 
+import { AmazonWebServicesS3Storage, AmazonWebServicesS3StorageConfig } from './Drivers/AmazonWebServicesS3Storage';
+import { GoogleCloudStorage, GoogleCloudStorageConfig } from './Drivers/GoogleCloudStorage';
+import { LocalFileSystemStorage, LocalFileSystemStorageConfig } from './Drivers/LocalFileSystemStorage';
+
+export type {
+	AmazonWebServicesS3Storage,
+	AmazonWebServicesS3StorageConfig,
+	GoogleCloudStorage,
+	GoogleCloudStorageConfig,
+	LocalFileSystemStorage,
+	LocalFileSystemStorageConfig,
+};
+
+export type StorageManagerSingleDiskConfig =
+	| {
+			driver: 's3';
+			config: AmazonWebServicesS3StorageConfig;
+	  }
+	| {
+			driver: 'gcs';
+			config: GoogleCloudStorageConfig;
+	  }
+	| {
+			driver: 'local';
+			config: LocalFileSystemStorageConfig;
+	  }
+	| {
+			driver: string;
+			config: unknown;
+	  };
+
 export interface StorageManagerDiskConfig {
-	[key: string]: {
-		driver: string;
-		[key: string]: unknown;
-	};
+	[key: string]: StorageManagerSingleDiskConfig;
 }
 
 export interface StorageManagerConfig {
