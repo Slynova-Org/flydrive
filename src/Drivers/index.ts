@@ -5,12 +5,12 @@
  * @copyright Slynova - Romain Lanz <romain.lanz@slynova.ch>
  */
 
-import { AWSS3 } from './AWSS3';
+import { AmazonWebServicesS3Storage } from './AmazonWebServicesS3Storage';
 import { GoogleCloudStorage } from './GoogleCloudStorage';
-import { LocalFileSystem } from './LocalFileSystem';
+import { LocalFileSystemStorage } from './LocalFileSystemStorage';
 
 export default {
-	s3: AWSS3,
+	s3: AmazonWebServicesS3Storage,
 	gcs: GoogleCloudStorage,
-	local: LocalFileSystem,
+	local: LocalFileSystemStorage,
 };

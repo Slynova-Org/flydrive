@@ -22,12 +22,12 @@ function handleError(err: Error, path: string, bucket: string): never {
 	}
 }
 
-export class AWSS3 extends Storage {
+export class AmazonWebServicesS3Storage extends Storage {
 	protected $driver: S3;
-	protected $config: AWSS3Config;
+	protected $config: AmazonWebServicesS3Config;
 	protected $bucket: string;
 
-	constructor(config: AWSS3Config) {
+	constructor(config: AmazonWebServicesS3Config) {
 		super();
 		// eslint-disable-next-line @typescript-eslint/no-var-requires
 		const S3 = require('aws-sdk/clients/s3');
@@ -44,10 +44,10 @@ export class AWSS3 extends Storage {
 
 	/**
 	 * Use a different bucket at runtime.
-	 * This method returns a new instance of AWSS3.
+	 * This method returns a new instance of AmazonWebServicesS3Storage.
 	 */
-	public bucket(bucket: string): AWSS3 {
-		return new AWSS3({
+	public bucket(bucket: string): AmazonWebServicesS3Storage {
+		return new AmazonWebServicesS3Storage({
 			...this.$config,
 			bucket,
 		});
@@ -234,7 +234,7 @@ export class AWSS3 extends Storage {
 	}
 }
 
-export interface AWSS3Config extends ClientConfiguration {
+export interface AmazonWebServicesS3Config extends ClientConfiguration {
 	key: string;
 	secret: string;
 	bucket: string;

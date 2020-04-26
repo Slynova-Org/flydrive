@@ -24,7 +24,7 @@ function handleError(err: Error & { code: string; path?: string }, fullPath: str
 	}
 }
 
-export class LocalFileSystem extends Storage {
+export class LocalFileSystemStorage extends Storage {
 	private $root: string;
 
 	constructor(config: LocalFileSystemConfig) {

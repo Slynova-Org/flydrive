@@ -52,19 +52,19 @@ storage.disk('awsCloud', customConfig); // Overwrite the default configuration o
 
 Each driver extends the abstract class [`Storage`](https://github.com/Slynova-Org/flydrive/blob/master/src/Storage.ts). This class will throw an exception for each methods by default. The driver needs to overwrite the methods it supports.
 
-The following method doesn't exist on the `LocalFileSystem` driver, therefore, it will throw an exception.
+The following method doesn't exist on the `LocalFileSystemStorage` driver, therefore, it will throw an exception.
 
 ```javascript
-// throws "E_METHOD_NOT_SUPPORTED: Method getSignedUrl is not supported for the driver LocalFileSystem"
+// throws "E_METHOD_NOT_SUPPORTED: Method getSignedUrl is not supported for the driver LocalFileSystemStorage"
 storage.disk('local').getSignedUrl();
 ```
 
 Since we are using TypeScript, you can make use of casting to get the real interface:
 
 ```typescript
-import { LocalFileSystem } from '@slynova/flydrive';
+import { LocalFileSystemStorage } from '@slynova/flydrive';
 
-storage.disk<LocalFileSystem>('local');
+storage.disk<LocalFileSystemStorage>('local');
 ```
 
 ### Response interface

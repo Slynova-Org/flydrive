@@ -11,9 +11,9 @@ import fs from 'fs-extra';
 import { Readable } from 'stream';
 
 import * as CE from '../../src/Exceptions';
-import { LocalFileSystem } from '../../src/Drivers/LocalFileSystem';
+import { LocalFileSystemStorage } from '../../src/Drivers/LocalFileSystemStorage';
 
-let storage: LocalFileSystem;
+let storage: LocalFileSystemStorage;
 
 function isWindowsDefenderError(error: { code: string }): boolean {
 	return error.code === 'EPERM';
@@ -36,7 +36,7 @@ function streamToString(stream: Readable): Promise<string> {
 test.group('Local Driver', (group) => {
 	group.before(async () => {
 		await fs.ensureDir(path.join(__dirname, 'storage'));
-		storage = new LocalFileSystem({ root: path.join(__dirname, 'storage') });
+		storage = new LocalFileSystemStorage({ root: path.join(__dirname, 'storage') });
 	});
 
 	group.afterEach(async () => {
