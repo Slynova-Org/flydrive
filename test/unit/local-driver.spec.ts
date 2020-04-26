@@ -66,7 +66,8 @@ test.group('Local Driver', (group) => {
 		await fs.outputFile(realFsPath('i_will_be_deleted'), '');
 
 		try {
-			await storage.delete('i_will_be_deleted');
+			const { wasDeleted } = await storage.delete('i_will_be_deleted');
+			assert.isTrue(wasDeleted);
 			const { exists } = await storage.exists('i_will_be_deleted');
 			assert.isFalse(exists);
 		} catch (error) {
@@ -76,13 +77,9 @@ test.group('Local Driver', (group) => {
 		}
 	});
 
-	test(`delete a file that doesn't exist`, async (assert) => {
-		assert.plan(1);
-		try {
-			await storage.delete('i_dont_exist');
-		} catch (error) {
-			assert.instanceOf(error, CE.FileNotFound);
-		}
+	test('delete a file that does not exist', async (assert) => {
+		const { wasDeleted } = await storage.delete('i_dont_exist');
+		assert.isFalse(wasDeleted);
 	});
 
 	test('move a file', async (assert) => {
@@ -171,17 +168,6 @@ test.group('Local Driver', (group) => {
 
 		const { content } = await storage.get('bar');
 		assert.equal(content, 'Foo related content');
-	});
-
-	test('append to exisiting file', async (assert) => {
-		await storage.put('object', ' World');
-		await storage.put('greeting', 'Hello');
-
-		const readStream = fs.createReadStream(realFsPath('object'));
-		await storage.append('greeting', readStream);
-
-		const { content } = await storage.get('greeting');
-		assert.equal(content, 'Hello World');
 	});
 
 	test('throw exception when unable to find file', async (assert) => {

@@ -100,21 +100,6 @@ await storage.disk('local').append('foo.txt', 'bar');
 </details>
 
 <details>
-<summary markdown="span"><code>bucket(name: string): Storage</code></summary>
-
-This method can be used to swap the bucket at runtime.
-It returns a new Storage instance.
-
-```javascript
-// Supported drivers: "s3", "gcs"
-
-storage.disk('cloud').bucket('anotherOne');
-// The following chained action will use the "anotherOne" bucket instead of the original one
-```
-
-</details>
-
-<details>
 <summary markdown="span"><code>copy(src: string, dest: string, options: object): Promise&lt;Response&gt;</code></summary>
 
 This method will copy a file to another location.
@@ -129,16 +114,20 @@ await storage.disk('local').copy('foo.txt', 'bar.txt');
 </details>
 
 <details>
-<summary markdown="span"><code>delete(location: string): Promise&lt;Response&gt;</code></summary>
+<summary markdown="span"><code>delete(location: string): Promise&lt;DeleteResponse&gt;</code></summary>
 
 This method will delete the file at the given location.
 
 ```javascript
 // Supported drivers: "local", "s3", "gcs"
 
-await storage.disk('local').delete('foo.txt');
-// foo.txt has been deleted
+const { wasDeleted } = await storage.disk('local').delete('foo.txt');
+// If a file named foo.txt has been deleted, wasDeleted is true.
 ```
+
+The value returned by this method will have a `wasDeleted` property that
+can be either a boolean (`true` if a file was deleted, `false` if there was
+no file to delete) or `null` (if no information about the file is available).
 
 </details>
 
@@ -148,9 +137,9 @@ await storage.disk('local').delete('foo.txt');
 This method returns the driver used if you need to do anything specific not supported by default.
 
 ```javascript
-storage.disk('local').driver(); // Returns "fs-extra"
-storage.disk('awsCloud').driver(); // Returns "aws-sdk"
-storage.disk('googleCloud').driver(); // Returns "@google-cloud/storage"
+storage.disk('local').driver(); // Returns the "fs-extra" module.
+storage.disk('awsCloud').driver(); // Returns an instance of the AWS S3 client.
+storage.disk('googleCloud').driver(); // Returns an instance of the the Google Cloud Storage client.
 // ....
 ```
 

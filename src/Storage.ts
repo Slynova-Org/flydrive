@@ -15,6 +15,7 @@ import {
 	SignedUrlOptions,
 	StatResponse,
 	FileListResponse,
+	DeleteResponse,
 } from './types';
 
 export default abstract class Storage {
@@ -23,17 +24,8 @@ export default abstract class Storage {
 	 *
 	 * Supported drivers: "local"
 	 */
-	append(location: string, content: Buffer | Readable | string, options: object): Promise<Response> {
+	append(location: string, content: Buffer | string): Promise<Response> {
 		throw new MethodNotSupported('append', this.constructor.name);
-	}
-
-	/**
-	 * Use a different bucket at runtime.
-	 *
-	 * Supported drivers: "s3", "gcs"
-	 */
-	bucket(name: string): void {
-		throw new MethodNotSupported('bucket', this.constructor.name);
 	}
 
 	/**
@@ -41,17 +33,19 @@ export default abstract class Storage {
 	 *
 	 * Supported drivers: "local", "s3", "gcs"
 	 */
-	copy(src: string, dest: string, options: object): Promise<Response> {
+	copy(src: string, dest: string): Promise<Response> {
 		throw new MethodNotSupported('copy', this.constructor.name);
 	}
 
 	/**
 	 * Delete existing file.
-	 * This method will not throw an exception if file doesn't exists.
+	 * The value returned by this method will have a `wasDeleted` property that
+	 * can be either a boolean (`true` if a file was deleted, `false` if there was
+	 * no file to delete) or `null` (if no information about the file is available).
 	 *
 	 * Supported drivers: "local", "s3", "gcs"
 	 */
-	delete(location: string): Promise<Response> {
+	delete(location: string): Promise<DeleteResponse> {
 		throw new MethodNotSupported('delete', this.constructor.name);
 	}
 

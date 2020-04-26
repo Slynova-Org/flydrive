@@ -53,3 +53,7 @@ export interface StatResponse extends Response {
 export interface FileListResponse extends Response {
 	path: string;
 }
+
+export interface DeleteResponse extends Response {
+	wasDeleted: boolean | null;
+}

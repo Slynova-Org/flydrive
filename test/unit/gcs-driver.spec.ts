@@ -3,7 +3,7 @@ import uuid from '@lukeed/uuid';
 import { Storage } from '@google-cloud/storage';
 
 import { GoogleCloudStorage } from '../../src/Drivers/GoogleCloudStorage';
-import { PermissionMissing, FileNotFound } from '../../src/Exceptions';
+import { FileNotFound } from '../../src/Exceptions';
 import { streamToString, getFlatList } from '../utils';
 
 const testBucket = 'flydrive-test';
@@ -32,22 +32,7 @@ test.group('GCS Driver', (group) => {
 		await storage.put(testFile, testString);
 	});
 	group.afterEach(async () => {
-		try {
-			await storage.delete(testFile);
-		} catch (e) {}
-		try {
-			await storage.delete(otherFile);
-		} catch (e) {}
-	});
-
-	test('change of bucket', async (assert) => {
-		assert.plan(1);
-		const newStorage = storage.bucket('other-bucket');
-		try {
-			await newStorage.put(testFile, testString);
-		} catch (error) {
-			assert.instanceOf(error, PermissionMissing);
-		}
+		await Promise.all([storage.delete(testFile), , storage.delete(otherFile)]);
 	});
 
 	test('copy a file', async (assert) => {
@@ -61,10 +46,16 @@ test.group('GCS Driver', (group) => {
 	}).timeout(5000);
 
 	test('delete a file', async (assert) => {
-		await storage.delete(testFile);
+		const { wasDeleted } = await storage.delete(testFile);
+		assert.isTrue(wasDeleted);
 
 		const { exists } = await storage.exists(testFile);
 		assert.isFalse(exists);
+	}).timeout(5000);
+
+	test('delete a file that does not exist', async (assert) => {
+		const { wasDeleted } = await storage.delete('not-exist');
+		assert.isFalse(wasDeleted);
 	}).timeout(5000);
 
 	test('get driver instance', (assert) => {

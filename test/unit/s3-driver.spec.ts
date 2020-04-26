@@ -11,6 +11,7 @@ import fs from 'fs-extra';
 import { AmazonWebServicesS3Storage, AmazonWebServicesS3Config } from '../../src/Drivers/AmazonWebServicesS3Storage';
 import { NoSuchBucket, FileNotFound } from '../../src/Exceptions';
 import { streamToString } from '../utils';
+import S3 from 'aws-sdk/clients/s3';
 
 const config: AmazonWebServicesS3Config = {
 	key: process.env.S3_KEY || '',
@@ -27,12 +28,11 @@ const config: AmazonWebServicesS3Config = {
 
 test.group('S3 Driver', (group) => {
 	const s3Driver = new AmazonWebServicesS3Storage(config);
-	const fileURL = (KEY) => `http://${s3Driver.driver().endpoint.host}/${process.env.S3_BUCKET}/${KEY}`;
+	const fileURL = (KEY) => `http://${(s3Driver.driver() as S3).endpoint.host}/${process.env.S3_BUCKET}/${KEY}`;
 
 	group.before(async () => {
 		// Create test bucket
-		await s3Driver
-			.driver()
+		await (s3Driver.driver() as S3)
 			.createBucket({
 				ACL: 'public-read',
 				Bucket: process.env.S3_BUCKET || '',
@@ -83,7 +83,8 @@ test.group('S3 Driver', (group) => {
 
 	test('delete existing file', async (assert) => {
 		await s3Driver.put('dummy-file.txt', 'Hello');
-		await s3Driver.delete('dummy-file.txt');
+		const { wasDeleted } = await s3Driver.delete('dummy-file.txt');
+		assert.isNull(wasDeleted);
 
 		const { exists } = await s3Driver.exists('dummy-file.txt');
 

@@ -17,21 +17,22 @@ import {
 	SignedUrlOptions,
 	StatResponse,
 	FileListResponse,
+	DeleteResponse,
 } from '../types';
 import { FileNotFound, PermissionMissing, UnknownException, AuthorizationRequired, WrongKeyPath } from '../Exceptions';
 
-function handleError(err: Error & { code?: number | string }, path: string): never {
+function handleError(err: Error & { code?: number | string }, path: string): Error {
 	switch (err.code) {
 		case 401:
-			throw new AuthorizationRequired(err, path);
+			return new AuthorizationRequired(err, path);
 		case 403:
-			throw new PermissionMissing(err, path);
+			return new PermissionMissing(err, path);
 		case 404:
-			throw new FileNotFound(err, path);
+			return new FileNotFound(err, path);
 		case 'ENOENT':
-			throw new WrongKeyPath(err, path);
+			return new WrongKeyPath(err, path);
 		default:
-			throw new UnknownException(err, String(err.code), path);
+			return new UnknownException(err, String(err.code), path);
 	}
 }
 
@@ -53,16 +54,6 @@ export class GoogleCloudStorage extends Storage {
 	}
 
 	/**
-	 * Use a different bucket at runtime.
-	 * This method returns a new instance of GoogleCloudStorage.
-	 */
-	public bucket(name: string): GoogleCloudStorage {
-		const newStorage = new GoogleCloudStorage(this.$config);
-		newStorage.$bucket = newStorage.$driver.bucket(name);
-		return newStorage;
-	}
-
-	/**
 	 * Copy a file to a location.
 	 */
 	public async copy(src: string, dest: string): Promise<Response> {
@@ -73,19 +64,25 @@ export class GoogleCloudStorage extends Storage {
 			const result = await srcFile.copy(destFile);
 			return { raw: result };
 		} catch (e) {
-			return handleError(e, src);
+			throw handleError(e, src);
 		}
 	}
 
 	/**
 	 * Delete existing file.
 	 */
-	public async delete(location: string): Promise<Response> {
+	public async delete(location: string): Promise<DeleteResponse> {
 		try {
 			const result = await this._file(location).delete();
-			return { raw: result };
+			return { raw: result, wasDeleted: true };
 		} catch (e) {
-			return handleError(e, location);
+			e = handleError(e, location);
+
+			if (e instanceof FileNotFound) {
+				return { raw: undefined, wasDeleted: false };
+			}
+
+			throw e;
 		}
 	}
 
@@ -104,7 +101,7 @@ export class GoogleCloudStorage extends Storage {
 			const result = await this._file(location).exists();
 			return { exists: result[0], raw: result };
 		} catch (e) {
-			return handleError(e, location);
+			throw handleError(e, location);
 		}
 	}
 
@@ -116,7 +113,7 @@ export class GoogleCloudStorage extends Storage {
 			const result = await this._file(location).download();
 			return { content: result[0].toString(encoding), raw: result };
 		} catch (e) {
-			return handleError(e, location);
+			throw handleError(e, location);
 		}
 	}
 
@@ -128,7 +125,7 @@ export class GoogleCloudStorage extends Storage {
 			const result = await this._file(location).download();
 			return { content: result[0], raw: result };
 		} catch (e) {
-			return handleError(e, location);
+			throw handleError(e, location);
 		}
 	}
 
@@ -144,7 +141,7 @@ export class GoogleCloudStorage extends Storage {
 			});
 			return { signedUrl: result[0], raw: result };
 		} catch (e) {
-			return handleError(e, location);
+			throw handleError(e, location);
 		}
 	}
 
@@ -160,7 +157,7 @@ export class GoogleCloudStorage extends Storage {
 				raw: result,
 			};
 		} catch (e) {
-			return handleError(e, location);
+			throw handleError(e, location);
 		}
 	}
 
@@ -191,7 +188,7 @@ export class GoogleCloudStorage extends Storage {
 			const result = await srcFile.move(destFile);
 			return { raw: result };
 		} catch (e) {
-			return handleError(e, src);
+			throw handleError(e, src);
 		}
 	}
 
@@ -212,7 +209,7 @@ export class GoogleCloudStorage extends Storage {
 			const result = await file.save(content, { resumable: false });
 			return { raw: result };
 		} catch (e) {
-			return handleError(e, location);
+			throw handleError(e, location);
 		}
 	}
 
@@ -238,7 +235,7 @@ export class GoogleCloudStorage extends Storage {
 					};
 				}
 			} catch (e) {
-				return handleError(e, prefix);
+				throw handleError(e, prefix);
 			}
 		} while (nextQuery);
 	}
