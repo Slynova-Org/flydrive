@@ -8,7 +8,7 @@
 import { Readable } from 'stream';
 import { dirname, join, resolve, relative, sep } from 'path';
 import { promises as fs } from 'fs';
-import fse from 'fs-extra';
+import * as fse from 'fs-extra';
 import Storage from '../Storage';
 import { FileNotFound, UnknownException, PermissionMissing } from '../Exceptions';
 import { isReadableStream, pipeline } from '../utils';
