@@ -3,6 +3,7 @@
   "version": "1.0.0-0",
   "description": "Flexible and Fluent way to manage storage in Node.js.",
   "main": "./build/index.js",
+  "types": "./build/index.d.ts",
   "license": "MIT",
   "keywords": [
     "storage",
