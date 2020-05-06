@@ -174,7 +174,7 @@ export class GoogleCloudStorage extends Storage {
 	 * status.
 	 */
 	public getUrl(location: string): string {
-		return `https://storage.cloud.google.com/${this.$bucket.name}/${location}`;
+		return `https://storage.googleapis.com/${this.$bucket.name}/${location}`;
 	}
 
 	/**
