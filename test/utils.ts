@@ -1,6 +1,6 @@
 import { Readable } from 'stream';
 
-import { Storage } from '../src';
+import { Storage } from '../packages/flydrive/src';
 
 export async function streamToString(stream: Readable): Promise<string> {
 	const chunks: string[] = [];

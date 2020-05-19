@@ -1,0 +1,49 @@
+{
+  "name": "@slynova/flydrive-gcs",
+  "version": "1.0.0",
+  "description": "Google Cloud Storage driver for @slynova/flydrive",
+  "homepage": "https://github.com/Slynova-Org/flydrive#readme",
+  "license": "MIT",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "keywords": [
+    "storage",
+    "filesystem",
+    "file",
+    "promise",
+    "async",
+    "google",
+    "cloud",
+    "flydrive"
+  ],
+  "author": "Romain Lanz <romain.lanz@slynova.ch>",
+  "contributors": [
+    "Michaël Zasso <targos@pm.me>"
+  ],
+  "files": [
+    "build"
+  ],
+  "scripts": {
+    "prepare": "tsc -b tsconfig.json"
+  },
+  "dependencies": {
+    "@google-cloud/storage": "^5.0.0"
+  },
+  "peerDependencies": {
+    "@slynova/flydrive": "^1.0.0"
+  },
+  "devDependencies": {
+    "@lukeed/uuid": "^1.0.1",
+    "@slynova/flydrive": "^1.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Slynova-Org/flydrive.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Slynova-Org/flydrive/issues"
+  }
+}

@@ -7,9 +7,9 @@
 
 import test from 'japa';
 
-import Storage from '../../src/Storage';
-import StorageManager from '../../src/StorageManager';
-import { LocalFileSystemStorage } from '../../src/Drivers/LocalFileSystemStorage';
+import Storage from '../src/Storage';
+import StorageManager from '../src/StorageManager';
+import { LocalFileSystemStorage } from '../src/LocalFileSystemStorage';
 
 test.group('Storage Manager', () => {
 	test('throw exception when no disk name is defined', (assert) => {

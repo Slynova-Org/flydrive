@@ -1,12 +1,12 @@
-import { Readable, pipeline as nodePipeline } from 'stream';
-import { promisify } from 'util';
-
 /**
  * @slynova/flydrive
  *
  * @license MIT
  * @copyright Slynova - Romain Lanz <romain.lanz@slynova.ch>
  */
+
+import { promisify } from 'util';
+import { Readable, pipeline as nodePipeline } from 'stream';
 
 /**
  * Returns a boolean indication if stream param

@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "allowSyntheticDefaultImports": true,
+    "baseUrl": ".",
+    "composite": true,
+    "declaration": true,
+    "declarationMap": true,
+    "esModuleInterop": true,
+    "lib": ["es2018"],
+    "moduleResolution": "node",
+    "module": "commonjs",
+    "target": "es2018",
+    "sourceMap": true,
+    "strict": true,
+  }
+}

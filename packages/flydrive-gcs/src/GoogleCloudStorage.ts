@@ -6,10 +6,18 @@
  */
 
 import { Readable } from 'stream';
-import { Storage as GCSDriver, StorageOptions, Bucket, File, GetFilesOptions } from '@google-cloud/storage';
-import Storage from '../Storage';
-import { isReadableStream, pipeline } from '../utils';
 import {
+	Storage as GCSDriver,
+	StorageOptions,
+	Bucket,
+	File,
+	GetFilesOptions,
+	GetFilesResponse,
+} from '@google-cloud/storage';
+import {
+	Storage,
+	isReadableStream,
+	pipeline,
 	Response,
 	ExistsResponse,
 	ContentResponse,
@@ -18,8 +26,12 @@ import {
 	StatResponse,
 	FileListResponse,
 	DeleteResponse,
-} from '../types';
-import { FileNotFound, PermissionMissing, UnknownException, AuthorizationRequired, WrongKeyPath } from '../Exceptions';
+	FileNotFound,
+	PermissionMissing,
+	UnknownException,
+	AuthorizationRequired,
+	WrongKeyPath,
+} from '@slynova/flydrive';
 
 function handleError(err: Error & { code?: number | string }, path: string): Error {
 	switch (err.code) {
@@ -108,7 +120,8 @@ export class GoogleCloudStorage extends Storage {
 	/**
 	 * Returns the file contents.
 	 */
-	public async get(location: string, encoding = 'utf-8'): Promise<ContentResponse<string>> {
+
+	public async get(location: string, encoding: BufferEncoding = 'utf-8'): Promise<ContentResponse<string>> {
 		try {
 			const result = await this._file(location).download();
 			return { content: result[0].toString(encoding), raw: result };
@@ -225,7 +238,7 @@ export class GoogleCloudStorage extends Storage {
 
 		do {
 			try {
-				const result = await this.$bucket.getFiles(nextQuery);
+				const result = (await this.$bucket.getFiles(nextQuery)) as GetFilesResponse;
 
 				nextQuery = result[1];
 				for (const file of result[0]) {
