@@ -8,12 +8,9 @@
 import test from 'japa';
 import fs from 'fs-extra';
 
-import {
-	AmazonWebServicesS3Storage,
-	AmazonWebServicesS3StorageConfig,
-} from '../../src/Drivers/AmazonWebServicesS3Storage';
-import { NoSuchBucket, FileNotFound } from '../../src/Exceptions';
-import { streamToString } from '../utils';
+import { AmazonWebServicesS3Storage, AmazonWebServicesS3StorageConfig } from '../src/AmazonWebServicesS3Storage';
+import { NoSuchBucket, FileNotFound } from '@slynova/flydrive';
+import { streamToString } from '../../../test/utils';
 import S3 from 'aws-sdk/clients/s3';
 
 const config: AmazonWebServicesS3StorageConfig = {

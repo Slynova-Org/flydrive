@@ -14,10 +14,10 @@ There are currently 3 drivers available:
 
 - `'local'`: Stores files on the local file system.
 - `'s3'`: Amazon S3 and other compatible services
-  - You need to install the `aws-sdk` package to be able to use this driver.
+  - You need to install the `@slynova/flydrive-s3` package to be able to use this driver.
   - This driver is compatible with DigitalOcean Spaces and Scaleway Object Storage.
 - `'gcs'`: Google Cloud Storage
-  - You need to install the `@google-cloud/storage` package to be able to use this driver.
+  - You need to install the `@slynova/flydrive-gcs` package to be able to use this driver.
 
 ---
 
@@ -79,7 +79,7 @@ contains the result from the original call made by the driver.
 
 ### Exceptions
 
-In case of runtime errors, `flydrive` will try to throw driver-agnostic exceptions.  
+In case of runtime errors, `flydrive` will try to throw driver-agnostic exceptions.
 Exceptions also have a `raw` property which contains the original error.
 
 ### Methods

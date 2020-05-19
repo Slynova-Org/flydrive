@@ -5,14 +5,14 @@
  * @copyright Slynova - Romain Lanz <romain.lanz@slynova.ch>
  */
 
-import { Readable } from 'stream';
-import { dirname, join, resolve, relative, sep } from 'path';
-import { promises as fs } from 'fs';
 import * as fse from 'fs-extra';
-import Storage from '../Storage';
-import { FileNotFound, UnknownException, PermissionMissing } from '../Exceptions';
-import { isReadableStream, pipeline } from '../utils';
-import { Response, ExistsResponse, ContentResponse, StatResponse, FileListResponse, DeleteResponse } from '../types';
+import { Readable } from 'stream';
+import { promises as fs } from 'fs';
+import { dirname, join, resolve, relative, sep } from 'path';
+import Storage from './Storage';
+import { isReadableStream, pipeline } from './utils';
+import { FileNotFound, UnknownException, PermissionMissing } from './Exceptions';
+import { Response, ExistsResponse, ContentResponse, StatResponse, FileListResponse, DeleteResponse } from './types';
 
 function handleError(err: Error & { code: string; path?: string }, location: string): Error {
 	switch (err.code) {

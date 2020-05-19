@@ -9,9 +9,9 @@ import test from 'japa';
 import path from 'path';
 import fs from 'fs-extra';
 
-import * as CE from '../../src/Exceptions';
-import { LocalFileSystemStorage } from '../../src/Drivers/LocalFileSystemStorage';
-import { streamToString, getFlatList } from '../utils';
+import * as CE from '../src/exceptions';
+import { LocalFileSystemStorage } from '../src/LocalFileSystemStorage';
+import { streamToString, getFlatList } from '../../../test/utils';
 
 let storage: LocalFileSystemStorage;
 

@@ -1,18 +1,9 @@
 {
-  "include": ["src/**/*"],
-  "exclude": ["node_modules"],
-  "compilerOptions": {
-    "allowSyntheticDefaultImports": true,
-    "declaration": true,
-    "esModuleInterop": true,
-    "lib": ["es2017"],
-    "module": "commonjs",
-    "moduleResolution": "node",
-    "noUnusedLocals": true,
-    "noUnusedParameters": false,
-    "outDir": "build",
-    "removeComments": false,
-    "strictNullChecks": true,
-    "target": "es2017"
-  }
+  "extends": "./tsconfig.settings.json",
+  "files": [],
+  "references": [
+    { "path": "packages/flydrive/tsconfig.json" },
+    { "path": "packages/flydrive-gcs/tsconfig.json" },
+    { "path": "packages/flydrive-s3/tsconfig.json" },
+  ]
 }

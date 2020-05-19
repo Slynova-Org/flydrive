@@ -1,0 +1,50 @@
+{
+  "name": "@slynova/flydrive-s3",
+  "version": "1.0.0",
+  "description": "AWS S3 driver for @slynova/flydrive",
+  "homepage": "https://github.com/Slynova-Org/flydrive#readme",
+  "license": "MIT",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "keywords": [
+    "storage",
+    "filesystem",
+    "file",
+    "aws",
+    "s3",
+    "promise",
+    "async",
+    "spaces",
+    "flydrive"
+  ],
+  "author": "Romain Lanz <romain.lanz@slynova.ch>",
+  "contributors": [
+    "Harminder Virk <virk@adonisjs.com>",
+    "Michaël Zasso <targos@pm.me>"
+  ],
+  "files": [
+    "build"
+  ],
+  "scripts": {
+    "prepare": "tsc -b tsconfig.json"
+  },
+  "dependencies": {
+    "aws-sdk": "^2.680.0"
+  },
+  "peerDependencies": {
+    "@slynova/flydrive": "^1.0.0"
+  },
+  "devDependencies": {
+    "@slynova/flydrive": "^1.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Slynova-Org/flydrive.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Slynova-Org/flydrive/issues"
+  }
+}

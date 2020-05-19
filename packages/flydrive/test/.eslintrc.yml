@@ -1,0 +1,3 @@
+rules:
+  # We need @ts-ignore to test invalid calls
+  '@typescript-eslint/ban-ts-ignore': off

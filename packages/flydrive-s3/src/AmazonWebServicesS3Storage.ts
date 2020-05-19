@@ -7,9 +7,12 @@
 
 import { Readable } from 'stream';
 import S3, { ClientConfiguration, ObjectList } from 'aws-sdk/clients/s3';
-import { Storage } from '..';
-import { UnknownException, NoSuchBucket, FileNotFound, PermissionMissing } from '../Exceptions';
 import {
+	Storage,
+	UnknownException,
+	NoSuchBucket,
+	FileNotFound,
+	PermissionMissing,
 	SignedUrlOptions,
 	Response,
 	ExistsResponse,
@@ -18,7 +21,7 @@ import {
 	StatResponse,
 	FileListResponse,
 	DeleteResponse,
-} from '../types';
+} from '@slynova/flydrive';
 
 function handleError(err: Error, path: string, bucket: string): Error {
 	switch (err.name) {
@@ -112,7 +115,7 @@ export class AmazonWebServicesS3Storage extends Storage {
 	/**
 	 * Returns the file contents.
 	 */
-	public async get(location: string, encoding = 'utf-8'): Promise<ContentResponse<string>> {
+	public async get(location: string, encoding: BufferEncoding = 'utf-8'): Promise<ContentResponse<string>> {
 		const bufferResult = await this.getBuffer(location);
 		return {
 			content: bufferResult.content.toString(encoding),

@@ -1,5 +1,6 @@
-/node_modules
-/build
+node_modules
+build
 
 .env
 gcp-key.json
+ts-config.tsbuildinfo
