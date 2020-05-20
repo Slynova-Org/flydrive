@@ -24,7 +24,7 @@ const config: AmazonWebServicesS3StorageConfig = {
 test.group('S3 Driver', () => {
 	const s3Driver = new AmazonWebServicesS3Storage(config);
 	const fileURL = (KEY: string): string =>
-		`http://${(s3Driver.driver() as S3).endpoint.host}/${process.env.S3_BUCKET}/${KEY}`;
+		`https://${(s3Driver.driver() as S3).endpoint.host}/${process.env.S3_BUCKET}/${KEY}`;
 
 	test("return false when file doesn't exists", async (assert) => {
 		const { exists } = await s3Driver.exists('some-file.jpg');
