@@ -9,10 +9,10 @@ RUN apk add --no-cache \
   g++
 
 COPY package.json ./
-COPY yarn.lock ./
+COPY package-lock.json ./
 
-RUN yarn
+RUN npm install
 
 COPY . .
 
-CMD ["yarn", "run", "test"]
+CMD ["npm", "run", "test"]
