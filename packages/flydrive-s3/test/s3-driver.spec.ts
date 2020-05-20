@@ -7,11 +7,11 @@
 
 import test from 'japa';
 import fs from 'fs-extra';
-
-import { AmazonWebServicesS3Storage, AmazonWebServicesS3StorageConfig } from '../src/AmazonWebServicesS3Storage';
-import { NoSuchBucket, FileNotFound } from '@slynova/flydrive';
-import { streamToString } from '../../../test/utils';
 import S3 from 'aws-sdk/clients/s3';
+import { NoSuchBucket, FileNotFound } from '@slynova/flydrive';
+
+import { streamToString } from '../../../test/utils';
+import { AmazonWebServicesS3Storage, AmazonWebServicesS3StorageConfig } from '../src/AmazonWebServicesS3Storage';
 
 const config: AmazonWebServicesS3StorageConfig = {
 	key: process.env.S3_KEY || '',
@@ -19,29 +19,12 @@ const config: AmazonWebServicesS3StorageConfig = {
 	secret: process.env.S3_SECRET || '',
 	bucket: process.env.S3_BUCKET || '',
 	region: process.env.S3_REGION || '',
-
-	// needed for docker
-
-	s3ForcePathStyle: true,
-	sslEnabled: false,
 };
 
-test.group('S3 Driver', (group) => {
+test.group('S3 Driver', () => {
 	const s3Driver = new AmazonWebServicesS3Storage(config);
-	const fileURL = (KEY) => `http://${(s3Driver.driver() as S3).endpoint.host}/${process.env.S3_BUCKET}/${KEY}`;
-
-	group.before(async () => {
-		// Create test bucket
-		await (s3Driver.driver() as S3)
-			.createBucket({
-				ACL: 'public-read',
-				Bucket: process.env.S3_BUCKET || '',
-				CreateBucketConfiguration: {
-					LocationConstraint: process.env.S3_REGION || '',
-				},
-			})
-			.promise();
-	});
+	const fileURL = (KEY: string): string =>
+		`http://${(s3Driver.driver() as S3).endpoint.host}/${process.env.S3_BUCKET}/${KEY}`;
 
 	test("return false when file doesn't exists", async (assert) => {
 		const { exists } = await s3Driver.exists('some-file.jpg');
