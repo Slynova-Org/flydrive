@@ -14,9 +14,9 @@ const storage = new GoogleCloudStorage({
 });
 
 // used to isolate tests in case of failures or other sessions running at the same time
-let folder;
-let testFile;
-let otherFile;
+let folder: string;
+let testFile: string;
+let otherFile: string;
 
 const testString = 'test-data';
 
@@ -102,7 +102,7 @@ test.group('GCS Driver', (group) => {
 
 	test('get a public URL', (assert) => {
 		const url = storage.getUrl(testFile);
-		assert.strictEqual(url, `https://storage.cloud.google.com/${testBucket}/${testFile}`);
+		assert.strictEqual(url, `https://storage.googleapis.com/${testBucket}/${testFile}`);
 	}).timeout(5000);
 
 	test('move a file', async (assert) => {
