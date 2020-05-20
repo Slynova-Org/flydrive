@@ -9,8 +9,8 @@ import fs from 'fs-extra';
 import S3 from 'aws-sdk/clients/s3';
 import { NoSuchBucket, FileNotFound } from '@slynova/flydrive';
 
-import { AmazonWebServicesS3Storage, AmazonWebServicesS3StorageConfig } from '../AmazonWebServicesS3Storage';
-import { streamToString } from '../../../../test/utils';
+import { AmazonWebServicesS3Storage, AmazonWebServicesS3StorageConfig } from '../src/AmazonWebServicesS3Storage';
+import { streamToString } from '../../../test/utils';
 
 const config: AmazonWebServicesS3StorageConfig = {
 	key: process.env.S3_KEY || '',

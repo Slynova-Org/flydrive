@@ -9,8 +9,8 @@ import uuid from '@lukeed/uuid';
 import { Storage } from '@google-cloud/storage';
 import { FileNotFound } from '@slynova/flydrive';
 
-import { GoogleCloudStorage } from '../GoogleCloudStorage';
-import { streamToString, getFlatList } from '../../../../test/utils';
+import { GoogleCloudStorage } from '../src/GoogleCloudStorage';
+import { streamToString, getFlatList } from '../../../test/utils';
 
 const testBucket = 'flydrive-test';
 const storage = new GoogleCloudStorage({
