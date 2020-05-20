@@ -34,7 +34,8 @@
   },
   "devDependencies": {
     "@lukeed/uuid": "^1.0.1",
-    "@slynova/flydrive": "^1.0.0"
+    "@slynova/flydrive": "^1.0.0",
+    "japa": "^3.0.1"
   },
   "publishConfig": {
     "access": "public"

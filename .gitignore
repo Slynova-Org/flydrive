@@ -3,4 +3,4 @@ build
 
 .env
 gcp-key.json
-ts-config.tsbuildinfo
+tsconfig.tsbuildinfo
