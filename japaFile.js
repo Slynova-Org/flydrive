@@ -3,7 +3,7 @@ require('dotenv').config();
 
 const configure = require('japa').configure;
 configure({
-	files: ['pagackes/**/*.spec.ts'],
+	files: ['packages/**/*.spec.ts'],
 	filter: (file) => {
 		if (process.env.GITHUB_ACTION) {
 			return true;
