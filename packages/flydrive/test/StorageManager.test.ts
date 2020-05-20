@@ -5,9 +5,9 @@
  * @copyright Slynova - Romain Lanz <romain.lanz@slynova.ch>
  */
 
-import Storage from '../Storage';
-import StorageManager from '../StorageManager';
-import { LocalFileSystemStorage } from '../LocalFileSystemStorage';
+import Storage from '../src/Storage';
+import StorageManager from '../src/StorageManager';
+import { LocalFileSystemStorage } from '../src/LocalFileSystemStorage';
 
 describe('Storage Manager', () => {
 	test('throw exception when no disk name is defined', () => {

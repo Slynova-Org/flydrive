@@ -8,9 +8,9 @@
 import path from 'path';
 import fs from 'fs-extra';
 
-import * as CE from '../exceptions';
-import { LocalFileSystemStorage } from '../LocalFileSystemStorage';
-import { streamToString, getFlatList } from '../../../../test/utils';
+import * as CE from '../src/exceptions';
+import { LocalFileSystemStorage } from '../src/LocalFileSystemStorage';
+import { streamToString, getFlatList } from '../../../test/utils';
 
 const storage = new LocalFileSystemStorage({ root: path.join(__dirname, 'storage') });
 
