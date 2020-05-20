@@ -31,6 +31,7 @@ test.group('GCS Driver', (group) => {
 		otherFile = `${folder}/sub/dir/other.txt`;
 		await storage.put(testFile, testString);
 	});
+
 	group.afterEach(async () => {
 		await Promise.all([storage.delete(testFile), , storage.delete(otherFile)]);
 	});
