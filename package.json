@@ -40,7 +40,7 @@
     "node-exceptions": "^4.0.1"
   },
   "devDependencies": {
-    "@google-cloud/storage": "^4.7.0",
+    "@google-cloud/storage": "^v5.0.1",
     "@lukeed/uuid": "^1.0.1",
     "@types/fs-extra": "^8.1.0",
     "@types/node": "^12.12.37",
