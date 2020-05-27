@@ -2,8 +2,8 @@
   "name": "root",
   "private": true,
   "scripts": {
-    "prepublishOnly": "lerna bootstrap",
-    "lint": "eslint --ext js,ts src test japaFile.js",
+    "prepare": "lerna bootstrap",
+    "lint": "eslint --ext js,ts packages test",
     "test": "jest"
   },
   "devDependencies": {
