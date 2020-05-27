@@ -11,6 +11,7 @@ import { InvalidConfig, DriverNotSupported } from './exceptions';
 import { StorageManagerConfig, StorageManagerDiskConfig, StorageManagerSingleDiskConfig } from './types';
 
 interface StorageConstructor<T extends Storage = Storage> {
+	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	new (...args: any[]): T;
 }
 

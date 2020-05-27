@@ -1,10 +1,7 @@
 name: Node.js tests
 on:
-  push:
-    branches:
-      - master
-      - develop
-  pull_request:
+  - push
+  - pull_request
 jobs:
   lint:
     runs-on: ubuntu-latest
@@ -16,16 +13,6 @@ jobs:
         run: npm run lint
   test:
     runs-on: ubuntu-latest
-    services:
-      localstack-s3:
-        image: localstack/localstack
-        env:
-          HOSTNAME: localhost
-          SERVICES: s3:5000
-          DEFAULT_REGION: eu-west-1
-        ports:
-          - '5000:5000'
-          - '8080:8080'
     strategy:
       fail-fast: false
       matrix:
@@ -39,11 +26,11 @@ jobs:
       - name: Install dependencies
         run: npm install
       - name: Run tests
-        run: npm run test:local
+        run: npm run test
         env:
           GCS_KEY: ${{secrets.GCS_KEY}}
-          S3_KEY: no_need
-          S3_SECRET: no_need
-          S3_ENDPOINT: http://localhost:5000
-          S3_BUCKET: testbucket
-          S3_REGION: eu-west-1
+          S3_KEY: ${{secrets.S3_KEY}}
+          S3_SECRET: ${{secrets.S3_SECRET}}
+          S3_ENDPOINT: ${{secrets.S3_ENDPOINT}}
+          S3_BUCKET: ${{secrets.S3_BUCKET}}
+          S3_REGION: ${{secrets.S3_REGION}}
