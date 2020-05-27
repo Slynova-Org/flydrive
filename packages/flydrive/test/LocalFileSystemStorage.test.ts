@@ -200,7 +200,8 @@ describe('Local Driver', () => {
 
 		const { size, modified } = await storage.getStat('foo');
 		expect(size).toEqual(testString.length);
-		expect(modified).toBeInstanceOf(Date);
+		// It seems that the Date constructor used in fs-extra is not the global one.
+		expect(modified.constructor.name).toStrictEqual('Date');
 	});
 
 	test('list files with no prefix and empty directory', async () => {
