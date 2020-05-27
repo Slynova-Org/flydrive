@@ -11,7 +11,7 @@ import { promises as fs } from 'fs';
 import { dirname, join, resolve, relative, sep } from 'path';
 import Storage from './Storage';
 import { isReadableStream, pipeline } from './utils';
-import { FileNotFound, UnknownException, PermissionMissing } from './Exceptions';
+import { FileNotFound, UnknownException, PermissionMissing } from './exceptions';
 import { Response, ExistsResponse, ContentResponse, StatResponse, FileListResponse, DeleteResponse } from './types';
 
 function handleError(err: Error & { code: string; path?: string }, location: string): Error {
