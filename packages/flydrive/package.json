@@ -1,6 +1,6 @@
 {
   "name": "@slynova/flydrive",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Flexible and Fluent way to manage storage in Node.js.",
   "homepage": "https://github.com/Slynova-Org/flydrive#readme",
   "license": "MIT",
