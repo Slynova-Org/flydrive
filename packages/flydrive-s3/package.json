@@ -1,6 +1,6 @@
 {
   "name": "@slynova/flydrive-s3",
-  "version": "1.0.1-alpha.0",
+  "version": "1.0.0",
   "description": "AWS S3 driver for @slynova/flydrive",
   "homepage": "https://github.com/Slynova-Org/flydrive#readme",
   "license": "MIT",
