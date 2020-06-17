@@ -5,9 +5,9 @@
  * @copyright Slynova - Romain Lanz <romain.lanz@slynova.ch>
  */
 
-import { LocalFileSystemStorage, LocalFileSystemStorageConfig } from './LocalFileSystemStorage';
+import { LocalFileSystemStorageConfig } from './LocalFileSystemStorage';
 
-export type { LocalFileSystemStorage, LocalFileSystemStorageConfig };
+export type { LocalFileSystemStorageConfig };
 
 export type StorageManagerSingleDiskConfig =
 	| {
