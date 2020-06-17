@@ -37,7 +37,7 @@ This class is a facade for the package and should be instantiated with a [config
 
 ```javascript
 const { StorageManager } = require('@slynova/flydrive');
-const storage = new StorageManager(config);
+const storage = new StorageManager(...);
 ```
 
 Once you instantiated the manager, you can use the `StorageManager#disk()` method to retrieve a disk an use it.
@@ -46,6 +46,20 @@ Once you instantiated the manager, you can use the `StorageManager#disk()` metho
 storage.disk(); // Returns the default disk (specified in the config)
 storage.disk('awsCloud'); // Returns the driver for the disk "s3"
 storage.disk('awsCloud', customConfig); // Overwrite the default configuration of the disk
+```
+
+## Registering External Driver
+
+After installing any external driver, like `@slynova/flydrive-gcs`, you need to register it inside our manager to be able to use it.
+
+The following is done by using the method `storage.registerDriver(name: string, Driver)`.
+
+```ts
+const { GoogleCloudStorage } = require('@slynova/flydrive-gcs');
+const { StorageManager } = require('@slynova/flydrive');
+const storage = new StorageManager(...);
+
+storage.registerDriver('gcs', GoogleCloudStorage);
 ```
 
 ## Driver's API
