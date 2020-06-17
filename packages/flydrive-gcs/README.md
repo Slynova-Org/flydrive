@@ -29,15 +29,15 @@ $ yarn add @slynova/flydrive-gcs
 const { GoogleCloudStorage } = require('@slynova/flydrive-gcs');
 const { StorageManager } = require('@slynova/flydrive');
 const storage = new StorageManager({
-	// ...
+  // ...
 
-	gcs: {
-		driver: 'gcs',
-		config: {
-			keyFilename: process.env.GCS_KEYFILENAME,
-			bucket: process.env.GCS_BUCKET,
-		},
-	},
+  gcs: {
+    driver: 'gcs',
+    config: {
+      keyFilename: process.env.GCS_KEYFILENAME,
+      bucket: process.env.GCS_BUCKET,
+    },
+  },
 });
 
 storage.registerDriver('gcs', GoogleCloudStorage);

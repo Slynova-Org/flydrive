@@ -29,18 +29,18 @@ $ yarn add @slynova/flydrive-s3
 const { AmazonWebServicesS3Storage } = require('@slynova/flydrive-s3');
 const { StorageManager } = require('@slynova/flydrive');
 const storage = new StorageManager({
-	// ...
+  // ...
 
-	s3: {
-		driver: 's3',
-		config: {
-			key: process.env.S3_KEY,
-			endpoint: process.env.S3_ENDPOINT,
-			secret: process.env.S3_SECRET,
-			bucket: process.env.S3_BUCKET,
-			region: process.env.S3_REGION,
-		},
-	},
+  s3: {
+    driver: 's3',
+    config: {
+      key: process.env.S3_KEY,
+      endpoint: process.env.S3_ENDPOINT,
+      secret: process.env.S3_SECRET,
+      bucket: process.env.S3_BUCKET,
+      region: process.env.S3_REGION,
+    },
+  },
 });
 
 storage.registerDriver('s3', AmazonWebServicesS3Storage);
