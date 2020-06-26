@@ -194,7 +194,7 @@ This method will return the file's content as a Buffer for the given location.
 ```javascript
 // Supported drivers: "local", "s3", "gcs"
 
-const { content } = await storage.disk('local').exists('foo.txt');
+const { content } = await storage.disk('local').getBuffer('foo.txt');
 ```
 
 </details>
