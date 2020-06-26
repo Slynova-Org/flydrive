@@ -33,7 +33,7 @@ $ yarn add @slynova/flydrive
 ```
 
 When you require the package in your file, it will give you access to the `StorageManager` class.
-This class is a facade for the package and should be instantiated with a [configuration object](https://github.com/Slynova-Org/flydrive/blob/master/test/stubs/config.ts).
+This class is a facade for the package and should be instantiated with a [configuration object](https://github.com/Slynova-Org/flydrive/blob/develop/examples/config.ts).
 
 ```javascript
 const { StorageManager } = require('@slynova/flydrive');
@@ -64,7 +64,7 @@ storage.registerDriver('gcs', GoogleCloudStorage);
 
 ## Driver's API
 
-Each driver extends the abstract class [`Storage`](https://github.com/Slynova-Org/flydrive/blob/master/src/Storage.ts). This class will throw an exception for each methods by default. The driver needs to overwrite the methods it supports.
+Each driver extends the abstract class [`Storage`](https://github.com/Slynova-Org/flydrive/blob/develop/packages/flydrive/src/Storage.ts). This class will throw an exception for each methods by default. The driver needs to overwrite the methods it supports.
 
 The following method doesn't exist on the `LocalFileSystemStorage` driver, therefore, it will throw an exception.
 
