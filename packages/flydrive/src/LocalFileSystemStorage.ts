@@ -6,7 +6,6 @@
  */
 
 import * as fse from 'fs-extra';
-import { Readable } from 'stream';
 import { promises as fs } from 'fs';
 import { dirname, join, resolve, relative, sep } from 'path';
 import Storage from './Storage';
@@ -144,7 +143,7 @@ export class LocalFileSystemStorage extends Storage {
 	/**
 	 * Returns a read stream for a file location.
 	 */
-	public getStream(location: string): Readable {
+	public getStream(location: string): NodeJS.ReadableStream {
 		return fse.createReadStream(this._fullPath(location));
 	}
 
@@ -180,7 +179,7 @@ export class LocalFileSystemStorage extends Storage {
 	 * Creates a new file.
 	 * This method will create missing directories on the fly.
 	 */
-	public async put(location: string, content: Buffer | Readable | string): Promise<Response> {
+	public async put(location: string, content: Buffer | NodeJS.ReadableStream | string): Promise<Response> {
 		const fullPath = this._fullPath(location);
 
 		try {
