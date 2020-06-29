@@ -46,7 +46,7 @@ export default class StorageManager {
 	 * Get the instantiated disks
 	 */
 	getDisks(): Map<string, Storage> {
-	return this._disks;
+		return this._disks;
 	}
 
 	/**
