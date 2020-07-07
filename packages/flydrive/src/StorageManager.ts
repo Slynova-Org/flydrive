@@ -43,6 +43,20 @@ export default class StorageManager {
 	}
 
 	/**
+	 * Get the instantiated disks
+	 */
+	getDisks(): Map<string, Storage> {
+		return this._disks;
+	}
+
+	/**
+	 * Get the registered drivers
+	 */
+	getDrivers(): Map<string, StorageConstructor<Storage>> {
+		return this._drivers;
+	}
+
+	/**
 	 * Get a disk instance.
 	 */
 	disk<T extends Storage = Storage>(name?: string): T {
