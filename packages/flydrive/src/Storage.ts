@@ -6,7 +6,6 @@
  * @copyright Slynova - Romain Lanz <romain.lanz@slynova.ch>
  */
 
-import { Readable } from 'stream';
 import { MethodNotSupported } from './exceptions';
 import {
 	Response,
@@ -109,7 +108,7 @@ export default abstract class Storage {
 	 *
 	 * Supported drivers: "local", "s3", "gcs"
 	 */
-	getStream(location: string): Readable {
+	getStream(location: string): NodeJS.ReadableStream {
 		throw new MethodNotSupported('getStream', this.constructor.name);
 	}
 
@@ -139,7 +138,7 @@ export default abstract class Storage {
 	 *
 	 * Supported drivers: "local", "s3", "gcs"
 	 */
-	put(location: string, content: Buffer | Readable | string): Promise<Response> {
+	put(location: string, content: Buffer | NodeJS.ReadableStream | string): Promise<Response> {
 		throw new MethodNotSupported('put', this.constructor.name);
 	}
 

@@ -5,7 +5,6 @@
  * @copyright Slynova - Romain Lanz <romain.lanz@slynova.ch>
  */
 
-import { Readable } from 'stream';
 import S3, { ClientConfiguration, ObjectList } from 'aws-sdk/clients/s3';
 import {
 	Storage,
@@ -182,7 +181,7 @@ export class AmazonWebServicesS3Storage extends Storage {
 	/**
 	 * Returns the stream for the given file.
 	 */
-	public getStream(location: string): Readable {
+	public getStream(location: string): NodeJS.ReadableStream {
 		const params = { Key: location, Bucket: this.$bucket };
 
 		return this.$driver.getObject(params).createReadStream();
@@ -216,7 +215,7 @@ export class AmazonWebServicesS3Storage extends Storage {
 	 * Creates a new file.
 	 * This method will create missing directories on the fly.
 	 */
-	public async put(location: string, content: Buffer | Readable | string): Promise<Response> {
+	public async put(location: string, content: Buffer | NodeJS.ReadableStream | string): Promise<Response> {
 		const params = { Key: location, Body: content, Bucket: this.$bucket };
 		try {
 			const result = await this.$driver.upload(params).promise();
