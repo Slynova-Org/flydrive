@@ -150,7 +150,7 @@ export class AmazonWebServicesS3Storage extends Storage {
 			const params = {
 				Key: location,
 				Bucket: this.$bucket,
-				Expiry: expiry,
+				Expires: expiry,
 			};
 
 			const result = await this.$driver.getSignedUrlPromise('getObject', params);
