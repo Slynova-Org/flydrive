@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.0.3](https://github.com/Slynova-Org/flydrive/compare/@slynova/flydrive-s3@1.0.2...@slynova/flydrive-s3@1.0.3) (2020-09-04)
+
+
+### Bug Fixes
+
+* **driver:s3:** change Expiry to Expires ([#154](https://github.com/Slynova-Org/flydrive/issues/154)) ([4792655](https://github.com/Slynova-Org/flydrive/commit/479265537521d2a238df801080575675633a5ae3))
+
+
+
+
+
 ## [1.0.2](https://github.com/Slynova-Org/flydrive/compare/@slynova/flydrive-s3@1.0.1...@slynova/flydrive-s3@1.0.2) (2020-07-07)
 
 

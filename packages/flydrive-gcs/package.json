@@ -1,6 +1,6 @@
 {
   "name": "@slynova/flydrive-gcs",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Google Cloud Storage driver for @slynova/flydrive",
   "homepage": "https://github.com/Slynova-Org/flydrive#readme",
   "license": "MIT",
@@ -34,7 +34,7 @@
   },
   "devDependencies": {
     "@lukeed/uuid": "^1.0.1",
-    "@slynova/flydrive": "^1.0.2"
+    "@slynova/flydrive": "^1.0.3"
   },
   "publishConfig": {
     "access": "public"
