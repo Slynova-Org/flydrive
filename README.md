@@ -300,8 +300,8 @@ This method will return an async iterator over all file names that start with `p
 // Supported drivers: "local", "s3", "gcs"
 
 const disk = storage.disk('local');
-for await (const filename of disk.flatList('a/b')) {
-  console.log(filename);
+for await (const file of disk.flatList('a/b')) {
+  console.log(file.path);
 }
 ```
 
