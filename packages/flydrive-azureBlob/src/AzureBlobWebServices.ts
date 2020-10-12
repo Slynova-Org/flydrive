@@ -37,11 +37,6 @@ export class AzureBlobWebServicesStorage extends Storage {
 
     } 
 
-    /**
-     * Copy a file to a location.
-     *
-     * Supported drivers: "local", "s3", "gcs"
-     */
     public async copy(src: string, dest: string): Promise<Response> {
         try {
             const source = this.$containerClient.getBlockBlobClient(src);
@@ -56,14 +51,7 @@ export class AzureBlobWebServicesStorage extends Storage {
         }
 
     }
-    /**
-     * Delete existing file.
-     * The value returned by this method will have a `wasDeleted` property that
-     * can be either a boolean (`true` if a file was deleted, `false` if there was
-     * no file to delete) or `null` (if no information about the file is available).
-     *
-     * Supported drivers: "local", "s3", "gcs"
-     */
+
     public async delete(location: string): Promise<DeleteResponse> {
         try {
             const result = await this.$containerClient.getBlockBlobClient(location).deleteIfExists();
@@ -73,20 +61,11 @@ export class AzureBlobWebServicesStorage extends Storage {
         }
 
     }
-    /**
-     * Returns the driver.
-     *
-     * Supported drivers: "local", "s3", "gcs"
-     */
+
     public driver(): BlobServiceClient {
         return this.$client;
     }
 
-    /**
-     * Determines if a file or folder already exists.
-     *
-     * Supported drivers: "local", "s3", "gcs"
-     */
     public async exists(location: string): Promise<ExistsResponse> {
         try {
             const result = await this.$containerClient.getBlockBlobClient(location).exists();
@@ -95,11 +74,7 @@ export class AzureBlobWebServicesStorage extends Storage {
             throw handleError(e, location);
         }
     }
-    /**
-     * Returns the file contents as a string.
-     *
-     * Supported drivers: "local", "s3", "gcs"
-     */
+
     public async get(location: string, encoding: BufferEncoding = 'utf-8'): Promise<ContentResponse<string>> {
         
         try {
@@ -112,11 +87,7 @@ export class AzureBlobWebServicesStorage extends Storage {
             throw new FileNotFound(e, location);
         }
     }
-    /**
-     * Returns the file contents as a Buffer.
-     *
-     * Supported drivers: "local", "s3", "gcs"
-     */
+
     public async getBuffer(location: string): Promise<ContentResponse<Buffer>> {
         try {
             const client = this.$containerClient.getBlobClient(location);
@@ -125,11 +96,7 @@ export class AzureBlobWebServicesStorage extends Storage {
             throw handleError(e, location);
         }
     }
-    /**
-     * Returns signed url for an existing file.
-     *
-     * Supported drivers: "s3", "gcs"
-     */
+
     public async getSignedUrl(location: string, options: SignedUrlOptions = {}): Promise<SignedUrlResponse> {
 		const { expiry = 900 } = options;
         
@@ -150,11 +117,7 @@ export class AzureBlobWebServicesStorage extends Storage {
             throw handleError(e, location);
         }
     }
-    /**
-     * Returns file's size and modification date.
-     *
-     * Supported drivers: "local", "s3", "gcs"
-     */
+
     public async getStat(location: string): Promise<StatResponse> {
         try {
             const props = await this.$containerClient.getBlobClient(location).getProperties();
@@ -167,30 +130,17 @@ export class AzureBlobWebServicesStorage extends Storage {
             throw handleError(e, location);
         }
     }
-    /**
-     * Returns the stream for the given file.
-     *
-     * Supported drivers: "local", "s3", "gcs"
-     */
+
+    // Commented out due to there not being any good ways to get a download stream in storage-blob. I might have missed something tho and it might be possible using download() as supplied bellow.
     // public getStream(location: string): NodeJS.ReadableStream {
     //     const stream = this.$containerClient.getBlobClient(location).download();
     //     return stream as NodeJS.ReadableStream;
     // }
-    /**
-     * Returns url for a given key. Note this method doesn't
-     * validates the existence of file or it's visibility
-     * status.
-     *
-     * Supported drivers: "s3", "gcs"
-     */
+
     public getUrl(location: string): string {
         return this.$containerClient.getBlobClient(location).url
     }
-    /**
-     * Move file to a new location.
-     *
-     * Supported drivers: "local", "s3", "gcs"
-     */
+    
     public async move(src: string, dest: string): Promise<Response> {
         const source = this.$containerClient.getBlockBlobClient(src);
         const target = this.$containerClient.getBlockBlobClient(dest);
@@ -202,12 +152,7 @@ export class AzureBlobWebServicesStorage extends Storage {
 
         return {raw: result};
     }
-    /**
-     * Creates a new file.
-     * This method will create missing directories on the fly.
-     *
-     * Supported drivers: "local", "s3", "gcs"
-     */
+
     public async put(location: string, content: Buffer | NodeJS.ReadableStream | string): Promise<Response> {
         const blockBlobClient = this.$containerClient.getBlockBlobClient(location);
         try {
@@ -223,11 +168,7 @@ export class AzureBlobWebServicesStorage extends Storage {
             throw handleError(e, location);
         }
     }
-    /**
-     * List files with a given prefix.
-     *
-     * Supported drivers: "local", "s3", "gcs"
-     */
+
     public async *flatList(prefix=''): AsyncIterable<FileListResponse> {
         try {
             const blobs = await this.$containerClient.listBlobsFlat();
