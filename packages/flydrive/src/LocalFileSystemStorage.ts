@@ -143,7 +143,7 @@ export class LocalFileSystemStorage extends Storage {
 	/**
 	 * Returns a read stream for a file location.
 	 */
-	public getStream(location: string): NodeJS.ReadableStream {
+	public async getStream(location: string): Promise<NodeJS.ReadableStream> {
 		return fse.createReadStream(this._fullPath(location));
 	}
 

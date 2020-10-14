@@ -107,7 +107,7 @@ describe('GCS Driver', () => {
 	});
 
 	test('get a readable stream', async () => {
-		const stream = storage.getStream(testFile);
+		const stream = await storage.getStream(testFile);
 		const result = await streamToString(stream);
 
 		expect(result).toStrictEqual(testString);
@@ -146,7 +146,7 @@ describe('GCS Driver', () => {
 	});
 
 	test('put a file from a stream', async () => {
-		const stream = storage.getStream(testFile);
+		const stream = await storage.getStream(testFile);
 		await storage.put(otherFile, stream);
 
 		const { content } = await storage.get(otherFile, 'utf-8');

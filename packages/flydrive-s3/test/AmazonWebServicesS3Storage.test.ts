@@ -49,7 +49,7 @@ describe('S3 Driver', () => {
 	});
 
 	test('create a new file from stream', async () => {
-		const readStream = fs.createReadStream(__filename);
+		const readStream = await fs.createReadStream(__filename);
 
 		await storage.put('stream-file.txt', readStream);
 		const { exists } = await storage.exists('stream-file.txt');
@@ -114,7 +114,7 @@ describe('S3 Driver', () => {
 	test('get file as stream', async () => {
 		await storage.put('dummy-file.txt', testString);
 
-		const stream = storage.getStream('dummy-file.txt');
+		const stream = await storage.getStream('dummy-file.txt');
 		const content = await streamToString(stream);
 		expect(content).toStrictEqual(testString);
 	});

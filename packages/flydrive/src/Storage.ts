@@ -108,7 +108,7 @@ export default abstract class Storage {
 	 *
 	 * Supported drivers: "local", "s3", "gcs"
 	 */
-	getStream(location: string): NodeJS.ReadableStream {
+	getStream(location: string): Promise<NodeJS.ReadableStream> {
 		throw new MethodNotSupported('getStream', this.constructor.name);
 	}
 

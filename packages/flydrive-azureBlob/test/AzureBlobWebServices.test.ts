@@ -4,6 +4,7 @@ import fs from 'fs-extra';
 
 import { FileNotFound, UnknownException } from '@slynova/flydrive';
 import { BlobServiceClient } from '@azure/storage-blob';
+import { streamToString } from '../../../test/utils';
 
 const config: AzureBlobWebServicesStorageConfig = {
     accountName: process.env.AZURE_ACCOUNT || '',
@@ -108,6 +109,24 @@ describe('Azure Driver', () => {
 		expect(size).toStrictEqual(testString.length);
 		expect(modified).toBeInstanceOf(Date);
 	});
+	
+	test('create a new file from stream', async () => {
+		const readStream = await fs.createReadStream(__filename);
+
+		await storage.put('stream-file.txt', readStream);
+		const { exists } = await storage.exists('stream-file.txt');
+
+		expect(exists).toBe(true);
+	});
+
+	test('get file as stream', async () => {
+		await storage.put('dummy-file.txt', testString);
+
+		const stream = await storage.getStream('dummy-file.txt');
+		const content = await streamToString(stream);
+		expect(content).toStrictEqual(testString);
+	});
+
 
 	test('get public url to a file', () => {
 		const url = storage.getUrl('dummy-file1.txt');
@@ -118,6 +137,7 @@ describe('Azure Driver', () => {
 		storage.delete("buffer-file.txt");
 		storage.delete("dummy-file.txt");
 		storage.delete("some-file.txt");
+		storage.delete("stream-file.txt");
 		storage.delete("subdir/some-file.txt");
 		storage.delete("stream-file.txt");
 	});

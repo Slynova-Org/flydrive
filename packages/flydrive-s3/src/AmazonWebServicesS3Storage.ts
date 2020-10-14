@@ -181,7 +181,7 @@ export class AmazonWebServicesS3Storage extends Storage {
 	/**
 	 * Returns the stream for the given file.
 	 */
-	public getStream(location: string): NodeJS.ReadableStream {
+	public async getStream(location: string): Promise<NodeJS.ReadableStream> {
 		const params = { Key: location, Bucket: this.$bucket };
 
 		return this.$driver.getObject(params).createReadStream();
