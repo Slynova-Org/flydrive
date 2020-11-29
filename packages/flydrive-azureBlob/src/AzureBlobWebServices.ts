@@ -131,7 +131,6 @@ export class AzureBlobWebServicesStorage extends Storage {
         }
     }
 
-    // Commented out due to there not being any good ways to get a download stream in storage-blob. I might have missed something tho and it might be possible using download() as supplied bellow.
     public async getStream(location: string): Promise<NodeJS.ReadableStream> {
         const stream = await this.$containerClient.getBlobClient(location).download();
 
