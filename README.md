@@ -119,7 +119,7 @@ await storage.disk('local').append('foo.txt', 'bar');
 This method will copy a file to another location.
 
 ```javascript
-// Supported drivers: "local", "s3", "gcs"
+// Supported drivers: "local", "s3", "gcs", "azureBlob"
 
 await storage.disk('local').copy('foo.txt', 'bar.txt');
 // foo.txt was copied to bar.txt
@@ -133,7 +133,7 @@ await storage.disk('local').copy('foo.txt', 'bar.txt');
 This method will delete the file at the given location.
 
 ```javascript
-// Supported drivers: "local", "s3", "gcs"
+// Supported drivers: "local", "s3", "gcs", "azureBlob"
 
 const { wasDeleted } = await storage.disk('local').delete('foo.txt');
 // If a file named foo.txt has been deleted, wasDeleted is true.
@@ -154,6 +154,7 @@ This method returns the driver used if you need to do anything specific not supp
 storage.disk('local').driver(); // Returns the "fs-extra" module.
 storage.disk('awsCloud').driver(); // Returns an instance of the AWS S3 client.
 storage.disk('googleCloud').driver(); // Returns an instance of the the Google Cloud Storage client.
+storage.disk('azureBlob').driver(); // Returns an instance of the azure-blob BlobServiceClient.
 // ....
 ```
 
@@ -165,7 +166,7 @@ storage.disk('googleCloud').driver(); // Returns an instance of the the Google C
 This method will determine if a file exists at the given location.
 
 ```javascript
-// Supported drivers: "local", "s3", "gcs"
+// Supported drivers: "local", "s3", "gcs", "azureBlob"
 
 const { exists } = await storage.disk('local').exists('foo.txt');
 // exists is true or false
@@ -179,7 +180,7 @@ const { exists } = await storage.disk('local').exists('foo.txt');
 This method will return the file's content as a string for the given location.
 
 ```javascript
-// Supported drivers: "local", "s3", "gcs"
+// Supported drivers: "local", "s3", "gcs", "azureBlob"
 
 const { content } = await storage.disk('local').get('foo.txt');
 ```
@@ -192,7 +193,7 @@ const { content } = await storage.disk('local').get('foo.txt');
 This method will return the file's content as a Buffer for the given location.
 
 ```javascript
-// Supported drivers: "local", "s3", "gcs"
+// Supported drivers: "local", "s3", "gcs", "azureBlob"
 
 const buffer = await storage.disk('local').getBuffer('foo.txt');
 ```
@@ -205,7 +206,7 @@ const buffer = await storage.disk('local').getBuffer('foo.txt');
 This method will return the signed url for an existing file.
 
 ```javascript
-// Supported drivers: "s3", "gcs"
+// Supported drivers: "s3", "gcs", "azureBlob"
 
 const { signedUrl } = await storage.disk('awsCloud').getSignedUrl('foo.txt');
 ```
@@ -218,7 +219,7 @@ const { signedUrl } = await storage.disk('awsCloud').getSignedUrl('foo.txt');
 This method will return the file's size (in bytes) and last modification date.
 
 ```javascript
-// Supported drivers: "local", "s3", "gcs"
+// Supported drivers: "local", "s3", "gcs", "azureBlob"
 
 const { size, modified } = await storage.disk('local').getStat('foo.txt');
 ```
@@ -244,7 +245,7 @@ const stream = storage.disk('local').getStream('foo.txt');
 This method will return a public URL for a given file.
 
 ```javascript
-// Supported drivers: "s3", "gcs"
+// Supported drivers: "s3", "gcs", "azureBlob"
 
 const uri = storage.disk('awsCloud').getUrl('foo.txt');
 ```
@@ -257,7 +258,7 @@ const uri = storage.disk('awsCloud').getUrl('foo.txt');
 This method will move the file to a new location.
 
 ```javascript
-// Supported drivers: "local", "s3", "gcs"
+// Supported drivers: "local", "s3", "gcs", "azureBlob"
 
 await storage.disk('local').move('foo.txt', 'newFolder/foo.txt');
 ```
@@ -270,7 +271,7 @@ await storage.disk('local').move('foo.txt', 'newFolder/foo.txt');
 This method will create a new file with the provided content.
 
 ```javascript
-// Supported drivers: "local", "s3", "gcs"
+// Supported drivers: "local", "s3", "gcs", "azureBlob"
 
 await storage.disk('local').put('bar.txt', 'Foobar');
 ```
@@ -297,7 +298,7 @@ await storage.disk('local').prepend('foo.txt', 'bar');
 This method will return an async iterator over all file names that start with `prefix` (recursive).
 
 ```javascript
-// Supported drivers: "local", "s3", "gcs"
+// Supported drivers: "local", "s3", "gcs", "azureBlob"
 
 const disk = storage.disk('local');
 for await (const file of disk.flatList('a/b')) {

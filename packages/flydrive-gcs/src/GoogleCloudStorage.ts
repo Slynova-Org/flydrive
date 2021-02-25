@@ -176,7 +176,7 @@ export class GoogleCloudStorage extends Storage {
 	/**
 	 * Returns the stream for the given file.
 	 */
-	public getStream(location: string): NodeJS.ReadableStream {
+	public async getStream(location: string): Promise<NodeJS.ReadableStream> {
 		return this._file(location).createReadStream();
 	}
 

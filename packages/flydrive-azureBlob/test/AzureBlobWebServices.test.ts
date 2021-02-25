@@ -1,34 +1,25 @@
-/**
- * @slynova/flydrive
- *
- * @license MIT
- * @copyright Slynova - Romain Lanz <romain.lanz@slynova.ch>
- */
+import {AzureBlobWebServicesStorageConfig, AzureBlobWebServicesStorage} from '../src/AzureBlobWebServices';
 
 import fs from 'fs-extra';
-import S3 from 'aws-sdk/clients/s3';
-import { NoSuchBucket, FileNotFound } from '@slynova/flydrive';
 
-import { AmazonWebServicesS3Storage, AmazonWebServicesS3StorageConfig } from '../src/AmazonWebServicesS3Storage';
+import { FileNotFound, UnknownException } from '@slynova/flydrive';
+import { BlobServiceClient } from '@azure/storage-blob';
 import { streamToString } from '../../../test/utils';
 
-const config: AmazonWebServicesS3StorageConfig = {
-	key: process.env.S3_KEY || '',
-	endpoint: process.env.S3_ENDPOINT || '',
-	secret: process.env.S3_SECRET || '',
-	bucket: process.env.S3_BUCKET || '',
-	region: process.env.S3_REGION || '',
-};
-
-const storage = new AmazonWebServicesS3Storage(config);
+const config: AzureBlobWebServicesStorageConfig = {
+    accountName: process.env.AZURE_ACCOUNT || '',
+    accountKey: process.env.AZURE_ACCOUNT_KEY || '',
+    containerName: process.env.AZURE_CONTAINER_NAME || ''
+}
+const storage = new AzureBlobWebServicesStorage(config);
 
 function fileURL(KEY: string): string {
-	return `https://${(storage.driver() as S3).endpoint.host}/${process.env.S3_BUCKET}/${KEY}`;
+	return `${(storage.driver() as BlobServiceClient).url}${config.containerName}/${KEY}`;
 }
 
 const testString = 'test-data';
 
-describe('S3 Driver', () => {
+describe('Azure Driver', () => {
 	test(`return false when file doesn't exists`, async () => {
 		const { exists } = await storage.exists('some-file.jpg');
 		expect(exists).toBe(false);
@@ -47,9 +38,17 @@ describe('S3 Driver', () => {
 		const { content } = await storage.get('some-file.txt');
 		expect(content).toStrictEqual(testString);
 	});
+	
+
+	test('create a new file in a subdir', async () => {
+		await storage.put('subdir/some-file.txt', testString);
+
+		const {content} = await storage.get('subdir/some-file.txt');
+		expect(content).toStrictEqual(testString);
+	});
 
 	test('create a new file from stream', async () => {
-		const readStream = await fs.createReadStream(__filename);
+		const readStream = fs.createReadStream(__filename);
 
 		await storage.put('stream-file.txt', readStream);
 		const { exists } = await storage.exists('stream-file.txt');
@@ -61,10 +60,10 @@ describe('S3 Driver', () => {
 		expect.assertions(1);
 
 		try {
-			const storage = new AmazonWebServicesS3Storage({ ...config, bucket: 'wrong' });
+			const storage = new AzureBlobWebServicesStorage({ ...config, containerName: 'wrong' });
 			await storage.put('dummy-file.txt', testString);
 		} catch (error) {
-			expect(error).toBeInstanceOf(NoSuchBucket);
+			expect(error).toBeInstanceOf(UnknownException);
 		}
 	});
 
@@ -72,7 +71,7 @@ describe('S3 Driver', () => {
 		await storage.put('dummy-file.txt', testString);
 
 		const { wasDeleted } = await storage.delete('dummy-file.txt');
-		expect(wasDeleted).toBe(null);
+		expect(wasDeleted).toBe(true);
 
 		const { exists } = await storage.exists('dummy-file.txt');
 		expect(exists).toBe(false);
@@ -110,6 +109,15 @@ describe('S3 Driver', () => {
 		expect(size).toStrictEqual(testString.length);
 		expect(modified).toBeInstanceOf(Date);
 	});
+	
+	test('create a new file from stream', async () => {
+		const readStream = await fs.createReadStream(__filename);
+
+		await storage.put('stream-file.txt', readStream);
+		const { exists } = await storage.exists('stream-file.txt');
+
+		expect(exists).toBe(true);
+	});
 
 	test('get file as stream', async () => {
 		await storage.put('dummy-file.txt', testString);
@@ -119,15 +127,18 @@ describe('S3 Driver', () => {
 		expect(content).toStrictEqual(testString);
 	});
 
+
 	test('get public url to a file', () => {
 		const url = storage.getUrl('dummy-file1.txt');
 		expect(url).toStrictEqual(fileURL('dummy-file1.txt'));
 	});
 
-	test('get public url to a file when region is not defined', () => {
-		const storage = new AmazonWebServicesS3Storage({ ...config, region: undefined });
-		const url = storage.getUrl('dummy-file1.txt');
-
-		expect(url).toStrictEqual(fileURL('dummy-file1.txt'));
+	test('cleanup all files', () => {
+		storage.delete("buffer-file.txt");
+		storage.delete("dummy-file.txt");
+		storage.delete("some-file.txt");
+		storage.delete("stream-file.txt");
+		storage.delete("subdir/some-file.txt");
+		storage.delete("stream-file.txt");
 	});
 });

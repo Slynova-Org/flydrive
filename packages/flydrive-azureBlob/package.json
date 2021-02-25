@@ -1,0 +1,49 @@
+{
+  "name": "flydrive-azureblob",
+  "version": "1.0.0",
+  "description": "Azure Blob driver for @slynova/flydrive",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "scripts": {
+    "prepare": "tsc -b tsconfig.json"
+  },
+  "keywords": [
+    "storage",
+    "filesystem",
+    "file",
+    "azure",
+    "azure-blob",
+    "promise",
+    "async",
+    "spaces",
+    "flydrive"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Slynova-Org/flydrive.git#readme"
+  },
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Slynova-Org/flydrive/issues"
+  },
+  
+  "author": "Romain Lanz <romain.lanz@slynova.ch>",
+  "contributors": [
+    "Robin Grundvåg <robgru52@gmail.com>"
+  ],
+  "homepage": "https://github.com/Slynova-Org/flydrive/tree/readme#readme",
+  "dependencies": {
+    "@azure/storage-blob": "^12.2.1"
+  },
+  "peerDependencies": {
+    "@slynova/flydrive": "^1.0.0"
+  },
+  "devDependencies": {
+    "@slynova/flydrive": "^1.0.3",
+    "@types/fs-extra": "^9.0.1",
+    "fs-extra": "^9.0.0"
+  },
+  "publishConfig": {
+    "access": "public"
+  }
+}

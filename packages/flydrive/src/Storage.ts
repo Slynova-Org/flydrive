@@ -31,7 +31,7 @@ export default abstract class Storage {
 	/**
 	 * Copy a file to a location.
 	 *
-	 * Supported drivers: "local", "s3", "gcs"
+	 * Supported drivers: "local", "s3", "gcs", "azureBlob"
 	 */
 	copy(src: string, dest: string): Promise<Response> {
 		throw new MethodNotSupported('copy', this.constructor.name);
@@ -43,7 +43,7 @@ export default abstract class Storage {
 	 * can be either a boolean (`true` if a file was deleted, `false` if there was
 	 * no file to delete) or `null` (if no information about the file is available).
 	 *
-	 * Supported drivers: "local", "s3", "gcs"
+	 * Supported drivers: "local", "s3", "gcs", "azureBlob"
 	 */
 	delete(location: string): Promise<DeleteResponse> {
 		throw new MethodNotSupported('delete', this.constructor.name);
@@ -52,7 +52,7 @@ export default abstract class Storage {
 	/**
 	 * Returns the driver.
 	 *
-	 * Supported drivers: "local", "s3", "gcs"
+	 * Supported drivers: "local", "s3", "gcs", "azureBlob"
 	 */
 	public driver(): unknown {
 		throw new MethodNotSupported('driver', this.constructor.name);
@@ -61,7 +61,7 @@ export default abstract class Storage {
 	/**
 	 * Determines if a file or folder already exists.
 	 *
-	 * Supported drivers: "local", "s3", "gcs"
+	 * Supported drivers: "local", "s3", "gcs", "azureBlob"
 	 */
 	exists(location: string): Promise<ExistsResponse> {
 		throw new MethodNotSupported('exists', this.constructor.name);
@@ -70,7 +70,7 @@ export default abstract class Storage {
 	/**
 	 * Returns the file contents as a string.
 	 *
-	 * Supported drivers: "local", "s3", "gcs"
+	 * Supported drivers: "local", "s3", "gcs", "azureBlob"
 	 */
 	get(location: string, encoding?: string): Promise<ContentResponse<string>> {
 		throw new MethodNotSupported('get', this.constructor.name);
@@ -79,7 +79,7 @@ export default abstract class Storage {
 	/**
 	 * Returns the file contents as a Buffer.
 	 *
-	 * Supported drivers: "local", "s3", "gcs"
+	 * Supported drivers: "local", "s3", "gcs", "azureBlob"
 	 */
 	getBuffer(location: string): Promise<ContentResponse<Buffer>> {
 		throw new MethodNotSupported('getBuffer', this.constructor.name);
@@ -88,7 +88,7 @@ export default abstract class Storage {
 	/**
 	 * Returns signed url for an existing file.
 	 *
-	 * Supported drivers: "s3", "gcs"
+	 * Supported drivers: "s3", "gcs", "azureBlob"
 	 */
 	getSignedUrl(location: string, options?: SignedUrlOptions): Promise<SignedUrlResponse> {
 		throw new MethodNotSupported('getSignedUrl', this.constructor.name);
@@ -97,7 +97,7 @@ export default abstract class Storage {
 	/**
 	 * Returns file's size and modification date.
 	 *
-	 * Supported drivers: "local", "s3", "gcs"
+	 * Supported drivers: "local", "s3", "gcs", "azureBlob"
 	 */
 	getStat(location: string): Promise<StatResponse> {
 		throw new MethodNotSupported('getStat', this.constructor.name);
@@ -108,7 +108,7 @@ export default abstract class Storage {
 	 *
 	 * Supported drivers: "local", "s3", "gcs"
 	 */
-	getStream(location: string): NodeJS.ReadableStream {
+	getStream(location: string): Promise<NodeJS.ReadableStream> {
 		throw new MethodNotSupported('getStream', this.constructor.name);
 	}
 
@@ -117,7 +117,7 @@ export default abstract class Storage {
 	 * validates the existence of file or it's visibility
 	 * status.
 	 *
-	 * Supported drivers: "s3", "gcs"
+	 * Supported drivers: "s3", "gcs", "azureBlob"
 	 */
 	getUrl(location: string): string {
 		throw new MethodNotSupported('getUrl', this.constructor.name);
@@ -126,7 +126,7 @@ export default abstract class Storage {
 	/**
 	 * Move file to a new location.
 	 *
-	 * Supported drivers: "local", "s3", "gcs"
+	 * Supported drivers: "local", "s3", "gcs", "azureBlob"
 	 */
 	move(src: string, dest: string): Promise<Response> {
 		throw new MethodNotSupported('move', this.constructor.name);
@@ -136,7 +136,7 @@ export default abstract class Storage {
 	 * Creates a new file.
 	 * This method will create missing directories on the fly.
 	 *
-	 * Supported drivers: "local", "s3", "gcs"
+	 * Supported drivers: "local", "s3", "gcs", "azureBlob"
 	 */
 	put(location: string, content: Buffer | NodeJS.ReadableStream | string): Promise<Response> {
 		throw new MethodNotSupported('put', this.constructor.name);
@@ -154,7 +154,7 @@ export default abstract class Storage {
 	/**
 	 * List files with a given prefix.
 	 *
-	 * Supported drivers: "local", "s3", "gcs"
+	 * Supported drivers: "local", "s3", "gcs", "azureBlob"
 	 */
 	flatList(prefix?: string): AsyncIterable<FileListResponse> {
 		throw new MethodNotSupported('flatList', this.constructor.name);

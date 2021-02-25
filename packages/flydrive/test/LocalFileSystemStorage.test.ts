@@ -168,7 +168,7 @@ describe('Local Driver', () => {
 	test('create file from stream', async () => {
 		await storage.put('foo', testString);
 
-		const readStream = fs.createReadStream(realFsPath('foo'));
+		const readStream = await fs.createReadStream(realFsPath('foo'));
 		await storage.put('bar', readStream);
 
 		const { content } = await storage.get('bar');
@@ -178,7 +178,7 @@ describe('Local Driver', () => {
 	test('throw exception when unable to find file', async () => {
 		expect.assertions(1);
 
-		const readStream = storage.getStream('foo');
+		const readStream = await storage.getStream('foo');
 
 		try {
 			await streamToString(readStream);
@@ -190,7 +190,7 @@ describe('Local Driver', () => {
 	test('get stream of a given file', async () => {
 		await storage.put('foo', testString);
 
-		const readStream = storage.getStream('foo');
+		const readStream = await storage.getStream('foo');
 		const content = await streamToString(readStream);
 		expect(content).toStrictEqual(testString);
 	});
