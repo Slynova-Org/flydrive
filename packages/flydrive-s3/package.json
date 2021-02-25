@@ -29,15 +29,15 @@
     "prepare": "tsc -b tsconfig.json"
   },
   "dependencies": {
-    "aws-sdk": "^2.680.0"
+    "aws-sdk": "^2.852.0"
   },
   "peerDependencies": {
-    "@slynova/flydrive": "^1.0.0"
+    "@slynova/flydrive": "^1.0.3"
   },
   "devDependencies": {
     "@slynova/flydrive": "^1.0.3",
-    "@types/fs-extra": "^9.0.1",
-    "fs-extra": "^9.0.0"
+    "@types/fs-extra": "^9.0.7",
+    "fs-extra": "^9.1.0"
   },
   "publishConfig": {
     "access": "public"

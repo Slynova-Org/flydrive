@@ -30,11 +30,11 @@
     "prepare": "tsc -b tsconfig.json"
   },
   "dependencies": {
-    "fs-extra": "^9.0.0",
+    "fs-extra": "^9.1.0",
     "node-exceptions": "^4.0.1"
   },
   "devDependencies": {
-    "@types/fs-extra": "^9.0.1"
+    "@types/fs-extra": "^9.0.7"
   },
   "publishConfig": {
     "access": "public"

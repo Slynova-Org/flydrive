@@ -27,13 +27,13 @@
     "prepare": "tsc -b tsconfig.json"
   },
   "dependencies": {
-    "@google-cloud/storage": "^5.0.0"
+    "@google-cloud/storage": "^5.8.0"
   },
   "peerDependencies": {
-    "@slynova/flydrive": "^1.0.0"
+    "@slynova/flydrive": "^1.0.3"
   },
   "devDependencies": {
-    "@lukeed/uuid": "^1.0.1",
+    "@lukeed/uuid": "^2.0.0",
     "@slynova/flydrive": "^1.0.3"
   },
   "publishConfig": {

@@ -5,7 +5,7 @@
  * @copyright Slynova - Romain Lanz <romain.lanz@slynova.ch>
  */
 
-import uuid from '@lukeed/uuid';
+import { v4 as uuid } from '@lukeed/uuid';
 import { Storage } from '@google-cloud/storage';
 import { FileNotFound } from '@slynova/flydrive';
 
