@@ -57,7 +57,7 @@ describe('S3 Driver', () => {
 		expect(exists).toBe(true);
 	});
 
-	test('check file content type', async () => {
+	test('check file content type on put', async () => {
 		const readStream = fs.createReadStream(__filename);
 
 		await storage.put('stream-file.txt', readStream);
@@ -65,6 +65,23 @@ describe('S3 Driver', () => {
 		const { raw } = await storage.getStat('stream-file.txt');
 
 		expect((raw as { ContentType: string }).ContentType).toBe('text/plain');
+	});
+
+	test('check file content type on move', async () => {
+		const readStream = fs.createReadStream(__filename);
+
+		await storage.put('stream-file.txt', readStream);
+		await storage.move('stream-file.txt', 'stream-file.js');
+
+		const { raw } = await storage.getStat('stream-file.js');
+
+		expect((raw as { ContentType: string }).ContentType).toBe('application/javascript');
+
+		await storage.move('stream-file.js', 'stream-file');
+
+		const { raw: rawOfSimpleFile } = await storage.getStat('stream-file');
+
+		expect((rawOfSimpleFile as { ContentType: string }).ContentType).toBe('application/octet-stream');
 	});
 
 	test('throw exception when unable to put file', async () => {

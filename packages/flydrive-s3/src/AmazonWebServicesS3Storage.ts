@@ -58,10 +58,16 @@ export class AmazonWebServicesS3Storage extends Storage {
 	 * Copy a file to a location.
 	 */
 	public async copy(src: string, dest: string): Promise<Response> {
+		const mime = getType(dest);
+
 		const params = {
 			Key: dest,
 			Bucket: this.$bucket,
 			CopySource: `/${this.$bucket}/${src}`,
+			// Prevent copy mime type from old src
+			// Default behavior of s3 sdk on first file put with empty ContentType is application/octet-stream
+			ContentType: mime || 'application/octet-stream',
+			MetadataDirective: 'REPLACE',
 		};
 
 		try {
