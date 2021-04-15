@@ -55,6 +55,7 @@ export class GoogleCloudStorage extends Storage {
 	public constructor(config: GoogleCloudStorageConfig) {
 		super();
 		this.$config = config;
+		// eslint-disable-next-line @typescript-eslint/no-var-requires
 		const GCSStorage = require('@google-cloud/storage').Storage;
 		this.$driver = new GCSStorage(config);
 		this.$bucket = this.$driver.bucket(config.bucket);
