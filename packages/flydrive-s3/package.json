@@ -29,7 +29,8 @@
     "prepare": "tsc -b tsconfig.json"
   },
   "dependencies": {
-    "aws-sdk": "^2.852.0"
+    "aws-sdk": "^2.852.0",
+    "mime": "^2.5.2"
   },
   "peerDependencies": {
     "@slynova/flydrive": "^1.0.3"
@@ -37,6 +38,7 @@
   "devDependencies": {
     "@slynova/flydrive": "^1.0.3",
     "@types/fs-extra": "^9.0.7",
+    "@types/mime": "^2.0.3",
     "fs-extra": "^9.1.0"
   },
   "publishConfig": {

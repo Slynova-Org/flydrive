@@ -6,6 +6,7 @@
  */
 
 import S3, { ClientConfiguration, ObjectList } from 'aws-sdk/clients/s3';
+import { getType } from 'mime';
 import {
 	Storage,
 	UnknownException,
@@ -57,10 +58,16 @@ export class AmazonWebServicesS3Storage extends Storage {
 	 * Copy a file to a location.
 	 */
 	public async copy(src: string, dest: string): Promise<Response> {
+		const mime = getType(dest);
+
 		const params = {
 			Key: dest,
 			Bucket: this.$bucket,
 			CopySource: `/${this.$bucket}/${src}`,
+			// Prevent copy mime type from old src
+			// Default behavior of s3 sdk on first file put with empty ContentType is application/octet-stream
+			ContentType: mime || 'application/octet-stream',
+			MetadataDirective: 'REPLACE',
 		};
 
 		try {
@@ -216,7 +223,9 @@ export class AmazonWebServicesS3Storage extends Storage {
 	 * This method will create missing directories on the fly.
 	 */
 	public async put(location: string, content: Buffer | NodeJS.ReadableStream | string): Promise<Response> {
-		const params = { Key: location, Body: content, Bucket: this.$bucket };
+		const mime = getType(location);
+
+		const params = { Key: location, Body: content, Bucket: this.$bucket, ContentType: mime || undefined };
 		try {
 			const result = await this.$driver.upload(params).promise();
 			return { raw: result };

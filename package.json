@@ -23,8 +23,7 @@
   "eslintConfig": {
     "extends": [
       "plugin:@typescript-eslint/recommended",
-      "prettier",
-      "prettier/@typescript-eslint"
+      "prettier"
     ],
     "parser": "@typescript-eslint/parser",
     "plugins": [
